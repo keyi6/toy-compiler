@@ -13,60 +13,23 @@
 #include <algorithm>
 using namespace std;
 
-// Token 种类
-extern const string TOKEN_STYLE[] = {
-        "KEY_WORD", "IDENTIFIER", "DIGIT_CONSTANT",
-        "OPERATOR", "SEPARATOR", "STRING_CONSTANT"
+
+// Token 类
+class Token {
+private:
+    string value;
+    string typeIndex;
+
+public:
+    Token();
+    Token(string _value, string _typeIndex);
+
+    static string TOKEN_STYLE[]; // Token 种类
+    static map<string, string> DETAIL_TOKEN_STYLE; // 将关键字、运算符、分隔符进行具体化
+    static string KEYWORDS[][5]; // 关键字
+    static string OPERATORS[]; // 运算符
+    static string DELIMITERS[]; // 分隔符
 };
 
-// 将关键字、运算符、分隔符进行具体化
-extern map<string, string> DETAIL_TOKEN_STYLE = {
-        {"include", "INCLUDE"},
-        {"int", "INT"},
-        {"float", "FLOAT"},
-        {"char", "CHAR"},
-        {"double", "DOUBLE"},
-        {"for", "FOR"},
-        {"if", "IF"},
-        {"else", "ELSE"},
-        {"while", "WHILE"},
-        {"do", "DO"},
-        {"return", "RETURN"},
-        {"=", "ASSIGN"},
-        {"&", "ADDRESS"},
-        {"<", "LT"},
-        {">", "GT"},
-        {"++", "SELF_PLUS"},
-        {"--", "SELF_MINUS"},
-        {"+", "PLUS"},
-        {"-", "MINUS"},
-        {"*", "MUL"},
-        {"/", "DIV"},
-        {">=", "GET"},
-        {"<=", "LET"},
-        {"(", "LL_BRACKET"},
-        {")", "RL_BRACKET"},
-        {"{", "LB_BRACKET"},
-        {"}", "RB_BRACKET"},
-        {"[", "LM_BRACKET"},
-        {"]", "RM_BRACKET"},
-        {",", "COMMA"},
-        {"\"", "DOUBLE_QUOTE"},
-        {";", "SEMICOLON"},
-        {"#", "SHARP"},
-};
 
-// 关键字
-extern const string KEYWORDS[][5] = {
-        {"int", "float", "double", "char", "void"},
-        {"if", "for", "while", "do", "else"},
-        {"include", "return"}
-};
 
-// 运算符
-extern const string operators[] = {
-        "=", "&", "<", ">", "++", "--", "+", "-", "*", "/", ">=", "<=", "!="
-};
-
-// 分隔符
-extern const string delimiters[] = {"(", ")", "{", "}", "[", "]", ",", "\"", ";" };
