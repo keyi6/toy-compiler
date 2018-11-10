@@ -1,1 +1,10 @@
 /.idea
+
+/CMakeFiles
+/cmake-build-debug
+/CMakeFiles
+
+CMakeCache.txt
+Makefile
+cmake_install.cmake
+toy_c_compiler.cbp
