@@ -8,3 +8,5 @@ CMakeCache.txt
 Makefile
 cmake_install.cmake
 toy_c_compiler.cbp
+
+toy_c_compiler
