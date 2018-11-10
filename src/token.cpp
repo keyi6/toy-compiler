@@ -7,13 +7,13 @@
 
 Token::Token() {}
 
-Token::Token(string _value, string _typeIndex) {
+Token::Token(string _value, int _typeIndex) {
     value = _value;
     typeIndex = _typeIndex;
 }
 
-string Token::TOKEN_STYLE[] = {"KEY_WORD", "IDENTIFIER", "DIGIT_CONSTANT",
-                               "OPERATOR", "SEPARATOR", "STRING_CONSTANT"};
+vector<string> Token::TOKEN_TYPE= {"KEY_WORD", "IDENTIFIER", "DIGIT_CONSTANT",
+                                     "OPERATOR", "SEPARATOR", "STRING_CONSTANT"};
 
 map<string, string> Token::DETAIL_TOKEN_STYLE = {
         {"include", "INCLUDE"},
@@ -51,14 +51,15 @@ map<string, string> Token::DETAIL_TOKEN_STYLE = {
         {"#", "SHARP"},
 };
 
-string Token::KEYWORDS[][5] = {
-        {"int", "float", "double", "char", "void"},
-        {"if", "for", "while", "do", "else"},
-        {"include", "return"}
+vector<string> Token::KEYWORDS = {
+        "int", "float", "double", "char", "void",
+        "if", "for", "while", "do", "else",
+        "include", "return"
 };
 
 
-string Token::OPERATORS[] = {"=", "&", "<", ">", "++", "--", "+", "-", "*", "/", ">=", "<=", "!=" };
+vector<string> Token::OPERATORS = {"=", "&", "<", ">", "++", "--", "+", "-", "*", "/", ">=", "<=", "!=" };
 
 
-string Token::DELIMITERS[] = {"(", ")", "{", "}", "[", "]", ",", "\"", ";" };
+
+vector<string> Token::DELIMITERS = {"(", ")", "{", "}", "[", "]", ",", "\"", ";" };

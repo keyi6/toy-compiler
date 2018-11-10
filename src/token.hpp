@@ -16,19 +16,18 @@ using namespace std;
 
 // Token 类
 class Token {
-private:
-    string value;
-    string typeIndex;
-
 public:
-    Token();
-    Token(string _value, string _typeIndex);
+    string value;
+    int typeIndex;
 
-    static string TOKEN_STYLE[]; // Token 种类
+    Token();
+    Token(string _value, int _typeIndex);
+
+    static vector<string> TOKEN_TYPE; // Token 种类
     static map<string, string> DETAIL_TOKEN_STYLE; // 将关键字、运算符、分隔符进行具体化
-    static string KEYWORDS[][5]; // 关键字
-    static string OPERATORS[]; // 运算符
-    static string DELIMITERS[]; // 分隔符
+    static vector<string> KEYWORDS; // 关键字
+    static vector<string> OPERATORS; // 运算符
+    static vector<string> DELIMITERS; // 分隔符
 };
 
 
