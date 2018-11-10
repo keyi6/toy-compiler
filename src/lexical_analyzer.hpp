@@ -14,24 +14,29 @@
 using namespace std;
 
 #include "token.hpp"
+#include "error.hpp"
 
 class LexicalAnalyzer {
 private:
     vector<Token> tokens;
+    vector<Error> errors;
     string sentence;
-    int curPos, len;
+    int curPos, curLineNumber, len;
 
     bool _isBlank();
-    bool _isKeywords(string word);
+    bool _isKeyword(string word);
+    bool _isSeparator(char ch);
+    bool _isOperator(char ch);
+
     void _skipBlank();
     void _init(string _sentence);
     void _analyze();
 
 
-    void _OUTPUT_TOKENS();
+    void _DEBUG_();
 
 
 public:
     LexicalAnalyzer();
-    void analyze(string _sentence);
+    void analyze(string _sentence, int lineNumber = 0);
 };

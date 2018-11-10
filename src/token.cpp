@@ -7,14 +7,16 @@
 
 Token::Token() {}
 
-Token::Token(string _value, int _typeIndex) {
+Token::Token(string _value, int _typeIndex, int _pos) {
     value = _value;
     typeIndex = _typeIndex;
+    pos = _pos;
 }
 
-vector<string> Token::TOKEN_TYPE= {"KEY_WORD", "IDENTIFIER", "DIGIT_CONSTANT",
-                                     "OPERATOR", "SEPARATOR", "STRING_CONSTANT"};
+vector<string> Token::TOKEN_TYPE= {"KEYWORD", "IDENTIFIER", "DIGIT_CONSTANT",
+                                   "OPERATOR", "SEPARATOR", "STRING_CONSTANT"};
 
+// TODO: complete with all keywords
 map<string, string> Token::DETAIL_TOKEN_STYLE = {
         {"include", "INCLUDE"},
         {"int", "INT"},
@@ -58,8 +60,10 @@ vector<string> Token::KEYWORDS = {
 };
 
 
-vector<string> Token::OPERATORS = {"=", "&", "<", ">", "++", "--", "+", "-", "*", "/", ">=", "<=", "!=" };
+vector<string> Token::OPERATORS = {"+",  "-",  "<",  ">", "!", "=", "|", "&", "*", "/",  // 0 - 9
+                                   "++", "--", "<<", ">>",         // 10 - 13
+                                               "<=", ">=", "!="};  // 14 - 16
 
 
 
-vector<string> Token::DELIMITERS = {"(", ")", "{", "}", "[", "]", ",", "\"", ";" };
+vector<char> Token::SEPARATORS = {'(', ')', '{', '}', '[', ']', ',', '\'', ';' };

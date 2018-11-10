@@ -18,17 +18,15 @@ using namespace std;
 class Token {
 public:
     string value;
-    int typeIndex;
+    int typeIndex, pos;
 
     Token();
-    Token(string _value, int _typeIndex);
+    Token(string _value, int _typeIndex, int _pos = 0);
 
     static vector<string> TOKEN_TYPE; // Token 种类
     static map<string, string> DETAIL_TOKEN_STYLE; // 将关键字、运算符、分隔符进行具体化
     static vector<string> KEYWORDS; // 关键字
     static vector<string> OPERATORS; // 运算符
-    static vector<string> DELIMITERS; // 分隔符
+    static vector<char> SEPARATORS; // 分隔符
 };
-
-
 
