@@ -1,7 +1,11 @@
-//
-// Created by Keyi Li on 2018/11/10.
-//
-
+/**
+ *
+ * @file token.hpp
+ * @brief Token类，用于识别Token
+ *
+ * @author Keyi Li
+ *
+ */
 #ifndef TOY_C_COMPILER_TOKEN_HPP
 #define TOY_C_COMPILER_TOKEN_HPP
 

@@ -1,8 +1,11 @@
-//
-// Created by Keyi Li on 2018/11/10.
-//
-
-
+/**
+ *
+ * @file token.hpp
+ * @brief Token类具体实现
+ *
+ * @author Keyi Li
+ *
+ */
 #include "token.hpp"
 
 Token::Token() {}

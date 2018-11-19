@@ -1,6 +1,11 @@
-//
-// Created by Keyi Li on 2018/11/10.
-//
+/**
+ *
+ * @file error.hpp
+ * @brief 错误类，用于报错
+ *
+ * @author Keyi Li
+ *
+ */
 
 #ifndef TOY_C_COMPILER_ERROR_HPP
 #define TOY_C_COMPILER_ERROR_HPP
@@ -10,13 +15,10 @@ using namespace std;
 
 
 class Error {
-private:
-    int lineNumber;
+public:
     string errorMsg;
 
-public:
-    Error(int _lineNumber, string _errorMsg);
-    void output();
+    Error(string _errorMsg);
 };
 
 
