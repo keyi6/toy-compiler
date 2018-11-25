@@ -9,7 +9,7 @@
 #ifndef TOY_C_COMPILER_SYNTAX_ANALYZER_HPP
 #define TOY_C_COMPILER_SYNTAX_ANALYZER_HPP
 
-#include "token.hpp"
+#include "token.h"
 
 class SyntaxTreeNode {
 public:

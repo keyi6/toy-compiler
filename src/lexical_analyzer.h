@@ -17,8 +17,8 @@
 #include <iomanip>
 using namespace std;
 
-#include "token.hpp"
-#include "error.hpp"
+#include "token.h"
+#include "error.h"
 
 class LexicalAnalyzer {
 private:

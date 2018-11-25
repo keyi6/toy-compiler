@@ -9,6 +9,6 @@ INCLUDE_DIRECTORIES(src)
 AUX_SOURCE_DIRECTORY(src DIR_SRCS)
 
 
-ADD_EXECUTABLE(${PROJECT_NAME} src/main.cpp src/token.hpp src/lexical_analyzer.cpp src/lexical_analyzer.hpp src/token.cpp src/error.cpp src/error.hpp src/syntax_analyzer.cpp src/syntax_analyzer.hpp)
+ADD_EXECUTABLE(${PROJECT_NAME} src/main.cc src/token.h src/lexical_analyzer.cc src/lexical_analyzer.h src/token.cc src/error.cc src/error.h src/syntax_analyzer.cc src/syntax_analyzer.h)
 
 

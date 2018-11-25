@@ -6,7 +6,7 @@
  * @author Keyi Li
  *
  */
-#include "token.hpp"
+#include "token.h"
 
 Token::Token() {}
 

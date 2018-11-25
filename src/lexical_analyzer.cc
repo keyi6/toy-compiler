@@ -6,7 +6,7 @@
  * @author Keyi Li
  *
  */
-#include "lexical_analyzer.hpp"
+#include "lexical_analyzer.h"
 
 #include <cctype>
 #include <string>

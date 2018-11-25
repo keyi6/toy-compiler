@@ -7,7 +7,7 @@
  *
  */
 
-#include "syntax_analyzer.hpp"
+#include "syntax_analyzer.h"
 
 /**
  * @brief 语法树节点构造函数

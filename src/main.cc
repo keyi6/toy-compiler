@@ -6,7 +6,7 @@
  * @author Keyi Li
  *
  */
-#include "lexical_analyzer.hpp"
+#include "lexical_analyzer.h"
 
 
 #include <vector>
@@ -41,7 +41,7 @@ vector<string> readSourceFile(string path) {
 
 
 int main() {
-    vector<string> source_file = readSourceFile("/Users/cjhahaha/Workspace/CompilePrinciple/test.c");
+    vector<string> source_file = readSourceFile("../test.c");
 
     LexicalAnalyzer la;
     la.analyze(source_file);
