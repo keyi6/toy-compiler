@@ -15,10 +15,13 @@ using namespace std;
 
 
 class Error {
-public:
+private:
     string errorMsg;
 
+public:
     Error(string _errorMsg);
+
+    friend ostream & operator << (ostream & out, Error & e);
 };
 
 

@@ -14,11 +14,10 @@ using namespace std;
 int main() {
     // TEST
     LexicalAnalyzer a;
-    //a.analyzeSentence("# include\"stdio\"");
     vector<string> v;
-    v.emplace_back("#include <stdio.h>");
+    v.emplace_back("#inlude <stdio.h>");
     v.emplace_back("int main() {");
     v.emplace_back("}");
-    a.analyze(v);
 
+    a.analyze(v);
 }

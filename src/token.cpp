@@ -70,3 +70,9 @@ vector<string> Token::OPERATORS = {"+",  "-",  "<",  ">", "!", "=", "|", "&", "*
 
 
 vector<char> Token::SEPARATORS = {'(', ')', '{', '}', '[', ']', ',', '\'', ';' };
+
+
+ostream & operator << (ostream & out, Token & t) {
+    out << "    [" <<  t.value << "]    type: " << Token::TOKEN_TYPE[t.typeIndex] << endl;
+    return out;
+}

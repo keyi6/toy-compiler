@@ -14,6 +14,8 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <iomanip>
+#include <iostream>
 #include <algorithm>
 using namespace std;
 
@@ -32,5 +34,7 @@ public:
     static vector<string> KEYWORDS; // 关键字
     static vector<string> OPERATORS; // 运算符
     static vector<char> SEPARATORS; // 分隔符
+
+    friend ostream & operator << (ostream &out, Token & t);
 };
 

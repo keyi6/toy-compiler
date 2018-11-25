@@ -22,9 +22,8 @@ using namespace std;
 
 class LexicalAnalyzer {
 private:
-    vector<Token> tokens;
+    vector<Token> tokens, allTokens;
     vector<Error> errors;
-    vector< vector<Token> > allTokens;
     string sentence;
     int curPos, curLineNumber, len;
 
@@ -39,11 +38,10 @@ private:
     void _init(string _sentence);
     void _analyze();
 
-    void _DEBUG_();
-
-
 public:
     LexicalAnalyzer();
+    vector<Token> getAllTokens();
+    vector<Error> getAllError();
     bool analyzeSentence(string _sentence);
     bool analyze(vector<string> _sentences);
 };

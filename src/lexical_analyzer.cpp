@@ -265,8 +265,6 @@ bool LexicalAnalyzer::analyzeSentence(string _sentence) {
     _init(_sentence);
     _analyze();
 
-    _DEBUG_();
-
     return ! errors.empty();
 }
 
@@ -288,36 +286,39 @@ bool LexicalAnalyzer::analyze(vector<string> _sentences) {
         _analyze();
 
         if (errors.empty()) {
-            // TODO: handle right
-
+            for (auto t: tokens)
+                allTokens.emplace_back(t);
         }
         else {
-            // TODO: handle not right
+            cout << "Errors!" << endl;
+            for (auto e: errors)
+                cout << e;
+
             return false;
         }
     }
+
+    cout << "Tokens\n";
+    for (auto t: allTokens)
+        cout << t;
 
     return true;
 }
 
 
 /**
- * @brief 用于调试，输出tokens列表和errors列表
+ * @brief 得到错误列表
+ * @return vector<Error>
  */
-void LexicalAnalyzer::_DEBUG_() {
-    cout << "TOKENS:\n";
-
-    for (auto t: tokens) {
-        cout << "    [";
-        cout << setw(10) << setfill(' ') << t.value;
-        cout << "]    type:";
-        cout << setw(15) << setfill(' ') << Token::TOKEN_TYPE[t.typeIndex];
-        cout << endl;
-    }
-
-    cout << "ERRORS:\n";
-    for (auto e: errors)
-        cout << "    " << e.errorMsg << endl;
+vector<Error> LexicalAnalyzer::getAllError() {
+    return errors;
 }
 
 
+/**
+ * @brief 得到Token列表
+ * @return vector<Token>
+ */
+vector<Token> LexicalAnalyzer::getAllTokens() {
+    return allTokens;
+}

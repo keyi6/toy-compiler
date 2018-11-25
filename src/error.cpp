@@ -22,3 +22,8 @@ using namespace std;
 Error::Error(string _errorMsg) {
     errorMsg = _errorMsg;
 }
+
+ostream & operator << (ostream & out, Error & e) {
+    out << "[Error]" << e.errorMsg << endl;
+    return out;
+}
