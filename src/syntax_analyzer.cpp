@@ -9,36 +9,51 @@
 
 #include "syntax_analyzer.hpp"
 
-/* SyntaxTreeNode */
-SyntaxTreeNode::SyntaxTreeNode() {
-    left = right = father = firstSon = NULL;
+/**
+ * @brief 语法树节点构造函数
+ */
+SyntaxTreeNode::SyntaxTreeNode(string _value, string _type, string _extra_info) {
+    left = right = father = first_son = nullptr;
+    value = _value;
+    type = _type;
+    extra_info = _extra_info;
 }
 
 
 
-/* SyntaxTree */
+/**
+ * @brief 语法树构造函数
+ */
 SyntaxTree::SyntaxTree() {
-    root = curNode = NULL;
+    root = cur_node = nullptr;
 }
 
 
 
-
-/* SyntaxAnalyzer */
-// TODO: constructor
+/**
+ * @brief 语法分析器构造函数
+ */
 SyntaxAnalyzer::SyntaxAnalyzer() {
-
 }
 
 
 
+/**
+ * @brief 进行语法分析
+ */
 // TODO: analyze
 void SyntaxAnalyzer::analyze() {
+    index = 0;
+    tree.cur_node = tree.root = new SyntaxTreeNode("Sentence");
 
 }
 
 
 
+
+/**
+ * @brief 处理申明语句
+ */
 void SyntaxAnalyzer::_statement() {
 
 }

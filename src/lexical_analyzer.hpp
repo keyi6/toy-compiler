@@ -22,10 +22,10 @@ using namespace std;
 
 class LexicalAnalyzer {
 private:
-    vector<Token> tokens, allTokens;
+    vector<Token> tokens, all_tokens;
     vector<Error> errors;
     string sentence;
-    int curPos, curLineNumber, len;
+    int cur_pos, cur_line_number, len;
 
     string _char2string(char ch);
 

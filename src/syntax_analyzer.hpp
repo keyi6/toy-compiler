@@ -13,32 +13,45 @@
 
 class SyntaxTreeNode {
 public:
-    Token t;
-    SyntaxTreeNode * left, * right, * father, * firstSon;
+    string value, type, extra_info;
+    SyntaxTreeNode * left, * right, * father, * first_son;
 
 
-    SyntaxTreeNode();
-
+    SyntaxTreeNode(string _value = "", string _type = "", string _extra_info = "");
 };
 
 
 class SyntaxTree {
-private:
-    SyntaxTreeNode * root, * curNode;
-
-
 public:
+    SyntaxTreeNode * root, * cur_node;
     SyntaxTree();
 };
+
 
 
 class SyntaxAnalyzer {
 private:
     int index;
+    vector<Token> tokens;
     SyntaxTree tree;
 
     void _statement();
+    /*
+     TODO
+    void _block();
+    void _include();
+    void _assignment();
+    void _expression();
+    void _control();
+    void _for();
+    void _while();
+    void _if();
+    void _functionStatement();
+    void _functionCall();
+    void _return();
 
+    void _judgeSentencePattern();
+    */
 public:
     SyntaxAnalyzer();
     void analyze();

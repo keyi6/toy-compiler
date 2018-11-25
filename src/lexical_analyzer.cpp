@@ -17,11 +17,8 @@ using namespace std;
 
 /**
  * @brief LexicalAnalyzer类构造函数
- * @return LexicalAnalyzer object 返回一个词法分析类
  */
-LexicalAnalyzer::LexicalAnalyzer() {
-    _init("");
-}
+LexicalAnalyzer::LexicalAnalyzer() { }
 
 /**
  * @brief 将字符转化为字符串
@@ -45,8 +42,8 @@ string LexicalAnalyzer::_char2string(char ch) {
  *      -<em>false</em> 不是空字符
  */
 bool LexicalAnalyzer::_isBlank() {
-    char curChar = sentence[curPos];
-    return (curChar == '\t' || curChar == '\n' || curChar == '\r' || curChar == ' ');
+    char cur_char = sentence[cur_pos];
+    return (cur_char == '\t' || cur_char == '\n' || cur_char == '\r' || cur_char == ' ');
 }
 
 
@@ -54,8 +51,8 @@ bool LexicalAnalyzer::_isBlank() {
  * @brief 自增curPos直到不为空
  */
 void LexicalAnalyzer::_skipBlank() {
-    while (curPos < len && _isBlank())
-        curPos ++;
+    while (cur_pos < len && _isBlank())
+        cur_pos ++;
 }
 
 
@@ -69,7 +66,7 @@ void LexicalAnalyzer::_init(string _sentence) {
 
     tokens.clear();
     errors.clear();
-    curPos = 0;
+    cur_pos = 0;
 }
 
 
@@ -125,39 +122,39 @@ bool LexicalAnalyzer::_isOperator(char ch) {
  * @brief 分析当前句子
  */
 void LexicalAnalyzer::_analyze() {
-    char curChar;
+    char cur_char;
 
-    while (curPos < len) {
+    while (cur_pos < len) {
         _skipBlank();
 
-        curChar = sentence[curPos];
+        cur_char = sentence[cur_pos];
 
         // #include
-        if (curChar == '#') {
-            tokens.emplace_back(Token("#", 4, curPos ++));
+        if (cur_char == '#') {
+            tokens.emplace_back(Token("#", 4, cur_pos ++));
             _skipBlank();
-            if (sentence.substr(curPos, 7) == "include") {
-                curPos += 7;
-                tokens.emplace_back(Token("include", 0, curPos));
+            if (sentence.substr(cur_pos, 7) == "include") {
+                cur_pos += 7;
+                tokens.emplace_back(Token("include", 0, cur_pos));
                 _skipBlank();
 
 
-                if (sentence[curPos] == '\"' || sentence[curPos] == '<') {
-                    curChar = sentence[curPos ++];
+                if (sentence[cur_pos] == '\"' || sentence[cur_pos] == '<') {
+                    cur_char = sentence[cur_pos ++];
 
-                    tokens.emplace_back(Token(_char2string(curChar), 4, curPos));
+                    tokens.emplace_back(Token(_char2string(cur_char), 4, cur_pos));
 
-                    char matchChar = curChar == '\"' ? '\"' : '>';
+                    char match_char = cur_char == '\"' ? '\"' : '>';
 
-                    int libNameStart = curPos, libNameLen = 0;
-                    while (curPos < len) {
-                        if (sentence[curPos] == matchChar) {
+                    int libNameStart = cur_pos, libNameLen = 0;
+                    while (cur_pos < len) {
+                        if (sentence[cur_pos] == match_char) {
                             tokens.emplace_back(Token(sentence.substr(libNameStart, libNameLen), 1, libNameStart));
-                            tokens.emplace_back(Token(_char2string(matchChar), 4, curPos));
+                            tokens.emplace_back(Token(_char2string(match_char), 4, cur_pos));
                             return;
                         }
                         else
-                            libNameLen ++, curPos ++;
+                            libNameLen ++, cur_pos ++;
                     }
 
                     errors.emplace_back(Error("include error"));
@@ -169,25 +166,26 @@ void LexicalAnalyzer::_analyze() {
             }
             return;
         }
-            // 关键字 和 标识符
-        else if (isalpha(curChar) || curChar == '_') {
-            int tempLen = 0;
-            while ((isalpha(sentence[curPos + tempLen]) || sentence[curPos + tempLen] == '_') && curPos + tempLen <= len)
-                tempLen ++;
+        // 关键字 和 标识符
+        else if (isalpha(cur_char) || cur_char == '_') {
+            int temp_len = 0;
+            while ((isalpha(sentence[cur_pos + temp_len]) || sentence[cur_pos + temp_len] == '_') && cur_pos + temp_len <= len)
+                temp_len ++;
 
-            string tempString = sentence.substr(curPos, tempLen);
-            int temp_typeIndex = _isKeyword(tempString) ? 0 : 1;
-            tokens.emplace_back(Token(tempString, temp_typeIndex, curPos));
+            string temp_str = sentence.substr(cur_pos, temp_len);
+            int temp_typeIndex = _isKeyword(temp_str) ? 0 : 1;
+            tokens.emplace_back(Token(temp_str, temp_typeIndex, cur_pos));
 
-            curPos += tempLen;
+            cur_pos += temp_len;
             continue;
         }
-            // 数字常量
-        else if (isdigit(curChar) || curChar == '.') {
-            int tempLen = 0;
+
+        // 数字常量
+        else if (isdigit(cur_char) || cur_char == '.') {
+            int temp_len = 0;
             bool hasDot = false;
-            while ((isdigit(sentence[curPos + tempLen]) || sentence[curPos + tempLen] == '.') && curPos + tempLen <= len) {
-                if (sentence[curPos + tempLen] == '.') {
+            while ((isdigit(sentence[cur_pos + temp_len]) || sentence[cur_pos + temp_len] == '.') && cur_pos + temp_len <= len) {
+                if (sentence[cur_pos + temp_len] == '.') {
                     if (not hasDot)
                         hasDot = true;
                     else {
@@ -196,59 +194,59 @@ void LexicalAnalyzer::_analyze() {
                     }
                 }
 
-                tempLen++;
+                temp_len++;
             }
 
-            tokens.emplace_back(Token(sentence.substr(curPos, tempLen), 2, curPos));
+            tokens.emplace_back(Token(sentence.substr(cur_pos, temp_len), 2, cur_pos));
 
-            curPos += tempLen;
+            cur_pos += temp_len;
             continue;
         }
-            // 分隔符 和 字符串常量
-        else if (_isSeparator(curChar)) {
-            string tempStr = sentence.substr(curPos, 1);
-            tokens.emplace_back(Token(tempStr, 4, curPos));
+        // 分隔符 和 字符串常量
+        else if (_isSeparator(cur_char)) {
+            string temp_str = sentence.substr(cur_pos, 1);
+            tokens.emplace_back(Token(temp_str, 4, cur_pos));
 
-            int tempLen = 0;
-            if (curChar == '\"' || curChar == '\'') {
-                curPos ++;
+            int temp_len = 0;
+            if (cur_char == '\"' || cur_char == '\'') {
+                cur_pos ++;
 
-                while (sentence[curPos + tempLen] != curChar && curPos + tempLen < len)
-                    tempLen ++;
+                while (sentence[cur_pos + temp_len] != cur_char && cur_pos + temp_len < len)
+                    temp_len ++;
 
-                if (curPos + tempLen >= len || sentence[curPos + tempLen] != curChar) {
-                    errors.emplace_back("Lack of " + _char2string(curChar) + ".");
+                if (cur_pos + temp_len >= len || sentence[cur_pos + temp_len] != cur_char) {
+                    errors.emplace_back("Lack of " + _char2string(cur_char) + ".");
                     return;
                 }
 
-                tokens.emplace_back(Token(sentence.substr(curPos, tempLen), 5, curPos + 1));
-                curPos += tempLen;
-                tokens.emplace_back(Token(tempStr, 4, curPos + 1));
+                tokens.emplace_back(Token(sentence.substr(cur_pos, temp_len), 5, cur_pos + 1));
+                cur_pos += temp_len;
+                tokens.emplace_back(Token(temp_str, 4, cur_pos + 1));
             }
 
-            curPos ++;
+            cur_pos ++;
             continue;
         }
-            // 运算符
-        else if (_isOperator(curChar)) {
+        // 运算符
+        else if (_isOperator(cur_char)) {
             // ++ -- << >>
-            if ((curChar == '+' || curChar == '-' || curChar == '<' || curChar == '>') && curPos + 1 < len && sentence[curPos + 1] == curChar) {
-                tokens.emplace_back(Token(sentence.substr(curPos, 2), 3, curPos));
-                curPos += 2;
+            if ((cur_char == '+' || cur_char == '-' || cur_char == '<' || cur_char == '>') && cur_pos + 1 < len && sentence[cur_pos + 1] == cur_char) {
+                tokens.emplace_back(Token(sentence.substr(cur_pos, 2), 3, cur_pos));
+                cur_pos += 2;
             }
                 // <= >= !=
-            else if ((curChar == '<' || curChar == '>' || curChar == '!') && curPos + 1 < len && sentence[curPos + 1] == '=') {
-                tokens.emplace_back(Token(sentence.substr(curPos, 2), 3, curPos));
-                curPos += 2;
+            else if ((cur_char == '<' || cur_char == '>' || cur_char == '!') && cur_pos + 1 < len && sentence[cur_pos + 1] == '=') {
+                tokens.emplace_back(Token(sentence.substr(cur_pos, 2), 3, cur_pos));
+                cur_pos += 2;
             }
                 // 一位的运算符
             else {
-                tokens.emplace_back(Token(sentence.substr(curPos, 1), 3, curPos));
-                curPos ++;
+                tokens.emplace_back(Token(sentence.substr(cur_pos, 1), 3, cur_pos));
+                cur_pos ++;
             }
         }
 
-        curPos ++;
+        cur_pos ++;
     }
 
 }
@@ -276,18 +274,18 @@ bool LexicalAnalyzer::analyzeSentence(string _sentence) {
  *      -<em>false</em> 有错误
  */
 bool LexicalAnalyzer::analyze(vector<string> _sentences) {
-    curLineNumber = 0;
-    allTokens.clear();
+    cur_line_number = 0;
+    all_tokens.clear();
 
     int line = _sentences.size();
     for (auto _s: _sentences) {
-        curLineNumber ++;
+        cur_line_number ++;
         _init(_s);
         _analyze();
 
         if (errors.empty()) {
             for (auto t: tokens)
-                allTokens.emplace_back(t);
+                all_tokens.emplace_back(t);
         }
         else {
             cout << "Errors!" << endl;
@@ -299,7 +297,7 @@ bool LexicalAnalyzer::analyze(vector<string> _sentences) {
     }
 
     cout << "Tokens\n";
-    for (auto t: allTokens)
+    for (auto t: all_tokens)
         cout << t;
 
     return true;
@@ -320,5 +318,5 @@ vector<Error> LexicalAnalyzer::getAllError() {
  * @return vector<Token>
  */
 vector<Token> LexicalAnalyzer::getAllTokens() {
-    return allTokens;
+    return all_tokens;
 }
