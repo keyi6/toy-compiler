@@ -7,8 +7,8 @@
  *
  */
 
-#include "syntax_analyzer.h"
-#include "lexical_analyzer.h"
+#include "../include/syntax_analyzer.h"
+#include "../include/lexical_analyzer.h"
 
 #include <queue>
 #include <iostream>
@@ -165,7 +165,7 @@ void SyntaxAnalyzer::_analyze() {
                 _statement(tree -> cur_node);
                 break;
             case int(SENTENCE_PATTERN_ENUM::FUNCTION_STATEMENT):
-                _functionStatement();
+                _functionStatement(tree -> root);
                 break;
             case int(SENTENCE_PATTERN_ENUM::FUNCTION_CALL):
                 _functionCall();
@@ -272,11 +272,9 @@ void SyntaxAnalyzer::_include(SyntaxTreeNode * father_node) {
 /**
  * @brief 处理函数声明
  */
-void SyntaxAnalyzer::_functionStatement() {
-    cout << "Function StateMENT" << endl;
-
+void SyntaxAnalyzer::_functionStatement(SyntaxTreeNode * father_node) {
     exit(0);
-    // TODO
+    SyntaxTree * func_state_tree = new SyntaxTree();
 }
 
 
@@ -294,6 +292,4 @@ void SyntaxAnalyzer::_functionCall() {
  */
 void SyntaxAnalyzer::_block(SyntaxTreeNode * father_node) {
     // TODO
-    index += 1;
-
 }

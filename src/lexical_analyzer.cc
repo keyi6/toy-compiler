@@ -8,7 +8,7 @@
  */
 
 
-#include "lexical_analyzer.h"
+#include "../include/lexical_analyzer.h"
 
 #include <cctype>
 #include <string>
@@ -285,7 +285,6 @@ bool LexicalAnalyzer::analyze(vector<string> _sentences, bool verbose) {
     cur_line_number = 0;
     all_tokens.clear();
 
-    int line = _sentences.size();
     for (auto _s: _sentences) {
         cur_line_number ++;
         _init(_s);

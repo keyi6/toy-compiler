@@ -60,11 +60,11 @@ private:
 
     void _analyze();
 
-    void _functionStatement();
-    void _functionCall();
     void _include(SyntaxTreeNode * father_node);
-
+    void _functionStatement(SyntaxTreeNode * father_node);
+    void _functionCall();
     void _statement(SyntaxTreeNode * father_node);
+
     void _block(SyntaxTreeNode * father_node);
     /*
      TODO

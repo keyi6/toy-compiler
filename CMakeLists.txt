@@ -1,14 +1,26 @@
 cmake_minimum_required(VERSION 3.2)
 
-PROJECT(toy_c_compiler)
+PROJECT(awesomeCC)
 
-add_definitions(-std=c++11)
-
-INCLUDE_DIRECTORIES(src)
-
-AUX_SOURCE_DIRECTORY(src DIR_SRCS)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 
 
-ADD_EXECUTABLE(${PROJECT_NAME} src/main.cc src/token.h src/lexical_analyzer.cc src/lexical_analyzer.h src/token.cc src/error.cc src/error.h src/syntax_analyzer.cc src/syntax_analyzer.h)
+include_directories(
+        ${PROJECT_SOURCE_DIR}/src
+        ${PROJECT_SOURCE_DIR}/include
+        ${PROJECT_SOURCE_DIR}/test)
+
+
+file(GLOB SOURCES "src/*.cc")
+file(GLOB HEADERS "include/*.h")
+file(GLOB TESTFILES "test/*.cc")
+
+
+# 编译成库
+add_library(awesomecc_lib ${HEADERS} ${SOURCES} )
+
+# 编译成可执行文件
+add_executable(awesomeCC app/main.cc ${HEADERS} ${SOURCES} )
 
 
