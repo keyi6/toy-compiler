@@ -1,12 +1,13 @@
 /**
  *
- * @file main.cpp
+ * @file main.cc
  * @brief 入口文件
  *
  * @author Keyi Li
  *
  */
 #include "lexical_analyzer.h"
+#include "syntax_analyzer.h"
 
 
 #include <vector>
@@ -14,6 +15,7 @@
 #include <fstream>
 #include <iostream>
 using namespace std;
+
 
 /**
  * @brief 读取源文件
@@ -43,6 +45,6 @@ vector<string> readSourceFile(string path) {
 int main() {
     vector<string> source_file = readSourceFile("../test.c");
 
-    LexicalAnalyzer la;
-    la.analyze(source_file);
+    SyntaxAnalyzer sa;
+    sa.analyze(source_file);
 }

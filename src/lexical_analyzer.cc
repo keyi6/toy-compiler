@@ -1,11 +1,13 @@
 /**
  *
- * @file lexical_analyzer.cpp
+ * @file lexical_analyzer.cc
  * @brief 词法分析器，具体实现
  *
  * @author Keyi Li
  *
  */
+
+
 #include "lexical_analyzer.h"
 
 #include <cctype>
@@ -15,10 +17,14 @@
 #include <iostream>
 using namespace std;
 
+
 /**
  * @brief LexicalAnalyzer类构造函数
  */
-LexicalAnalyzer::LexicalAnalyzer() { }
+LexicalAnalyzer::LexicalAnalyzer() {
+
+}
+
 
 /**
  * @brief 将字符转化为字符串
@@ -34,6 +40,7 @@ string LexicalAnalyzer::_char2string(char ch) {
 
     return ret;
 }
+
 
 /**
  * @brief 判断curPos处是否为空字符
@@ -70,7 +77,6 @@ void LexicalAnalyzer::_init(string _sentence) {
 }
 
 
-
 /**
  * @brief 判断是否是关键词
  * @param word string, 等待分析的词
@@ -85,6 +91,7 @@ bool LexicalAnalyzer::_isKeyword(string word) {
 
     return false;
 }
+
 
 /**
  * @brief 判断是否是分隔符
@@ -131,26 +138,25 @@ void LexicalAnalyzer::_analyze() {
 
         // #include
         if (cur_char == '#') {
-            tokens.emplace_back(Token("#", 4, cur_pos ++));
+            tokens.emplace_back(Token("#", TOKEN_TYPE_ENUM::SEPARATOR, cur_pos ++));
             _skipBlank();
-            if (sentence.substr(cur_pos, 7) == "include") {
+            if (cur_pos + 7 < len && sentence.substr(cur_pos, 7) == "include") {
                 cur_pos += 7;
-                tokens.emplace_back(Token("include", 0, cur_pos));
+                tokens.emplace_back(Token("include", TOKEN_TYPE_ENUM::KEYWORD, cur_pos));
                 _skipBlank();
-
 
                 if (sentence[cur_pos] == '\"' || sentence[cur_pos] == '<') {
                     cur_char = sentence[cur_pos ++];
 
-                    tokens.emplace_back(Token(_char2string(cur_char), 4, cur_pos));
+                    tokens.emplace_back(Token(_char2string(cur_char), TOKEN_TYPE_ENUM::SEPARATOR, cur_pos));
 
                     char match_char = cur_char == '\"' ? '\"' : '>';
 
                     int libNameStart = cur_pos, libNameLen = 0;
                     while (cur_pos < len) {
                         if (sentence[cur_pos] == match_char) {
-                            tokens.emplace_back(Token(sentence.substr(libNameStart, libNameLen), 1, libNameStart));
-                            tokens.emplace_back(Token(_char2string(match_char), 4, cur_pos));
+                            tokens.emplace_back(Token(sentence.substr(libNameStart, libNameLen), TOKEN_TYPE_ENUM::IDENTIFIER, libNameStart));
+                            tokens.emplace_back(Token(_char2string(match_char), TOKEN_TYPE_ENUM::SEPARATOR, cur_pos));
                             return;
                         }
                         else
@@ -162,19 +168,19 @@ void LexicalAnalyzer::_analyze() {
             }
             else {
                 errors.emplace_back(Error("include error"));
-
             }
             return;
         }
         // 关键字 和 标识符
         else if (isalpha(cur_char) || cur_char == '_') {
             int temp_len = 0;
-            while ((isalpha(sentence[cur_pos + temp_len]) || sentence[cur_pos + temp_len] == '_') && cur_pos + temp_len <= len)
+            while (cur_pos + temp_len <= len && (isalpha(sentence[cur_pos + temp_len]) || sentence[cur_pos + temp_len] == '_') )
                 temp_len ++;
 
             string temp_str = sentence.substr(cur_pos, temp_len);
-            int temp_typeIndex = _isKeyword(temp_str) ? 0 : 1;
-            tokens.emplace_back(Token(temp_str, temp_typeIndex, cur_pos));
+            tokens.emplace_back(Token(temp_str,
+                                      _isKeyword(temp_str) ? TOKEN_TYPE_ENUM::KEYWORD : TOKEN_TYPE_ENUM::IDENTIFIER,
+                                      cur_pos));
 
             cur_pos += temp_len;
             continue;
@@ -197,7 +203,7 @@ void LexicalAnalyzer::_analyze() {
                 temp_len++;
             }
 
-            tokens.emplace_back(Token(sentence.substr(cur_pos, temp_len), 2, cur_pos));
+            tokens.emplace_back(Token(sentence.substr(cur_pos, temp_len), TOKEN_TYPE_ENUM::DIGIT_CONSTANT, cur_pos));
 
             cur_pos += temp_len;
             continue;
@@ -205,7 +211,7 @@ void LexicalAnalyzer::_analyze() {
         // 分隔符 和 字符串常量
         else if (_isSeparator(cur_char)) {
             string temp_str = sentence.substr(cur_pos, 1);
-            tokens.emplace_back(Token(temp_str, 4, cur_pos));
+            tokens.emplace_back(Token(temp_str, TOKEN_TYPE_ENUM::SEPARATOR, cur_pos));
 
             int temp_len = 0;
             if (cur_char == '\"' || cur_char == '\'') {
@@ -219,9 +225,9 @@ void LexicalAnalyzer::_analyze() {
                     return;
                 }
 
-                tokens.emplace_back(Token(sentence.substr(cur_pos, temp_len), 5, cur_pos + 1));
+                tokens.emplace_back(Token(sentence.substr(cur_pos, temp_len), TOKEN_TYPE_ENUM::STRING_CONSTANT, cur_pos + 1));
                 cur_pos += temp_len;
-                tokens.emplace_back(Token(temp_str, 4, cur_pos + 1));
+                tokens.emplace_back(Token(temp_str, TOKEN_TYPE_ENUM::SEPARATOR, cur_pos + 1));
             }
 
             cur_pos ++;
@@ -231,17 +237,17 @@ void LexicalAnalyzer::_analyze() {
         else if (_isOperator(cur_char)) {
             // ++ -- << >>
             if ((cur_char == '+' || cur_char == '-' || cur_char == '<' || cur_char == '>') && cur_pos + 1 < len && sentence[cur_pos + 1] == cur_char) {
-                tokens.emplace_back(Token(sentence.substr(cur_pos, 2), 3, cur_pos));
+                tokens.emplace_back(Token(sentence.substr(cur_pos, 2), TOKEN_TYPE_ENUM::OPERATOR, cur_pos));
                 cur_pos += 2;
             }
-                // <= >= !=
+            // <= >= !=
             else if ((cur_char == '<' || cur_char == '>' || cur_char == '!') && cur_pos + 1 < len && sentence[cur_pos + 1] == '=') {
-                tokens.emplace_back(Token(sentence.substr(cur_pos, 2), 3, cur_pos));
+                tokens.emplace_back(Token(sentence.substr(cur_pos, 2), TOKEN_TYPE_ENUM::OPERATOR, cur_pos));
                 cur_pos += 2;
             }
-                // 一位的运算符
+            // 一位的运算符
             else {
-                tokens.emplace_back(Token(sentence.substr(cur_pos, 1), 3, cur_pos));
+                tokens.emplace_back(Token(sentence.substr(cur_pos, 1), TOKEN_TYPE_ENUM::OPERATOR, cur_pos));
                 cur_pos ++;
             }
         }
@@ -266,14 +272,16 @@ bool LexicalAnalyzer::analyzeSentence(string _sentence) {
     return ! errors.empty();
 }
 
+
 /**
  * @brief 分析一个程序（很多句子），如果正确生成Token列表，如果错误生成错误列表
- * @param _sentences vector<string>, 等待分析的程序
+ * @param _sentences vector string, 等待分析的程序
+ * @param verbose bool, 是否就地输出tokens
  * @return
  *      -<em>true</em> 无错误
  *      -<em>false</em> 有错误
  */
-bool LexicalAnalyzer::analyze(vector<string> _sentences) {
+bool LexicalAnalyzer::analyze(vector<string> _sentences, bool verbose) {
     cur_line_number = 0;
     all_tokens.clear();
 
@@ -296,9 +304,11 @@ bool LexicalAnalyzer::analyze(vector<string> _sentences) {
         }
     }
 
-    cout << "Tokens\n";
-    for (auto t: all_tokens)
-        cout << t;
+    if (verbose) {
+        cout << "Tokens\n";
+        for (auto t: all_tokens)
+            cout << t;
+    }
 
     return true;
 }

@@ -1,6 +1,6 @@
 /**
  *
- * @file error.hpp
+ * @file error.h
  * @brief 错误类，用于报错
  *
  * @author Keyi Li

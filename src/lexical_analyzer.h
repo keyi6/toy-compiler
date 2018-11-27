@@ -1,6 +1,6 @@
 /**
  *
- * @file lexical_analyzer.hpp
+ * @file lexical_analyzer.h
  * @brief 词法分析器类生成Token列表和Error列表
  *
  * @author Keyi Li
@@ -8,8 +8,6 @@
  */
 #ifndef TOY_C_COMPILER_LEXICAL_ANALYZER_HPP
 #define TOY_C_COMPILER_LEXICAL_ANALYZER_HPP
-
-#endif //TOY_C_COMPILER_LEXICAL_ANALYZER_HPP
 
 #include <string>
 #include <vector>
@@ -43,5 +41,8 @@ public:
     vector<Token> getAllTokens();
     vector<Error> getAllError();
     bool analyzeSentence(string _sentence);
-    bool analyze(vector<string> _sentences);
+    bool analyze(vector<string> _sentences, bool verbose = true);
 };
+
+
+#endif //TOY_C_COMPILER_LEXICAL_ANALYZER_HPP
