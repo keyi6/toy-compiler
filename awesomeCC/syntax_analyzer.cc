@@ -38,19 +38,17 @@ SyntaxTree::SyntaxTree() {
  * @brief 悬挂一个节点
  */
 void SyntaxTree::addChildNode(SyntaxTreeNode * child_node, SyntaxTreeNode * father_node) {
-    if (! father_node)
-        father_node = cur_node;
-
     child_node -> father = father_node;
-    if (! father_node -> first_son)
+
+    cur_node = father_node -> first_son;
+    if (! cur_node)
         father_node -> first_son = child_node;
     else {
-        cur_node = father_node -> first_son;
         while (cur_node -> right)
             cur_node = cur_node -> right;
 
-        cur_node -> right = child_node;
         child_node -> left = cur_node;
+        cur_node -> right = child_node;
     }
 
     cur_node = child_node;
@@ -76,39 +74,39 @@ void SyntaxTree::switchNode(SyntaxTreeNode * left, SyntaxTreeNode * right) {
 }
 
 
+
+/**
+ * @brief dfs语法树
+ */
+ void SyntaxTree::dfs(SyntaxTreeNode * cur, int depth, int status) {
+     for (int i = 0; i < depth; i ++) {
+         if (status & (1 << (depth - i - 1)))
+             cout << "    ";
+         else
+             cout << "│   ";
+     }
+     cout << (cur -> right ? "├── " : "└── " ) << cur -> value << endl;
+     int new_status = (status << 1) + int(cur -> right == nullptr);
+
+     if (cur -> first_son) {
+
+         dfs(cur -> first_son, depth + 1, new_status);
+     }
+
+     if (! cur -> left) {
+         while (cur -> right) {
+             dfs(cur -> right, depth, status);
+             cur = cur -> right;
+         }
+     }
+ }
+
+
 /**
  * @brief 打印语法树
  */
  void SyntaxTree::display() {
-     int cur_depth, pre_depth = 0;
-     SyntaxTreeNode * cur, * node, * pre_father = nullptr;
-     queue< pair<SyntaxTreeNode * , int> > q;
-
-     q.push(make_pair(root, 1));
-
-     while (not q.empty()) {
-         cur = q.front().first;
-         cur_depth = q.front().second;
-         q.pop();
-
-         if (pre_depth < cur_depth) {
-             cout << endl << endl << "depth #" << cur_depth << endl;
-             pre_depth = cur_depth;
-             pre_father = cur -> father;
-         }
-         if (cur -> father != pre_father) {
-             cout << "---" << endl;
-             pre_father = cur -> father;
-         }
-
-         cout << "Type: " << cur -> type << "    Value: " << cur -> value << endl;
-
-         node = cur -> first_son;
-         while (node) {
-             q.push(make_pair(node, cur_depth + 1));
-             node = node -> right;
-         }
-     }
+     dfs(root, 0, 0);
  }
 
 
@@ -247,6 +245,22 @@ SENTENCE_PATTERN_ENUM SyntaxAnalyzer::_judgeSentencePattern() {
  */
 void SyntaxAnalyzer::_statement(SyntaxTreeNode * father_node) {
     // TODO
+
+}
+
+/**
+ * @brief 处理表达式
+ */
+void SyntaxAnalyzer::_expression(SyntaxTreeNode * father_node) {
+    SyntaxTree * exp_tree = new SyntaxTree();
+    exp_tree -> root = exp_tree -> cur_node = new SyntaxTreeNode("Expression");
+    tree -> addChildNode(exp_tree -> root, tree -> cur_node);
+
+    // 返回第一个操作数的值，测试用
+    exp_tree -> addChildNode(new SyntaxTreeNode(tokens[index].value), exp_tree -> root);
+    index ++;
+
+    // TODO
 }
 
 
@@ -256,9 +270,10 @@ void SyntaxAnalyzer::_statement(SyntaxTreeNode * father_node) {
  */
 void SyntaxAnalyzer::_include(SyntaxTreeNode * father_node) {
     SyntaxTree * include_tree = new SyntaxTree();
-    include_tree -> root = include_tree -> cur_node = new SyntaxTreeNode("INCLUDE");
+    include_tree -> root = include_tree -> cur_node = new SyntaxTreeNode("Include");
 
     tree -> addChildNode(include_tree -> root, father_node);
+
 
     int quote_cnt = 0;
     bool flag = true;
@@ -272,7 +287,7 @@ void SyntaxAnalyzer::_include(SyntaxTreeNode * father_node) {
         SyntaxTreeNode * new_node = new SyntaxTreeNode(tokens[index].value);
         include_tree -> addChildNode(new_node, include_tree -> root);
 
-        index += 1;
+        index ++;
     }
 }
 
@@ -288,6 +303,7 @@ void SyntaxAnalyzer::_functionStatement(SyntaxTreeNode * father_node) {
 
     string cur_value;
     TOKEN_TYPE_ENUM cur_type;
+
     while (index < len) {
         cur_value = tokens[index].value;
         cur_type = tokens[index].type;
@@ -296,19 +312,19 @@ void SyntaxAnalyzer::_functionStatement(SyntaxTreeNode * father_node) {
         if (cur_value == "int" || cur_value == "double" || cur_value == "float" || cur_value == "void") {
             func_state_tree -> addChildNode(new SyntaxTreeNode("Type"), func_state_tree -> root);
             func_state_tree -> addChildNode(new SyntaxTreeNode(cur_value), func_state_tree -> cur_node);
-            index += 1;
+            index ++;
         }
         // 如果是函数名
         else if (cur_type == TOKEN_TYPE_ENUM::IDENTIFIER) {
             func_state_tree -> addChildNode(new SyntaxTreeNode("FunctionName"), func_state_tree -> root);
             func_state_tree -> addChildNode(new SyntaxTreeNode(cur_value), func_state_tree -> cur_node);
-            index += 1;
+            index ++;
         }
         // 如果是参数列表的(
         else if (cur_type == TOKEN_TYPE_ENUM::LL_BRACKET) {
             SyntaxTreeNode * param_list = new SyntaxTreeNode("ParameterList");
             func_state_tree -> addChildNode(param_list, func_state_tree -> root);
-            index += 1;
+            index ++;
 
             while (index < len && tokens[index].type != TOKEN_TYPE_ENUM::RL_BRACKET) {
                 cur_value = tokens[index].value;
@@ -318,15 +334,15 @@ void SyntaxAnalyzer::_functionStatement(SyntaxTreeNode * father_node) {
                     func_state_tree -> addChildNode(param, param_list);
                     func_state_tree -> addChildNode(new SyntaxTreeNode(cur_value), param);
 
-                    index += 1;
+                    index ++;
                     if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::IDENTIFIER) {
                         func_state_tree -> addChildNode(new SyntaxTreeNode(tokens[index].value), param);
-                        index += 1;
+                        index ++;
 
                         if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::COMMA)
-                            index += 1;
+                            index ++;
                         else if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::RL_BRACKET) {
-                            index += 1;
+                            index ++;
                             break;
                         }
                         else {
@@ -363,8 +379,70 @@ void SyntaxAnalyzer::_functionCall() {
 
 
 /**
+ * @brief 处理return
+ */
+void SyntaxAnalyzer::_return(SyntaxTreeNode * father_node) {
+    SyntaxTree * return_tree = new SyntaxTree();
+
+    index ++;
+    if (index < len) {
+        if (tokens[index].type == TOKEN_TYPE_ENUM::SEMICOLON) {
+            return_tree -> root = return_tree -> cur_node = new SyntaxTreeNode("VoidReturn");
+            return_tree -> addChildNode(new SyntaxTreeNode(tokens[index - 1].value), return_tree -> cur_node);
+
+            tree -> addChildNode(return_tree -> root, father_node);
+            index ++;
+        }
+        else {
+            return_tree -> root = return_tree -> cur_node = new SyntaxTreeNode("Return");
+            tree -> addChildNode(return_tree -> root, father_node);
+
+            return_tree -> addChildNode(new SyntaxTreeNode(tokens[index - 1].value), return_tree -> cur_node);
+            _expression(return_tree -> root);
+
+            if (tokens[index].type == TOKEN_TYPE_ENUM::SEMICOLON)
+                index ++;
+            else
+                errors.emplace_back(Error("lack of ;"));
+            return;
+        }
+
+    }
+    else {
+        errors.emplace_back(Error("return error"));
+        return;
+    }
+}
+
+
+
+/**
  * @brief 处理大括号
  */
 void SyntaxAnalyzer::_block(SyntaxTreeNode * father_node) {
-    
+    SyntaxTree * block_tree = new SyntaxTree();
+    block_tree -> root = block_tree -> cur_node = new SyntaxTreeNode("Sentence");
+    tree -> addChildNode(block_tree -> root, tree -> cur_node);
+
+    index ++;
+    while (index < len && tokens[index].type != TOKEN_TYPE_ENUM::RB_BRACKET) {
+        int cur_type = int(_judgeSentencePattern());
+
+        switch (cur_type) {
+            //TODO: 完成switch
+            case int(SENTENCE_PATTERN_ENUM::RETURN):
+                _return(block_tree -> root);
+                break;
+            default:
+                errors.emplace_back(Error("Unidentified symbols in block"));
+                return;
+        }
+    }
+
+    if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::RB_BRACKET)
+        index ++;
+    else {
+        errors.emplace_back(Error("lack of }"));
+        return;
+    }
 }

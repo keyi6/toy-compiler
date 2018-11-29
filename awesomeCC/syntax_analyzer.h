@@ -39,6 +39,9 @@ public:
 
 
 class SyntaxTree {
+private:
+    void dfs(SyntaxTreeNode * cur, int depth, int status);
+
 public:
     SyntaxTreeNode * root, * cur_node;
     SyntaxTree();
@@ -66,15 +69,16 @@ private:
     void _statement(SyntaxTreeNode * father_node);
 
     void _block(SyntaxTreeNode * father_node);
+    void _return(SyntaxTreeNode * father_node);
+
+    void _expression(SyntaxTreeNode * father_node);
     /*
      TODO
     void _assignment();
-    void _expression();
     void _control();
     void _for();
     void _while();
     void _if();
-    void _return();
     */
 
 public:
