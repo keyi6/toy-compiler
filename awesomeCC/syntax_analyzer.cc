@@ -135,6 +135,7 @@ bool SyntaxAnalyzer::analyze(vector<string> sentences, bool verbose) {
 
         tokens = la.getAllTokens();
         len = tokens.size();
+        line_number_map = la.getLineNumberMap();
 
         try {
             _analyze();
@@ -176,7 +177,7 @@ void SyntaxAnalyzer::_analyze() {
                 _functionCall();
                 break;
             default:
-                throw Error("in main, unidentified symbol");
+                throw Error("in main, unidentified symbol", line_number_map[index]);
         }
     }
 }
@@ -341,11 +342,11 @@ void SyntaxAnalyzer::_functionStatement(SyntaxTreeNode * father_node) {
                         break;
                     }
                     else
-                        throw Error("in function statement's parameter list, should be `,` or `)` after");
+                        throw Error("in function statement's parameter list, should be `,` or `)` after", line_number_map[index]);
                 }
             }
             else
-                throw Error("in function statement's parameter list, unidentified parameter type found");
+                throw Error("in function statement's parameter list, unidentified parameter type found", line_number_map[index]);
         }
     }
 
@@ -358,7 +359,7 @@ void SyntaxAnalyzer::_functionStatement(SyntaxTreeNode * father_node) {
     // 如果下一个是; ，就当作单纯的函数声明
     // 如果两个都不是 就有问题
     else if (cur_type != TOKEN_TYPE_ENUM::SEMICOLON)
-        throw Error("fin function statement, expected `;` or `}`");
+        throw Error("fin function statement, expected `;` or `}`", line_number_map[index]);
 }
 
 
@@ -396,13 +397,13 @@ void SyntaxAnalyzer::_return(SyntaxTreeNode * father_node) {
             if (tokens[index].type == TOKEN_TYPE_ENUM::SEMICOLON)
                 index ++;
             else
-                throw Error("in return, expected `;`");
+                throw Error("in return, expected `;`", line_number_map[index]);
             return;
         }
 
     }
     else
-        throw Error("in return, expected an expression or semicolon after `return`");
+        throw Error("in return, expected an expression or semicolon after `return`", line_number_map[index]);
 }
 
 
@@ -425,12 +426,12 @@ void SyntaxAnalyzer::_block(SyntaxTreeNode * father_node) {
                 _return(block_tree->root);
                 break;
             default:
-                throw Error("in block, unidentified symbols found");
+                throw Error("in block, unidentified symbols found", line_number_map[index]);
         }
     }
 
     if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::RB_BRACKET)
         index ++;
     else
-        throw Error("in block, expected `}`");
+        throw Error("in block, expected `}`", line_number_map[index]);
 }

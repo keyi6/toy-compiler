@@ -70,7 +70,8 @@ awesome C Compiler
    - [ ] 赋值语句
 
 3. 其他
+   - [ ] Google test
 
-  - [ ] Google test
-  - [ ] unit test
-  - [ ] error类直接throw，不存在vector里
+   - [ ] unit test
+
+   - [x] error类直接throw，不存在vector里

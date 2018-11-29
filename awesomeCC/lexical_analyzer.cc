@@ -269,12 +269,17 @@ bool LexicalAnalyzer::analyze(vector<string> _sentences, bool verbose) {
     try {
         for (auto _s: _sentences) {
             cur_line_number ++;
+
             _init(_s);
             _analyze();
 
-            for (auto t: tokens)
+            for (auto t: tokens) {
                 all_tokens.emplace_back(t);
+                line_number_map.emplace_back(cur_line_number);
+            }
         }
+
+        line_number_map.emplace_back(cur_line_number);
 
         if (verbose) {
             cout << "Tokens\n";
@@ -298,4 +303,12 @@ bool LexicalAnalyzer::analyze(vector<string> _sentences, bool verbose) {
  */
 vector<Token> LexicalAnalyzer::getAllTokens() {
     return all_tokens;
+}
+
+/**
+ * @brief 得到line_number_map列表
+ * @return vector<int>
+ */
+vector<int> LexicalAnalyzer::getLineNumberMap() {
+    return line_number_map;
 }
