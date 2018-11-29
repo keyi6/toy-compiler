@@ -72,7 +72,6 @@ void LexicalAnalyzer::_init(string _sentence) {
     sentence = _sentence;
 
     tokens.clear();
-    errors.clear();
     cur_pos = 0;
 }
 
@@ -140,11 +139,14 @@ void LexicalAnalyzer::_analyze() {
         if (cur_char == '#') {
             tokens.emplace_back(Token("#", TOKEN_TYPE_ENUM::SEPARATOR, cur_pos ++));
             _skipBlank();
+
             if (cur_pos + 7 < len && sentence.substr(cur_pos, 7) == "include") {
+                // 读取include
                 cur_pos += 7;
                 tokens.emplace_back(Token("include", TOKEN_TYPE_ENUM::KEYWORD, cur_pos));
                 _skipBlank();
 
+                // 如果是 " 或者 《
                 if (sentence[cur_pos] == '\"' || sentence[cur_pos] == '<') {
                     cur_char = sentence[cur_pos ++];
 
@@ -163,13 +165,12 @@ void LexicalAnalyzer::_analyze() {
                             libNameLen ++, cur_pos ++;
                     }
 
-                    errors.emplace_back(Error("include error"));
+                    throw Error("in include, lack of " + _char2string(match_char), cur_line_number);
                 }
             }
-            else {
-                errors.emplace_back(Error("include error"));
-            }
-            return;
+
+            else
+                throw Error("in include, unidentified symbol after #", cur_line_number);
         }
         // 关键字 和 标识符
         else if (isalpha(cur_char) || cur_char == '_') {
@@ -194,10 +195,8 @@ void LexicalAnalyzer::_analyze() {
                 if (sentence[cur_pos + temp_len] == '.') {
                     if (not hasDot)
                         hasDot = true;
-                    else {
-                        errors.emplace_back(Error("Two many dots in a number."));
-                        return;
-                    }
+                    else
+                        throw Error("in digit constant, too many dots in one number", cur_line_number);
                 }
 
                 temp_len++;
@@ -220,10 +219,8 @@ void LexicalAnalyzer::_analyze() {
                 while (sentence[cur_pos + temp_len] != cur_char && cur_pos + temp_len < len)
                     temp_len ++;
 
-                if (cur_pos + temp_len >= len || sentence[cur_pos + temp_len] != cur_char) {
-                    errors.emplace_back("Lack of " + _char2string(cur_char) + ".");
-                    return;
-                }
+                if (cur_pos + temp_len >= len || sentence[cur_pos + temp_len] != cur_char)
+                    throw Error("in string constant, lack of " + _char2string(cur_char), cur_line_number);
 
                 tokens.emplace_back(Token(sentence.substr(cur_pos, temp_len), TOKEN_TYPE_ENUM::STRING_CONSTANT, cur_pos + 1));
                 cur_pos += temp_len;
@@ -254,22 +251,6 @@ void LexicalAnalyzer::_analyze() {
 
         cur_pos ++;
     }
-
-}
-
-
-/**
- * @brief 分析一个句子，如果正确生成Token列表，如果错误生成错误列表
- * @param _sentence string, 等待分析的句子
- * @return
- *      -<em>true</em> 无错误
- *      -<em>false</em> 有错误
- */
-bool LexicalAnalyzer::analyzeSentence(string _sentence) {
-    _init(_sentence);
-    _analyze();
-
-    return ! errors.empty();
 }
 
 
@@ -285,40 +266,29 @@ bool LexicalAnalyzer::analyze(vector<string> _sentences, bool verbose) {
     cur_line_number = 0;
     all_tokens.clear();
 
-    for (auto _s: _sentences) {
-        cur_line_number ++;
-        _init(_s);
-        _analyze();
+    try {
+        for (auto _s: _sentences) {
+            cur_line_number ++;
+            _init(_s);
+            _analyze();
 
-        if (errors.empty()) {
             for (auto t: tokens)
                 all_tokens.emplace_back(t);
         }
-        else {
-            cout << "Errors!" << endl;
-            for (auto e: errors)
-                cout << e;
 
-            return false;
+        if (verbose) {
+            cout << "Tokens\n";
+            for (auto t: all_tokens)
+                cout << t;
         }
     }
-
-    if (verbose) {
-        cout << "Tokens\n";
-        for (auto t: all_tokens)
-            cout << t;
+    catch (Error e) {
+        cout << "Lexical analyze errors" << endl;
+        cout << e;
+        return false;
     }
 
     return true;
-}
-
-
-/**
- * @brief 得到错误列表
- * @return vector<Error>
- */
-vector<Error> LexicalAnalyzer::getAllError() {
-    return errors;
 }
 
 

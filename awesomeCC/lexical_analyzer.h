@@ -21,7 +21,6 @@ using namespace std;
 class LexicalAnalyzer {
 private:
     vector<Token> tokens, all_tokens;
-    vector<Error> errors;
     string sentence;
     int cur_pos, cur_line_number, len;
 
@@ -39,7 +38,6 @@ private:
 public:
     LexicalAnalyzer();
     vector<Token> getAllTokens();
-    vector<Error> getAllError();
     bool analyzeSentence(string _sentence);
     bool analyze(vector<string> _sentences, bool verbose = true);
 };

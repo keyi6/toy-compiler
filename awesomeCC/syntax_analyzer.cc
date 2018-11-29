@@ -74,7 +74,6 @@ void SyntaxTree::switchNode(SyntaxTreeNode * left, SyntaxTreeNode * right) {
 }
 
 
-
 /**
  * @brief dfs语法树
  */
@@ -106,7 +105,9 @@ void SyntaxTree::switchNode(SyntaxTreeNode * left, SyntaxTreeNode * right) {
  * @brief 打印语法树
  */
  void SyntaxTree::display() {
-     dfs(root, 0, 0);
+     cout << root -> value << endl;
+     dfs(root -> first_son, 0, 0);
+     cout << endl;
  }
 
 
@@ -135,22 +136,20 @@ bool SyntaxAnalyzer::analyze(vector<string> sentences, bool verbose) {
         tokens = la.getAllTokens();
         len = tokens.size();
 
-        _analyze();
+        try {
+            _analyze();
+        }
+        catch (Error e) {
+            cout << "Syntax analyze errors" << endl;
+            cout << e;
+            return false;
+        }
 
         if (verbose)
             tree -> display();
-
-        // TODO 错误处理
-        if (! errors.empty()) {
-            if (verbose) {
-                cout << "Errors\n";
-                for (auto e: errors)
-                    cout << e;
-            }
-        }
     }
 
-    return false;
+    return true;
 }
 
 
@@ -177,8 +176,7 @@ void SyntaxAnalyzer::_analyze() {
                 _functionCall();
                 break;
             default:
-                errors.emplace_back(Error("Errors in main"));
-                return;
+                throw Error("in main, unidentified symbol");
         }
     }
 }
@@ -244,9 +242,9 @@ SENTENCE_PATTERN_ENUM SyntaxAnalyzer::_judgeSentencePattern() {
  * @brief 处理申明语句
  */
 void SyntaxAnalyzer::_statement(SyntaxTreeNode * father_node) {
-    // TODO
-
+    // TODO 处理声明语句
 }
+
 
 /**
  * @brief 处理表达式
@@ -260,9 +258,8 @@ void SyntaxAnalyzer::_expression(SyntaxTreeNode * father_node) {
     exp_tree -> addChildNode(new SyntaxTreeNode(tokens[index].value), exp_tree -> root);
     index ++;
 
-    // TODO
+    // TODO 处理表达式
 }
-
 
 
 /**
@@ -273,7 +270,6 @@ void SyntaxAnalyzer::_include(SyntaxTreeNode * father_node) {
     include_tree -> root = include_tree -> cur_node = new SyntaxTreeNode("Include");
 
     tree -> addChildNode(include_tree -> root, father_node);
-
 
     int quote_cnt = 0;
     bool flag = true;
@@ -298,74 +294,71 @@ void SyntaxAnalyzer::_include(SyntaxTreeNode * father_node) {
 void SyntaxAnalyzer::_functionStatement(SyntaxTreeNode * father_node) {
     SyntaxTree * func_state_tree = new SyntaxTree();
     func_state_tree -> root = func_state_tree -> cur_node = new SyntaxTreeNode("FunctionStatement");
-
     tree -> addChildNode(func_state_tree -> root, father_node);
 
     string cur_value;
     TOKEN_TYPE_ENUM cur_type;
 
-    while (index < len) {
-        cur_value = tokens[index].value;
-        cur_type = tokens[index].type;
+    // 读取返回类型
+    func_state_tree -> addChildNode(new SyntaxTreeNode("Type"), func_state_tree -> root);
+    func_state_tree -> addChildNode(new SyntaxTreeNode(tokens[index].value), func_state_tree -> cur_node);
+    index ++;
 
-        // 如果是返回值类型
-        if (cur_value == "int" || cur_value == "double" || cur_value == "float" || cur_value == "void") {
-            func_state_tree -> addChildNode(new SyntaxTreeNode("Type"), func_state_tree -> root);
-            func_state_tree -> addChildNode(new SyntaxTreeNode(cur_value), func_state_tree -> cur_node);
-            index ++;
-        }
-        // 如果是函数名
-        else if (cur_type == TOKEN_TYPE_ENUM::IDENTIFIER) {
-            func_state_tree -> addChildNode(new SyntaxTreeNode("FunctionName"), func_state_tree -> root);
-            func_state_tree -> addChildNode(new SyntaxTreeNode(cur_value), func_state_tree -> cur_node);
-            index ++;
-        }
-        // 如果是参数列表的(
-        else if (cur_type == TOKEN_TYPE_ENUM::LL_BRACKET) {
-            SyntaxTreeNode * param_list = new SyntaxTreeNode("ParameterList");
-            func_state_tree -> addChildNode(param_list, func_state_tree -> root);
-            index ++;
+    // 读取函数名
+    func_state_tree -> addChildNode(new SyntaxTreeNode("FunctionName"), func_state_tree -> root);
+    func_state_tree -> addChildNode(new SyntaxTreeNode(tokens[index].value), func_state_tree -> cur_node);
+    index ++;
 
-            while (index < len && tokens[index].type != TOKEN_TYPE_ENUM::RL_BRACKET) {
-                cur_value = tokens[index].value;
+    // 读取(
+    index ++;
 
-                if (cur_value == "int" || cur_value == "double" || cur_value == "float" || cur_value == "void") {
-                    SyntaxTreeNode * param = new SyntaxTreeNode("Parameter");
-                    func_state_tree -> addChildNode(param, param_list);
-                    func_state_tree -> addChildNode(new SyntaxTreeNode(cur_value), param);
+    // 如果下一个是）
+    if (tokens[index].type == TOKEN_TYPE_ENUM::RL_BRACKET) {
+    }
+    // 如果下一个不是），读取参数列表
+    else {
+        // 建一个参数树
+        SyntaxTreeNode * param_list = new SyntaxTreeNode("ParameterList");
+        func_state_tree -> addChildNode(param_list, func_state_tree -> root);
 
+        while (index < len && tokens[index].type != TOKEN_TYPE_ENUM::RL_BRACKET) {
+            cur_value = tokens[index].value;
+
+            if (cur_value == "int" || cur_value == "double" || cur_value == "float") {
+                SyntaxTreeNode * param = new SyntaxTreeNode("Parameter");
+                func_state_tree -> addChildNode(param, param_list);
+                func_state_tree -> addChildNode(new SyntaxTreeNode(cur_value), param);
+
+                index ++;
+                if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::IDENTIFIER) {
+                    func_state_tree -> addChildNode(new SyntaxTreeNode(tokens[index].value), param);
                     index ++;
-                    if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::IDENTIFIER) {
-                        func_state_tree -> addChildNode(new SyntaxTreeNode(tokens[index].value), param);
-                        index ++;
 
-                        if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::COMMA)
-                            index ++;
-                        else if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::RL_BRACKET) {
-                            index ++;
-                            break;
-                        }
-                        else {
-                            errors.emplace_back(Error("should be , ) after"));
-                            return;
-                        }
+                    if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::COMMA)
+                        index ++;
+                    else if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::RL_BRACKET) {
+                        index ++;
+                        break;
                     }
-                }
-                else {
-                    errors.emplace_back(Error("wrong in parameter list"));
-                    return;
+                    else
+                        throw Error("in function statement's parameter list, should be `,` or `)` after");
                 }
             }
-        }
-        // 如果是{
-        else if (cur_type == TOKEN_TYPE_ENUM::LB_BRACKET) {
-            _block(func_state_tree -> root);
-        }
-        else {
-            errors.emplace_back(Error("unidentified symbol in parameter list"));
-            return;
+            else
+                throw Error("in function statement's parameter list, unidentified parameter type found");
         }
     }
+
+
+    // 如果下一个是 { , 就处理大括号里的内容
+    cur_type = tokens[index].type;
+    if (cur_type == TOKEN_TYPE_ENUM::LB_BRACKET) {
+        _block(func_state_tree -> root);
+    }
+    // 如果下一个是; ，就当作单纯的函数声明
+    // 如果两个都不是 就有问题
+    else if (cur_type != TOKEN_TYPE_ENUM::SEMICOLON)
+        throw Error("fin function statement, expected `;` or `}`");
 }
 
 
@@ -403,15 +396,13 @@ void SyntaxAnalyzer::_return(SyntaxTreeNode * father_node) {
             if (tokens[index].type == TOKEN_TYPE_ENUM::SEMICOLON)
                 index ++;
             else
-                errors.emplace_back(Error("lack of ;"));
+                throw Error("in return, expected `;`");
             return;
         }
 
     }
-    else {
-        errors.emplace_back(Error("return error"));
-        return;
-    }
+    else
+        throw Error("in return, expected an expression or semicolon after `return`");
 }
 
 
@@ -431,18 +422,15 @@ void SyntaxAnalyzer::_block(SyntaxTreeNode * father_node) {
         switch (cur_type) {
             //TODO: 完成switch
             case int(SENTENCE_PATTERN_ENUM::RETURN):
-                _return(block_tree -> root);
+                _return(block_tree->root);
                 break;
             default:
-                errors.emplace_back(Error("Unidentified symbols in block"));
-                return;
+                throw Error("in block, unidentified symbols found");
         }
     }
 
     if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::RB_BRACKET)
         index ++;
-    else {
-        errors.emplace_back(Error("lack of }"));
-        return;
-    }
+    else
+        throw Error("in block, expected `}`");
 }
