@@ -129,7 +129,8 @@ SyntaxAnalyzer::SyntaxAnalyzer() {
  */
 bool SyntaxAnalyzer::analyze(vector<string> sentences, bool verbose) {
     LexicalAnalyzer la;
-    if (la.analyze(sentences)) {
+    // 如果能通过词法分析
+    if (la.analyze(sentences, false)) {
         index = 0;
         tree = new SyntaxTree();
 
@@ -142,6 +143,13 @@ bool SyntaxAnalyzer::analyze(vector<string> sentences, bool verbose) {
             tree -> display();
 
         // TODO 错误处理
+        if (! errors.empty()) {
+            if (verbose) {
+                cout << "Errors\n";
+                for (auto e: errors)
+                    cout << e;
+            }
+        }
     }
 
     return false;
@@ -304,7 +312,6 @@ void SyntaxAnalyzer::_functionStatement(SyntaxTreeNode * father_node) {
 
             while (index < len && tokens[index].type != TOKEN_TYPE_ENUM::RL_BRACKET) {
                 cur_value = tokens[index].value;
-                cur_type = tokens[index].type;
 
                 if (cur_value == "int" || cur_value == "double" || cur_value == "float" || cur_value == "void") {
                     SyntaxTreeNode * param = new SyntaxTreeNode("Parameter");
@@ -316,12 +323,14 @@ void SyntaxAnalyzer::_functionStatement(SyntaxTreeNode * father_node) {
                         func_state_tree -> addChildNode(new SyntaxTreeNode(tokens[index].value), param);
                         index += 1;
 
-                        if (index < len && (tokens[index].type == TOKEN_TYPE_ENUM::COMMA ||
-                                            tokens[index].type == TOKEN_TYPE_ENUM::RL_BRACKET))
+                        if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::COMMA)
                             index += 1;
-
+                        else if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::RL_BRACKET) {
+                            index += 1;
+                            break;
+                        }
                         else {
-                            errors.emplace_back(Error("should be , or ) after"));
+                            errors.emplace_back(Error("should be , ) after"));
                             return;
                         }
                     }
@@ -332,8 +341,8 @@ void SyntaxAnalyzer::_functionStatement(SyntaxTreeNode * father_node) {
                 }
             }
         }
-        // 如果是}
-        else if (cur_type == TOKEN_TYPE_ENUM::RB_BRACKET) {
+        // 如果是{
+        else if (cur_type == TOKEN_TYPE_ENUM::LB_BRACKET) {
             _block(func_state_tree -> root);
         }
         else {
@@ -357,7 +366,5 @@ void SyntaxAnalyzer::_functionCall() {
  * @brief 处理大括号
  */
 void SyntaxAnalyzer::_block(SyntaxTreeNode * father_node) {
-    // TODO
-    cout << "VLOCK\n";
-    exit(0);
+    
 }
