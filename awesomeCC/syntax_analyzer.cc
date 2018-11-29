@@ -29,8 +29,8 @@ SyntaxTreeNode::SyntaxTreeNode(string _value, string _type, string _extra_info) 
 /**
  * @brief 语法树构造函数
  */
-SyntaxTree::SyntaxTree() {
-    root = cur_node = nullptr;
+SyntaxTree::SyntaxTree(SyntaxTreeNode * _root) {
+    root = cur_node = _root;
 }
 
 
@@ -140,7 +140,7 @@ bool SyntaxAnalyzer::analyze(vector<string> sentences, bool verbose) {
         try {
             _analyze();
         }
-        catch (Error e) {
+        catch (Error & e) {
             cout << "Syntax analyze errors" << endl;
             cout << e;
             return false;
@@ -148,9 +148,11 @@ bool SyntaxAnalyzer::analyze(vector<string> sentences, bool verbose) {
 
         if (verbose)
             tree -> display();
+
+        return true;
     }
 
-    return true;
+    return false;
 }
 
 
@@ -174,7 +176,7 @@ void SyntaxAnalyzer::_analyze() {
                 _functionStatement(tree -> root);
                 break;
             case int(SENTENCE_PATTERN_ENUM::FUNCTION_CALL):
-                _functionCall();
+                _functionCall(tree -> cur_node);
                 break;
             default:
                 throw Error("in main, unidentified symbol", line_number_map[index]);
@@ -251,8 +253,7 @@ void SyntaxAnalyzer::_statement(SyntaxTreeNode * father_node) {
  * @brief 处理表达式
  */
 void SyntaxAnalyzer::_expression(SyntaxTreeNode * father_node) {
-    SyntaxTree * exp_tree = new SyntaxTree();
-    exp_tree -> root = exp_tree -> cur_node = new SyntaxTreeNode("Expression");
+    SyntaxTree * exp_tree = new SyntaxTree(new SyntaxTreeNode("Expression"));
     tree -> addChildNode(exp_tree -> root, tree -> cur_node);
 
     // 返回第一个操作数的值，测试用
@@ -267,8 +268,7 @@ void SyntaxAnalyzer::_expression(SyntaxTreeNode * father_node) {
  * @brief 处理include语句
  */
 void SyntaxAnalyzer::_include(SyntaxTreeNode * father_node) {
-    SyntaxTree * include_tree = new SyntaxTree();
-    include_tree -> root = include_tree -> cur_node = new SyntaxTreeNode("Include");
+    SyntaxTree * include_tree = new SyntaxTree(new SyntaxTreeNode("Include"));
 
     tree -> addChildNode(include_tree -> root, father_node);
 
@@ -293,8 +293,7 @@ void SyntaxAnalyzer::_include(SyntaxTreeNode * father_node) {
  * @brief 处理函数声明
  */
 void SyntaxAnalyzer::_functionStatement(SyntaxTreeNode * father_node) {
-    SyntaxTree * func_state_tree = new SyntaxTree();
-    func_state_tree -> root = func_state_tree -> cur_node = new SyntaxTreeNode("FunctionStatement");
+    SyntaxTree * func_state_tree = new SyntaxTree(new SyntaxTreeNode("FunctionStatement"));
     tree -> addChildNode(func_state_tree -> root, father_node);
 
     string cur_value;
@@ -315,6 +314,7 @@ void SyntaxAnalyzer::_functionStatement(SyntaxTreeNode * father_node) {
 
     // 如果下一个是）
     if (tokens[index].type == TOKEN_TYPE_ENUM::RL_BRACKET) {
+        index ++;
     }
     // 如果下一个不是），读取参数列表
     else {
@@ -359,17 +359,8 @@ void SyntaxAnalyzer::_functionStatement(SyntaxTreeNode * father_node) {
     // 如果下一个是; ，就当作单纯的函数声明
     // 如果两个都不是 就有问题
     else if (cur_type != TOKEN_TYPE_ENUM::SEMICOLON)
-        throw Error("fin function statement, expected `;` or `}`", line_number_map[index]);
+        throw Error("in function statement, expected `;` or `}`", line_number_map[index]);
 }
-
-
-/**
- * @brief 处理函数调用
- */
-void SyntaxAnalyzer::_functionCall() {
-    // TODO
-}
-
 
 
 /**
@@ -407,13 +398,11 @@ void SyntaxAnalyzer::_return(SyntaxTreeNode * father_node) {
 }
 
 
-
 /**
  * @brief 处理大括号
  */
 void SyntaxAnalyzer::_block(SyntaxTreeNode * father_node) {
-    SyntaxTree * block_tree = new SyntaxTree();
-    block_tree -> root = block_tree -> cur_node = new SyntaxTreeNode("Sentence");
+    SyntaxTree * block_tree = new SyntaxTree(new SyntaxTreeNode("Sentence"));
     tree -> addChildNode(block_tree -> root, tree -> cur_node);
 
     index ++;
@@ -421,9 +410,20 @@ void SyntaxAnalyzer::_block(SyntaxTreeNode * father_node) {
         int cur_type = int(_judgeSentencePattern());
 
         switch (cur_type) {
-            //TODO: 完成switch
+            case int(SENTENCE_PATTERN_ENUM::STATEMENT):
+                _statement(block_tree -> root);
+                break;
+            case int(SENTENCE_PATTERN_ENUM::ASSIGNMENT):
+                _assignment(block_tree -> root);
+                break;
+            case int(SENTENCE_PATTERN_ENUM::FUNCTION_CALL):
+                _functionCall(block_tree -> root);
+                break;
+            case int(SENTENCE_PATTERN_ENUM::CONTROL):
+                _control(block_tree -> root);
+                break;
             case int(SENTENCE_PATTERN_ENUM::RETURN):
-                _return(block_tree->root);
+                _return(block_tree -> root);
                 break;
             default:
                 throw Error("in block, unidentified symbols found", line_number_map[index]);
@@ -433,5 +433,70 @@ void SyntaxAnalyzer::_block(SyntaxTreeNode * father_node) {
     if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::RB_BRACKET)
         index ++;
     else
-        throw Error("in block, expected `}`", line_number_map[index]);
+        throw Error("in block, expected }`", line_number_map[index]);
+}
+
+
+/**
+ * @brief 处理函数调用
+ */
+void SyntaxAnalyzer::_functionCall(SyntaxTreeNode * father_node) {
+    // TODO 处理函数调用
+}
+
+
+/**
+ * @brief 处理赋值语句
+ */
+void SyntaxAnalyzer::_assignment(SyntaxTreeNode *father_node) {
+    // TODO 处理赋值语句
+}
+
+
+/**
+ * @brief 处理控制语句
+ */
+void SyntaxAnalyzer::_control(SyntaxTreeNode * father_node) {
+    // TODO 处理控制语句
+}
+
+
+/**
+ * @brief 处理for
+ */
+void SyntaxAnalyzer::_for(SyntaxTreeNode * father_node) {
+    // TODO 处理for
+
+}
+
+
+/**
+ * @brief 处理while
+ */
+void SyntaxAnalyzer::_while(SyntaxTreeNode * father_node) {
+    // TODO 处理 while
+}
+
+
+/**
+ * @brief 处理if
+ */
+void SyntaxAnalyzer::_if(SyntaxTreeNode * father_node) {
+    // TODO 处理if
+}
+
+
+/**
+ * @brief 处理else if
+ */
+void SyntaxAnalyzer::_else_if(SyntaxTreeNode * father_node) {
+    // TODO 处理else if
+}
+
+
+/**
+ * @brief 处理else
+ */
+void SyntaxAnalyzer::_else(SyntaxTreeNode * father_node) {
+    // TODO 处理else
 }

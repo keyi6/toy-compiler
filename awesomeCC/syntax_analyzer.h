@@ -30,6 +30,7 @@ class SyntaxTreeNode {
 public:
     string value, type, extra_info;
 
+    // 孩子-兄弟表示法
     // left 是左兄弟, right 是右边兄弟
     // father 是父节点, first_son 是第一个子节点
     SyntaxTreeNode * left, * right, * father, * first_son;
@@ -44,7 +45,7 @@ private:
 
 public:
     SyntaxTreeNode * root, * cur_node;
-    SyntaxTree();
+    SyntaxTree(SyntaxTreeNode * _root = nullptr);
 
     void addChildNode(SyntaxTreeNode * child_node, SyntaxTreeNode * father_node = nullptr);
     void switchNode(SyntaxTreeNode * left, SyntaxTreeNode * right);
@@ -65,21 +66,18 @@ private:
 
     void _include(SyntaxTreeNode * father_node);
     void _functionStatement(SyntaxTreeNode * father_node);
-    void _functionCall();
     void _statement(SyntaxTreeNode * father_node);
-
+    void _functionCall(SyntaxTreeNode * father_node);
     void _block(SyntaxTreeNode * father_node);
     void _return(SyntaxTreeNode * father_node);
-
     void _expression(SyntaxTreeNode * father_node);
-    /*
-     TODO
-    void _assignment();
-    void _control();
-    void _for();
-    void _while();
-    void _if();
-    */
+    void _assignment(SyntaxTreeNode * father_node);
+    void _control(SyntaxTreeNode * father_node);
+    void _for(SyntaxTreeNode * father_node);
+    void _while(SyntaxTreeNode * father_node);
+    void _if(SyntaxTreeNode * father_node);
+    void _else(SyntaxTreeNode * father_node);
+    void _else_if(SyntaxTreeNode * father_node);
 
 public:
     SyntaxAnalyzer();

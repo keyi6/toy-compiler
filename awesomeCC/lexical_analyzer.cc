@@ -279,7 +279,7 @@ bool LexicalAnalyzer::analyze(vector<string> _sentences, bool verbose) {
             }
         }
 
-        line_number_map.emplace_back(cur_line_number);
+        line_number_map.emplace_back(cur_line_number + 1);
 
         if (verbose) {
             cout << "Tokens\n";

@@ -1,5 +1,9 @@
 #include <stdio.h>
 
-int main(int argv) {
+int add(int x, int y) {
+	return 0;
+}
+
+int main() {
 	return 0;
 }
