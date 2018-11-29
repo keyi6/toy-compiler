@@ -273,8 +273,74 @@ void SyntaxAnalyzer::_include(SyntaxTreeNode * father_node) {
  * @brief 处理函数声明
  */
 void SyntaxAnalyzer::_functionStatement(SyntaxTreeNode * father_node) {
-    exit(0);
     SyntaxTree * func_state_tree = new SyntaxTree();
+    func_state_tree -> root = func_state_tree -> cur_node = new SyntaxTreeNode("FunctionStatement");
+
+    tree -> addChildNode(func_state_tree -> root, father_node);
+
+    string cur_value;
+    TOKEN_TYPE_ENUM cur_type;
+    while (index < len) {
+        cur_value = tokens[index].value;
+        cur_type = tokens[index].type;
+
+        // 如果是返回值类型
+        if (cur_value == "int" || cur_value == "double" || cur_value == "float" || cur_value == "void") {
+            func_state_tree -> addChildNode(new SyntaxTreeNode("Type"), func_state_tree -> root);
+            func_state_tree -> addChildNode(new SyntaxTreeNode(cur_value), func_state_tree -> cur_node);
+            index += 1;
+        }
+        // 如果是函数名
+        else if (cur_type == TOKEN_TYPE_ENUM::IDENTIFIER) {
+            func_state_tree -> addChildNode(new SyntaxTreeNode("FunctionName"), func_state_tree -> root);
+            func_state_tree -> addChildNode(new SyntaxTreeNode(cur_value), func_state_tree -> cur_node);
+            index += 1;
+        }
+        // 如果是参数列表的(
+        else if (cur_type == TOKEN_TYPE_ENUM::LL_BRACKET) {
+            SyntaxTreeNode * param_list = new SyntaxTreeNode("ParameterList");
+            func_state_tree -> addChildNode(param_list, func_state_tree -> root);
+            index += 1;
+
+            while (index < len && tokens[index].type != TOKEN_TYPE_ENUM::RL_BRACKET) {
+                cur_value = tokens[index].value;
+                cur_type = tokens[index].type;
+
+                if (cur_value == "int" || cur_value == "double" || cur_value == "float" || cur_value == "void") {
+                    SyntaxTreeNode * param = new SyntaxTreeNode("Parameter");
+                    func_state_tree -> addChildNode(param, param_list);
+                    func_state_tree -> addChildNode(new SyntaxTreeNode(cur_value), param);
+
+                    index += 1;
+                    if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::IDENTIFIER) {
+                        func_state_tree -> addChildNode(new SyntaxTreeNode(tokens[index].value), param);
+                        index += 1;
+
+                        if (index < len && (tokens[index].type == TOKEN_TYPE_ENUM::COMMA ||
+                                            tokens[index].type == TOKEN_TYPE_ENUM::RL_BRACKET))
+                            index += 1;
+
+                        else {
+                            errors.emplace_back(Error("should be , or ) after"));
+                            return;
+                        }
+                    }
+                }
+                else {
+                    errors.emplace_back(Error("wrong in parameter list"));
+                    return;
+                }
+            }
+        }
+        // 如果是}
+        else if (cur_type == TOKEN_TYPE_ENUM::RB_BRACKET) {
+            _block(func_state_tree -> root);
+        }
+        else {
+            errors.emplace_back(Error("unidentified symbol in parameter list"));
+            return;
+        }
+    }
 }
 
 
@@ -292,4 +358,6 @@ void SyntaxAnalyzer::_functionCall() {
  */
 void SyntaxAnalyzer::_block(SyntaxTreeNode * father_node) {
     // TODO
+    cout << "VLOCK\n";
+    exit(0);
 }

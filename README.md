@@ -3,7 +3,8 @@ awesome C Compiler
 
 ## 项目结构
 ```
-├── src
+├── awesomeCC
+│   ├── CMakeLists.txt
 │   ├── error.cc
 │   ├── error.h
 │   ├── lexical_analyzer.cc
@@ -13,7 +14,10 @@ awesome C Compiler
 │   ├── syntax_analyzer.h
 │   ├── token.cc
 │   └── token.h
-└── test.c
+├── awesomeCC_test
+│   ├── CMakeLists.txt
+│   ├── basic_test
+└── └── lib
 ```
 
 
@@ -37,14 +41,13 @@ awesome C Compiler
 
 1. 词法分析
 
-   - [ ] 支持()换行（目前是一行一行分析的，要是一行内成对出现符号匹配不了就会出错）
    - [ ] 支持注释
 
 2. 语法分析
 
    - [x] include 语句
 
-   - [ ] 函数声明处理
+   - [x] 函数声明处理
 
    - [ ] 函数调用处理
 
@@ -52,20 +55,22 @@ awesome C Compiler
 
    - [ ] 控制语句
 
-	   - [ ] if
+      - [ ] if
 
-	   - [ ] else
+      - [ ] else
 
-	   - [ ] else if
+      - [ ] else if
 
-	   - [ ] while
+      - [ ] while
 
-	   - [ ] do
+      - [ ] do
 
-	   - [ ] for
+      - [ ] for
 
    - [ ] 赋值语句
 
 3. 其他
-   
-	- [ ] Google test
+
+  - [ ] Google test
+  - [ ] unit test
+  - [ ] error类直接throw，不存在vector里
