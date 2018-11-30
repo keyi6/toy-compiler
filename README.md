@@ -66,11 +66,11 @@ awesome C Compiler
 
       - [ ] else if
 
-      - [ ] while
+      - [x] while
 
       - [ ] do
 
-      - [ ] for
+      - [x] for
 
    - [ ] 赋值语句
 

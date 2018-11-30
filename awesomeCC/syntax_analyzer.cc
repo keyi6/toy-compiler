@@ -114,8 +114,7 @@ void SyntaxTree::switchNode(SyntaxTreeNode * left, SyntaxTreeNode * right) {
 /**
  * @brief 语法分析器构造函数
  */
-SyntaxAnalyzer::SyntaxAnalyzer() {
-}
+SyntaxAnalyzer::SyntaxAnalyzer() = default;
 
 
 /**
@@ -421,7 +420,7 @@ void SyntaxAnalyzer::_return(SyntaxTreeNode * father_node) {
  */
 void SyntaxAnalyzer::_block(SyntaxTreeNode * father_node) {
     SyntaxTree * block_tree = new SyntaxTree(new SyntaxTreeNode("Sentence"));
-    tree -> addChildNode(block_tree -> root, tree -> cur_node);
+    tree -> addChildNode(block_tree -> root, father_node);
 
     index ++;
     while (index < len && tokens[index].type != TOKEN_TYPE_ENUM::RB_BRACKET) {
@@ -496,8 +495,41 @@ void SyntaxAnalyzer::_control(SyntaxTreeNode * father_node) {
  * @brief 处理for
  */
 void SyntaxAnalyzer::_for(SyntaxTreeNode * father_node) {
-    // TODO 处理for
+    SyntaxTree * for_tree = new SyntaxTree(new SyntaxTreeNode("ForControl"));
+    tree -> addChildNode(for_tree -> root, father_node);
 
+    // 读取 for
+    index ++;
+
+    if (tokens[index].type == TOKEN_TYPE_ENUM::LL_BRACKET) {
+        // TODO 看看expression需不需要读取 ；
+        // 读取 (
+        index ++;
+
+        // 读取第一个赋值语句
+        _assignment(for_tree -> root);
+
+        // 读取第二个条件语句
+        _expression(for_tree -> root);
+
+        // 读取第三个赋值语句
+        _assignment(for_tree -> root);
+
+        // 读取 ）
+        if (tokens[index].type == TOKEN_TYPE_ENUM::RL_BRACKET) {
+            index ++;
+
+            // 读取 {
+            if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::LB_BRACKET)
+                _block(for_tree -> root);
+            else
+                throw Error("Expected `{` after `for (assignment; condition; assignment)`", line_number_map[index]);
+        }
+        else
+            throw Error("Expected `)`", line_number_map[index]);
+    }
+    else
+        throw Error("Expected `(` after `for`", line_number_map[index]);
 }
 
 
@@ -505,7 +537,33 @@ void SyntaxAnalyzer::_for(SyntaxTreeNode * father_node) {
  * @brief 处理while
  */
 void SyntaxAnalyzer::_while(SyntaxTreeNode * father_node) {
-    // TODO 处理 while
+    SyntaxTree * while_tree = new SyntaxTree(new SyntaxTreeNode("WhileControl"));
+    tree -> addChildNode(while_tree -> root, father_node);
+
+    // 读取while
+    index ++;
+
+    if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::LL_BRACKET) {
+        index ++;
+
+        // TODO 要看expression需不需要长度
+        _expression(while_tree -> root);
+
+        // 读取 ）
+        if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::RL_BRACKET) {
+            index ++;
+
+            // 读取 {
+            if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::LB_BRACKET)
+                _block(while_tree -> root);
+            else
+                throw Error("Expected `{` after `while (condition)`", line_number_map[index]);
+        }
+        else
+            throw Error("Expected `)` after", line_number_map[index]);
+    }
+    else
+        throw Error("Expected `(` after `while`", line_number_map[index]);
 }
 
 
