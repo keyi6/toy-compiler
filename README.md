@@ -3,9 +3,7 @@ awesome C Compiler
 
 ![](https://img.shields.io/travis/cjhahaha/awesomeCC.svg)
 ![](https://img.shields.io/badge/language-c++-orange.svg)
-![](https://img.shields.io/badge/license-MIT-000000.svg)
-
-
+![](https://img.shields.io/badge/license-MIT-blue.svg)
 
 
 ## 项目结构
@@ -60,7 +58,7 @@ awesome C Compiler
 
    - [ ] 声明语句
 
-   - [ ] 控制语句
+   - [x] 控制语句
 
       - [ ] if
 
@@ -76,9 +74,14 @@ awesome C Compiler
 
    - [ ] 赋值语句
 
+   - [ ] 表达式处理
+
 3. 其他
-   - [ ] Google test
+   - [x] Google test
 
    - [ ] unit test
 
+   - [ ] build test
+
    - [x] error类直接throw，不存在vector里
+

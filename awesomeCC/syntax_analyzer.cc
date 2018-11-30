@@ -245,7 +245,25 @@ SENTENCE_PATTERN_ENUM SyntaxAnalyzer::_judgeSentencePattern() {
  * @brief 处理申明语句
  */
 void SyntaxAnalyzer::_statement(SyntaxTreeNode * father_node) {
+    SyntaxTree * state_tree = new SyntaxTree(new SyntaxTreeNode("Statement"));
+    tree -> addChildNode(state_tree -> root, father_node);
+
+    // 读取变量类型
+    string variable_type = tokens[index].value;
+    index ++;
+
     // TODO 处理声明语句
+    /*
+    string cur_value;
+    int cur_type;
+    while (index < len && tokens[index].type != TOKEN_TYPE_ENUM::SEMICOLON) {
+        cur_value = tokens[index].value, cur_type = int(tokens[index].type);
+
+        switch (cur_type) {
+            case int(TOKEN_TYPE_ENUM::IDENTIFIER):
+        }
+    }
+    */
 }
 
 
@@ -457,7 +475,20 @@ void SyntaxAnalyzer::_assignment(SyntaxTreeNode *father_node) {
  * @brief 处理控制语句
  */
 void SyntaxAnalyzer::_control(SyntaxTreeNode * father_node) {
-    // TODO 处理控制语句
+    int cur_type = int(tokens[index].type);
+    switch (cur_type) {
+        case int(TOKEN_TYPE_ENUM::WHILE):
+            _while(father_node);
+            break;
+        case int(TOKEN_TYPE_ENUM::FOR):
+            _for(father_node);
+            break;
+        case int(TOKEN_TYPE_ENUM::IF):
+            _if(father_node);
+            break;
+        default:
+            throw Error("unsupported control statement", line_number_map[index]);
+    }
 }
 
 
