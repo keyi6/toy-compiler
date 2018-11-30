@@ -1,5 +1,7 @@
 # awesomeCC
+![](https://img.shields.io/travis/cjhahaha/awesomeCC.svg)
 awesome C Compiler
+
 
 ## 项目结构
 ```
