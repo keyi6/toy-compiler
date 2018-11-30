@@ -2,4 +2,9 @@ language: c++
 install: cmake . && make
 compiler:
   - clang
-  - gcc
+jobs:
+  include:
+  - stage: test
+    script: cmake . && make && ./cmake-build-debug/awesomeCC_test/basic_test/CMakeFiles/awesomeCC_test
+  - stage: deploy
+    script: cmake . && make && ./cmake-build-debug/awesomeCC/awesomeCC_exe
