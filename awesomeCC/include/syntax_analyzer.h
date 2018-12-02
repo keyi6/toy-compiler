@@ -6,8 +6,8 @@
  * @author Keyi Li
  *
  */
-#ifndef TOY_C_COMPILER_SYNTAX_ANALYZER_HPP
-#define TOY_C_COMPILER_SYNTAX_ANALYZER_HPP
+#ifndef AWESOME_CC_SYNTAX_ANALYZER_HPP
+#define AWESOME_CC_SYNTAX_ANALYZER_HPP
 
 #include "token.h"
 #include "error.h"
@@ -85,4 +85,4 @@ public:
 };
 
 
-#endif //TOY_C_COMPILER_SYNTAX_ANALYZER_HPP
+#endif //AWESOME_CC_SYNTAX_ANALYZER_HPP

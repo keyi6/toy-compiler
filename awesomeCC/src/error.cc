@@ -7,7 +7,7 @@
  *
  */
 
-#include "error.h"
+#include "../include/error.h"
 
 #include <iostream>
 using namespace std;

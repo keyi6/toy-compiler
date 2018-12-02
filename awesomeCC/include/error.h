@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef TOY_C_COMPILER_ERROR_HPP
-#define TOY_C_COMPILER_ERROR_HPP
+#ifndef AWESOME_CC_ERROR_HPP
+#define AWESOME_CC_ERROR_HPP
 
 #include <string>
 using namespace std;
@@ -26,4 +26,4 @@ public:
 };
 
 
-#endif //TOY_C_COMPILER_ERROR_HPP
+#endif //AWESOME_CC_ERROR_HPP

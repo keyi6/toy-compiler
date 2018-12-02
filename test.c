@@ -5,5 +5,6 @@ int add(int x, int y) {
 }
 
 int main() {
+	int a, b, c[20];
 	return 0;
 }

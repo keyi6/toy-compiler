@@ -5,8 +5,8 @@
  * @author Keyi Li
  *
  */
-#ifndef TOY_C_COMPILER_TOKEN_HPP
-#define TOY_C_COMPILER_TOKEN_HPP
+#ifndef AWESOME_CC_TOKEN_HPP
+#define AWESOME_CC_TOKEN_HPP
 
 #include <map>
 #include <vector>
@@ -91,4 +91,4 @@ public:
 };
 
 
-#endif //TOY_C_COMPILER_TOKEN_HPP
+#endif //AWESOME_CC_TOKEN_HPP

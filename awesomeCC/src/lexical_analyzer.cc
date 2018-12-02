@@ -8,7 +8,8 @@
  */
 
 
-#include "lexical_analyzer.h"
+#include "../include/strtools.h"
+#include "../include/lexical_analyzer.h"
 
 #include <cctype>
 #include <string>
@@ -26,20 +27,6 @@ LexicalAnalyzer::LexicalAnalyzer() {
 }
 
 
-/**
- * @brief 将字符转化为字符串
- * @param ch char, 输入字符
- * @return string string, 返回字符串
- */
-string LexicalAnalyzer::_char2string(char ch) {
-    stringstream ss;
-    ss << ch;
-
-    string ret = ss.str();
-    ss.clear();
-
-    return ret;
-}
 
 
 /**
@@ -150,7 +137,7 @@ void LexicalAnalyzer::_analyze() {
                 if (sentence[cur_pos] == '\"' || sentence[cur_pos] == '<') {
                     cur_char = sentence[cur_pos ++];
 
-                    tokens.emplace_back(Token(_char2string(cur_char), TOKEN_TYPE_ENUM::SEPARATOR, cur_pos));
+                    tokens.emplace_back(Token(char2string(cur_char), TOKEN_TYPE_ENUM::SEPARATOR, cur_pos));
 
                     char match_char = cur_char == '\"' ? '\"' : '>';
 
@@ -158,14 +145,14 @@ void LexicalAnalyzer::_analyze() {
                     while (cur_pos < len) {
                         if (sentence[cur_pos] == match_char) {
                             tokens.emplace_back(Token(sentence.substr(libNameStart, libNameLen), TOKEN_TYPE_ENUM::IDENTIFIER, libNameStart));
-                            tokens.emplace_back(Token(_char2string(match_char), TOKEN_TYPE_ENUM::SEPARATOR, cur_pos));
+                            tokens.emplace_back(Token(char2string(match_char), TOKEN_TYPE_ENUM::SEPARATOR, cur_pos));
                             return;
                         }
                         else
                             libNameLen ++, cur_pos ++;
                     }
 
-                    throw Error("in include, lack of " + _char2string(match_char), cur_line_number);
+                    throw Error("in include, lack of " + char2string(match_char), cur_line_number);
                 }
             }
 
@@ -220,7 +207,7 @@ void LexicalAnalyzer::_analyze() {
                     temp_len ++;
 
                 if (cur_pos + temp_len >= len || sentence[cur_pos + temp_len] != cur_char)
-                    throw Error("in string constant, lack of " + _char2string(cur_char), cur_line_number);
+                    throw Error("in string constant, lack of " + char2string(cur_char), cur_line_number);
 
                 tokens.emplace_back(Token(sentence.substr(cur_pos, temp_len), TOKEN_TYPE_ENUM::STRING_CONSTANT, cur_pos + 1));
                 cur_pos += temp_len;

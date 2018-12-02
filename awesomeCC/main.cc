@@ -6,8 +6,8 @@
  * @author Keyi Li
  *
  */
-#include "lexical_analyzer.h"
-#include "syntax_analyzer.h"
+#include "include/lexical_analyzer.h"
+#include "include/syntax_analyzer.h"
 
 
 #include <vector>

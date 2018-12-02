@@ -7,8 +7,8 @@
  *
  */
 
-#include "syntax_analyzer.h"
-#include "lexical_analyzer.h"
+#include "../include/syntax_analyzer.h"
+#include "../include/lexical_analyzer.h"
 
 #include <queue>
 #include <iostream>
@@ -250,19 +250,70 @@ void SyntaxAnalyzer::_statement(SyntaxTreeNode * father_node) {
     // 读取变量类型
     string variable_type = tokens[index].value;
     index ++;
-
-    // TODO 处理声明语句
-    /*
     string cur_value;
     int cur_type;
-    while (index < len && tokens[index].type != TOKEN_TYPE_ENUM::SEMICOLON) {
+    while (index < len && tokens[index].type!= TOKEN_TYPE_ENUM::SEMICOLON) {
         cur_value = tokens[index].value, cur_type = int(tokens[index].type);
 
         switch (cur_type) {
-            case int(TOKEN_TYPE_ENUM::IDENTIFIER):
+            // 是个标识符
+            case int(TOKEN_TYPE_ENUM::IDENTIFIER): {
+                index ++;
+
+                TOKEN_TYPE_ENUM n_type = tokens[index].type;
+                // 如果是，或者；就直接读取
+                if (n_type == TOKEN_TYPE_ENUM::COMMA || n_type == TOKEN_TYPE_ENUM::SEMICOLON) {
+                    state_tree -> addChildNode(new SyntaxTreeNode(cur_value, variable_type), state_tree -> root);
+                    index ++;
+                    if (n_type == TOKEN_TYPE_ENUM::COMMA)
+                        break;
+                    else
+                        return;
+                }
+                // 如果是[，就按照数组定义来做
+                if (n_type == TOKEN_TYPE_ENUM::LM_BRACKET) {
+                    // 读取 [
+                    index ++;
+
+                    // 读取数组大小
+                    string size = tokens[index].value;
+                    index ++;
+
+                    // 读取 ]
+                    if (tokens[index].type == TOKEN_TYPE_ENUM::RM_BRACKET) {
+                        index ++;
+
+                        TOKEN_TYPE_ENUM n_type = tokens[index].type;
+                        // 如果是，或者；就直接读取
+                        if (n_type == TOKEN_TYPE_ENUM::COMMA || n_type == TOKEN_TYPE_ENUM::SEMICOLON) {
+                            state_tree -> addChildNode(new SyntaxTreeNode(cur_value, variable_type, size), state_tree -> root);
+                            if (tokens[index ++].type == TOKEN_TYPE_ENUM::COMMA)
+                                break;
+                            else
+                                return;
+                        }
+                        // 如果是{ 那么就读取那些初始化信息
+                        else if (n_type == TOKEN_TYPE_ENUM::LL_BRACKET) {
+                            while (index < len &&
+                                   (tokens[index].type != TOKEN_TYPE_ENUM::COMMA ||
+                                    tokens[index].type != TOKEN_TYPE_ENUM::SEMICOLON)) {
+                                // TODO 读取数组的初始化值
+                                index ++;
+                            }
+                            break;
+                        }
+                        else
+                            throw Error("Unrecognized symbol in statement", line_number_map[index]);
+                    }
+                    else
+                        throw Error("Expected `]` after a statement of an array", line_number_map[index]);
+                }
+                throw Error("Unrecognized symbol in statement", line_number_map[index]);
+            }
+            default:
+                throw Error("Unrecognized symbol in statement", line_number_map[index]);
         }
     }
-    */
 }
 
 

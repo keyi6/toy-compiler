@@ -6,17 +6,18 @@
  * @author Keyi Li
  *
  */
-#ifndef TOY_C_COMPILER_LEXICAL_ANALYZER_HPP
-#define TOY_C_COMPILER_LEXICAL_ANALYZER_HPP
+#ifndef AWESOME_CC_LEXICAL_ANALYZER_HPP
+#define AWESOME_CC_LEXICAL_ANALYZER_HPP
 
 #include <string>
 #include <vector>
 #include <iostream>
 #include <iomanip>
-using namespace std;
 
 #include "token.h"
 #include "error.h"
+using namespace std;
+
 
 class LexicalAnalyzer {
 private:
@@ -24,8 +25,6 @@ private:
     vector<int> line_number_map;
     string sentence;
     int cur_pos, cur_line_number, len;
-
-    string _char2string(char ch);
 
     bool _isBlank();
     bool _isKeyword(string word);
@@ -44,4 +43,4 @@ public:
 };
 
 
-#endif //TOY_C_COMPILER_LEXICAL_ANALYZER_HPP
+#endif //AWESOME_CC_LEXICAL_ANALYZER_HPP
