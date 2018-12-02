@@ -11,10 +11,13 @@
 #include <map>
 #include <vector>
 #include <string>
-#include <iomanip>
 #include <iostream>
-#include <algorithm>
-using namespace std;
+
+using std::vector;
+using std::string;
+using std::map;
+using std::ostream;
+
 
 
 enum class TOKEN_TYPE_ENUM {

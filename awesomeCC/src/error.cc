@@ -10,7 +10,8 @@
 #include "../include/error.h"
 
 #include <iostream>
-using namespace std;
+using std::ostream;
+using std::endl;
 
 
 /**

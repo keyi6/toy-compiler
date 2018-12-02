@@ -10,9 +10,9 @@
 #include "../include/syntax_analyzer.h"
 #include "../include/lexical_analyzer.h"
 
-#include <queue>
 #include <iostream>
-using namespace std;
+using std::cout;
+using std::endl;
 
 
 /**

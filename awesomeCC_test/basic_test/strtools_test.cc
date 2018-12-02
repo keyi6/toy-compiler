@@ -3,7 +3,7 @@
 //
 
 #include "gtest/gtest.h"
-#include "../../awesomeCC/include/strtools.h"
+#include "../../awesomeCC/include/str_tools.h"
 
 TEST(string2int_test, string2int_test_case) {
     EXPECT_EQ(string2int("1123"), 1123);

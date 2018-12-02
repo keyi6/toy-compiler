@@ -5,8 +5,14 @@
  * @author Keyi Li
  *
  */
+
 #include "../include/token.h"
 
+#include <iomanip>
+
+using std::setw;
+using std::setfill;
+using std::endl;
 
 
 vector<string> Token::TOKEN_TYPE = {

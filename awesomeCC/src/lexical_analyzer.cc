@@ -8,25 +8,22 @@
  */
 
 
-#include "../include/strtools.h"
+#include "../include/str_tools.h"
 #include "../include/lexical_analyzer.h"
 
-#include <cctype>
 #include <string>
 #include <vector>
-#include <sstream>
 #include <iostream>
-using namespace std;
+using std::string;
+using std::vector;
+using std::cout;
+using std::endl;
 
 
 /**
  * @brief LexicalAnalyzer类构造函数
  */
-LexicalAnalyzer::LexicalAnalyzer() {
-
-}
-
-
+LexicalAnalyzer::LexicalAnalyzer() = default;
 
 
 /**

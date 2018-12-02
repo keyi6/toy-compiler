@@ -11,7 +11,8 @@
 #define AWESOME_CC_ERROR_HPP
 
 #include <string>
-using namespace std;
+using std::string;
+using std::ostream;
 
 
 class Error {

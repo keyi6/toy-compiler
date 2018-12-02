@@ -9,14 +9,15 @@
 #ifndef AWESOME_CC_LEXICAL_ANALYZER_HPP
 #define AWESOME_CC_LEXICAL_ANALYZER_HPP
 
+#include "token.h"
+#include "error.h"
+
 #include <string>
 #include <vector>
 #include <iostream>
 #include <iomanip>
-
-#include "token.h"
-#include "error.h"
-using namespace std;
+using std::vector;
+using std::string;
 
 
 class LexicalAnalyzer {
