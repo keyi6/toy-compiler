@@ -33,15 +33,20 @@ string char2string(char ch) {
  * @return int，返回int
  */
 int string2int(string str) {
-    int ret = 0, len = str.length();
-    for (int i = 0; i < len; i ++) {
+    int ret = 0, len = str.length(), i = 0;
+    bool flag = true;
+
+    if (str[i] == '-')
+        flag = false, i ++;
+
+    for (; i < len; i ++) {
         if ('0' <= str[i] && str[i] <= '9')
             ret = ret * 10  + str[i] - '0';
         else
-            throw "It is not a interger";
+            throw "It is not an interger";
     }
 
-    return ret;
+    return flag ? ret : -ret;
 }
 
 
@@ -52,9 +57,13 @@ int string2int(string str) {
  */
  double string2double(string str) {
     double ret = 0, base = 0.1;
-    bool meet_dot = false;
-    int len = str.length();
-    for (int i = 0; i < len; i ++) {
+    bool meet_dot = false, flag = true;
+    int len = str.length(), i = 0;
+
+    if (str[i] == '-')
+        flag = false, i ++;
+
+    for (; i < len; i ++) {
         if ('0' <= str[i] && str[i] <= '9') {
             if (meet_dot) {
                 ret += (str[i] - '0') * base;
@@ -69,7 +78,8 @@ int string2int(string str) {
             throw "It is not a interger";
     }
 
-    return ret;
+    return flag ? ret : -ret;
 }
+
 
 #endif //AWESOMECC_STRTOOLS_H
