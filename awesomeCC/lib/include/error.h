@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef AWESOME_CC_ERROR_HPP
-#define AWESOME_CC_ERROR_HPP
+#ifndef AWESOMECC_ERROR_HPP
+#define AWESOMECC_ERROR_HPP
 
 #include <string>
 using std::string;
@@ -27,4 +27,4 @@ public:
 };
 
 
-#endif //AWESOME_CC_ERROR_HPP
+#endif //AWESOMECC_ERROR_HPP

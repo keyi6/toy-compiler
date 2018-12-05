@@ -6,11 +6,11 @@
  * @author Keyi Li
  *
  */
-#ifndef AWESOME_CC_SYNTAX_ANALYZER_HPP
-#define AWESOME_CC_SYNTAX_ANALYZER_HPP
+#ifndef AWESOMECC_SYNTAX_ANALYZER_HPP
+#define AWESOMECC_SYNTAX_ANALYZER_HPP
 
-#include "token.h"
-#include "error.h"
+#include "../../lib/include/token.h"
+#include "../../lib/include/error.h"
 
 
 enum class SENTENCE_PATTERN_ENUM {
@@ -85,4 +85,4 @@ public:
 };
 
 
-#endif //AWESOME_CC_SYNTAX_ANALYZER_HPP
+#endif //AWESOMECC_SYNTAX_ANALYZER_HPP

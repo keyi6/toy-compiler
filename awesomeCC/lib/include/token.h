@@ -5,8 +5,8 @@
  * @author Keyi Li
  *
  */
-#ifndef AWESOME_CC_TOKEN_HPP
-#define AWESOME_CC_TOKEN_HPP
+#ifndef AWESOMECC_TOKEN_HPP
+#define AWESOMECC_TOKEN_HPP
 
 #include <map>
 #include <vector>
@@ -94,4 +94,4 @@ public:
 };
 
 
-#endif //AWESOME_CC_TOKEN_HPP
+#endif //AWESOMECC_TOKEN_HPP

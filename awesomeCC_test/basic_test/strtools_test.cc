@@ -1,6 +1,11 @@
-//
-// Created by cj on 2018/11/27.
-//
+/**
+ *
+ * @file strtools_test.cc
+ * @brief 测试
+ *
+ * @author Keyi Li
+ *
+ */
 
 #include "gtest/gtest.h"
 #include "../../awesomeCC/include/str_tools.h"

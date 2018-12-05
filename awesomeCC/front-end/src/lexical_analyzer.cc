@@ -8,7 +8,7 @@
  */
 
 
-#include "../include/str_tools.h"
+#include "../../lib/include/str_tools.h"
 #include "../include/lexical_analyzer.h"
 
 #include <string>
@@ -23,7 +23,9 @@ using std::endl;
 /**
  * @brief LexicalAnalyzer类构造函数
  */
-LexicalAnalyzer::LexicalAnalyzer() = default;
+LexicalAnalyzer::LexicalAnalyzer() {
+    in_comment = false;
+};
 
 
 /**
@@ -39,11 +41,46 @@ bool LexicalAnalyzer::_isBlank() {
 
 
 /**
+ * @brief 判断curPos处是是不是备注开始
+ * @return
+ *      -<em>true</em> 是备注开始
+ *      -<em>false</em> 不是
+ */
+bool LexicalAnalyzer::_isCommentStart() {
+    return (sentence[cur_pos] == '/' &&
+        cur_pos + 1 < len &&
+        sentence[cur_pos + 1] == '*');
+}
+
+
+/**
+ * @brief 判断curPos处是是不是备注结束
+ * @return
+ *      -<em>true</em> 是备注结束
+ *      -<em>false</em> 不是
+ */
+bool LexicalAnalyzer::_isCommentEnd() {
+    return (sentence[cur_pos] == '*' &&
+            cur_pos + 1 < len &&
+            sentence[cur_pos + 1] == '/');
+}
+
+/**
  * @brief 自增curPos直到不为空
  */
 void LexicalAnalyzer::_skipBlank() {
-    while (cur_pos < len && _isBlank())
+    while (cur_pos < len &&
+          (_isBlank() || (in_comment && ! _isCommentEnd() ))) {
         cur_pos ++;
+    }
+
+    if (cur_pos < len && _isCommentEnd()) {
+        in_comment = false;
+        cur_pos += 2;
+
+        if (cur_pos < len)
+            _skipBlank();
+    }
 }
 
 
@@ -119,8 +156,13 @@ void LexicalAnalyzer::_analyze() {
 
         cur_char = sentence[cur_pos];
 
+        if (_isCommentStart()) {
+            in_comment = true;
+            cur_pos += 2;
+            continue;
+        }
         // #include
-        if (cur_char == '#') {
+        else if (cur_char == '#') {
             tokens.emplace_back(Token("#", TOKEN_TYPE_ENUM::SEPARATOR, cur_pos ++));
             _skipBlank();
 
@@ -248,6 +290,7 @@ void LexicalAnalyzer::_analyze() {
  */
 bool LexicalAnalyzer::analyze(vector<string> _sentences, bool verbose) {
     cur_line_number = 0;
+    in_comment = false;
     all_tokens.clear();
 
     try {

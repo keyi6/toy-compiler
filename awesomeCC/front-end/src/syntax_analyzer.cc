@@ -128,7 +128,7 @@ SyntaxAnalyzer::SyntaxAnalyzer() = default;
 bool SyntaxAnalyzer::analyze(vector<string> sentences, bool verbose) {
     LexicalAnalyzer la;
     // 如果能通过词法分析
-    if (la.analyze(sentences, false)) {
+    if (la.analyze(sentences)) {
         index = 0;
         tree = new SyntaxTree();
 

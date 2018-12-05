@@ -1,9 +1,15 @@
 #include <stdio.h>
 
+/* this is a function */
 int add(int x, int y) {
 	return 0;
 }
 
+/* this is main
+ * function
+ * test of mulitiline
+ * comment
+ * */
 int main() {
 	int a, b, c[20];
 	return 0;
