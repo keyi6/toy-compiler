@@ -171,6 +171,9 @@ void SyntaxAnalyzer::_analyze() {
             case int(SENTENCE_PATTERN_ENUM::FUNCTION_CALL):
                 _functionCall(tree -> cur_node);
                 break;
+            case int(SENTENCE_PATTERN_ENUM::PRINT):
+                _print(tree -> cur_node);
+                break;
             default:
                 throw Error("in main, unidentified symbol", line_number_map[index]);
         }
@@ -187,6 +190,9 @@ SENTENCE_PATTERN_ENUM SyntaxAnalyzer::_judgeSentencePattern() {
     string token_value = tokens[index].value;
 
     switch (token_type) {
+        // print 语句
+        case int(TOKEN_TYPE_ENUM::PRINT):
+            return SENTENCE_PATTERN_ENUM::PRINT;
         // include 语句
         case int(TOKEN_TYPE_ENUM::SHARP):
             if (index + 1 < len && tokens[index + 1].type == TOKEN_TYPE_ENUM::INCLUDE)
@@ -231,6 +237,18 @@ SENTENCE_PATTERN_ENUM SyntaxAnalyzer::_judgeSentencePattern() {
         default:
             return SENTENCE_PATTERN_ENUM::ERROR;
     }
+}
+
+
+/**
+ * @brief 处理print语句
+ */
+void SyntaxAnalyzer::_print(SyntaxTreeNode * father_node) {
+    SyntaxTree * print_tree = new SyntaxTree(new SyntaxTreeNode("Print"));
+    tree -> addChildNode(print_tree -> root, father_node);
+
+    index ++;
+    _expression(print_tree -> root);
 }
 
 
@@ -371,16 +389,21 @@ void SyntaxAnalyzer::_expression(SyntaxTreeNode * father_node, TOKEN_TYPE_ENUM s
             // 如果是 ）
             else if (cur_type == TOKEN_TYPE_ENUM::RL_BRACKET) {
                 SyntaxTree * temp_t;
+                bool flag = false;
                 while (! op_stack.empty()) {
                     temp_t = op_stack.top();
                     op_stack.pop();
 
-                    if (temp_t -> root -> first_son -> value == token2string(TOKEN_TYPE_ENUM::LL_BRACKET))
+                    if (temp_t -> root -> first_son -> value == token2string(TOKEN_TYPE_ENUM::LL_BRACKET)) {
+                        flag = true;
                         break;
+                    }
 
                     reverse_polish_exp.emplace_back(temp_t);
                 }
 
+                if (! flag)
+                    throw Error("in expression, expected `(` before `)`", line_number_map[index]);
             }
             // 如果是其他的 + - * / > < 那些
             else {
@@ -408,24 +431,25 @@ void SyntaxAnalyzer::_expression(SyntaxTreeNode * father_node, TOKEN_TYPE_ENUM s
     }
 
     if (!(len < index || tokens[index].type == stop_sign))
-        throw Error("in expression, expected token `" + token2string(stop_sign) + "`", line_number_map[index]);
+        throw Error("in expression, expected token `" + token2string(stop_sign) + "` at the end", line_number_map[index]);
 
+    // 读取stop sign
     index ++;
 
+    SyntaxTree * temp_t;
     while (! op_stack.empty()) {
-        reverse_polish_exp.emplace_back(op_stack.top());
+        temp_t = op_stack.top();
+        if (temp_t -> root -> first_son -> value == "(")
+            throw Error("in expression, expected `)` after `(`", line_number_map[index]);
+        reverse_polish_exp.emplace_back(temp_t);
         op_stack.pop();
     }
 
-    cout << "---\n";
-    for (auto it = reverse_polish_exp.begin(); it != reverse_polish_exp.end(); it ++) {
-        (*it) -> display() ;
-    }
-
     // 这里把op_stack 做成操作数栈
-    SyntaxTree * temp_t, * a, * b;
-    for (auto it = reverse_polish_exp.begin(); it != reverse_polish_exp.end(); it ++) {
-        temp_t = * it;
+    SyntaxTree * a, * b;
+    int temp_size = reverse_polish_exp.size();
+    for (int i = 0; i < temp_size; i ++) {
+        temp_t = reverse_polish_exp[i];
 
         // 如果是运算符
         if (temp_t -> root -> value == "Expression-Operator") {
@@ -626,6 +650,9 @@ void SyntaxAnalyzer::_block(SyntaxTreeNode * father_node) {
                 break;
             case int(SENTENCE_PATTERN_ENUM::RETURN):
                 _return(block_tree -> root);
+                break;
+            case int(SENTENCE_PATTERN_ENUM::PRINT):
+                _print(block_tree -> root);
                 break;
             default:
                 throw Error("in block, unidentified symbols found", line_number_map[index]);

@@ -29,6 +29,7 @@ enum class SENTENCE_PATTERN_ENUM {
     CONTROL,
     RETURN,
     RB_BRACKET,
+    PRINT,
     ERROR
 };
 
@@ -71,6 +72,7 @@ private:
 
     void _analyze();
 
+    void _print(SyntaxTreeNode * father_node);
     void _include(SyntaxTreeNode * father_node);
     void _functionStatement(SyntaxTreeNode * father_node);
     void _statement(SyntaxTreeNode * father_node);

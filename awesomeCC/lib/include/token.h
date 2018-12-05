@@ -29,6 +29,7 @@ enum class TOKEN_TYPE_ENUM {
     /* detailed keyword type */
     INCLUDE,
     VOID,
+    PRINT,
     INT,
     FLOAT,
     CHAR,

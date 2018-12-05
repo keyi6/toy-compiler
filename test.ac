@@ -1,12 +1,14 @@
-#include <stdio.h>
-
-
 /* this is main
  * function
  * test of mulitiline
  * comment
  * */
+
 int main() {
 	int a, b, c[20];
-	a = 2 * (b + 3) + c[i * 2] - (43 << 4);
+
+	a = 1 + 2 * (3 - 4);
+	print a;
+
+	return 0;
 }
