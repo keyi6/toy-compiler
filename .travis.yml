@@ -5,4 +5,4 @@ compiler:
 jobs:
   include:
   - stage: test
-    script: cmake --build ./cmake-build-debug --target awesomeCC_test -- -j 2
+    script: cmake --target awesomeCC_test -j 2

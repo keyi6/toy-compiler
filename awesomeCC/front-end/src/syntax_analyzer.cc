@@ -4,105 +4,11 @@
  * @brief 语法分析器类具体实现
  *
  * @author Keyi Li
+ * @author Hanwen Liu
  *
  */
 
 #include "../include/syntax_analyzer.h"
-
-/**
- * @brief 语法树节点构造函数
- */
-SyntaxTreeNode::SyntaxTreeNode(string _value, string _type, string _extra_info) {
-    left = right = father = first_son = nullptr;
-    value = _value;
-    type = _type;
-    extra_info = _extra_info;
-}
-
-
-/**
- * @brief 语法树构造函数
- */
-SyntaxTree::SyntaxTree(SyntaxTreeNode * _root) {
-    root = cur_node = _root;
-}
-
-
-/**
- * @brief 悬挂一个节点
- */
-void SyntaxTree::addChildNode(SyntaxTreeNode * child_node, SyntaxTreeNode * father_node) {
-    child_node -> father = father_node;
-
-    cur_node = father_node -> first_son;
-    if (! cur_node)
-        father_node -> first_son = child_node;
-    else {
-        while (cur_node -> right)
-            cur_node = cur_node -> right;
-
-        child_node -> left = cur_node;
-        cur_node -> right = child_node;
-    }
-
-    cur_node = child_node;
-}
-
-
-/**
- * @brief 交换左右两个相邻节点
- */
-void SyntaxTree::switchNode(SyntaxTreeNode * left, SyntaxTreeNode * right) {
-    SyntaxTreeNode * ll = left -> left, * rr = right -> right;
-
-    left -> left = right;
-    left -> right = rr;
-
-    right -> right = ll;
-    right -> right = left;
-
-    if (ll)
-        ll -> right = right;
-    if (rr)
-        rr -> left = left;
-}
-
-
-/**
- * @brief dfs语法树
- */
- void SyntaxTree::dfs(SyntaxTreeNode * cur, int depth, int status) {
-     for (int i = 0; i < depth; i ++) {
-         if (status & (1 << (depth - i - 1)))
-             cout << "    ";
-         else
-             cout << "│   ";
-     }
-     cout << (cur -> right ? "├── " : "└── " ) << cur -> value << endl;
-     int new_status = (status << 1) + int(cur -> right == nullptr);
-
-     if (cur -> first_son) {
-
-         dfs(cur -> first_son, depth + 1, new_status);
-     }
-
-     if (! cur -> left) {
-         while (cur -> right) {
-             dfs(cur -> right, depth, status);
-             cur = cur -> right;
-         }
-     }
- }
-
-
-/**
- * @brief 打印语法树
- */
- void SyntaxTree::display() {
-     cout << root -> value << endl;
-     dfs(root -> first_son, 0, 0);
-     cout << endl;
- }
 
 
 /**
@@ -113,6 +19,7 @@ SyntaxAnalyzer::SyntaxAnalyzer() = default;
 
 /**
  * @brief 进行语法分析
+ * @author Keyi Li
  * @param sentences string vector, 等待分析的句子们
  * @param verbose bool, 是否输出语法树
  * @return
@@ -122,7 +29,7 @@ SyntaxAnalyzer::SyntaxAnalyzer() = default;
 bool SyntaxAnalyzer::analyze(vector<string> sentences, bool verbose) {
     LexicalAnalyzer la;
     // 如果能通过词法分析
-    if (la.analyze(sentences)) {
+    if (la.analyze(sentences, verbose)) {
         index = 0;
         tree = new SyntaxTree();
 
@@ -151,6 +58,7 @@ bool SyntaxAnalyzer::analyze(vector<string> sentences, bool verbose) {
 
 /**
  * @brief 进行语法分析
+ * @author Keyi Li
  */
 void SyntaxAnalyzer::_analyze() {
     tree -> cur_node = tree -> root = new SyntaxTreeNode("Program");
@@ -183,6 +91,7 @@ void SyntaxAnalyzer::_analyze() {
 
 /**
  * @brief 判断句子的种类
+ * @author Keyi Li
  * @return SENTENCE_PATTERN_ENUM, 句子种类的枚举类
  */
 SENTENCE_PATTERN_ENUM SyntaxAnalyzer::_judgeSentencePattern() {
@@ -242,6 +151,7 @@ SENTENCE_PATTERN_ENUM SyntaxAnalyzer::_judgeSentencePattern() {
 
 /**
  * @brief 处理print语句
+ * @author Keyi Li
  */
 void SyntaxAnalyzer::_print(SyntaxTreeNode * father_node) {
     SyntaxTree * print_tree = new SyntaxTree(new SyntaxTreeNode("Print"));
@@ -254,6 +164,7 @@ void SyntaxAnalyzer::_print(SyntaxTreeNode * father_node) {
 
 /**
  * @brief 处理申明语句
+ * @author Keyi Li
  */
 void SyntaxAnalyzer::_statement(SyntaxTreeNode * father_node) {
     SyntaxTree * state_tree = new SyntaxTree(new SyntaxTreeNode("Statement"));
@@ -331,6 +242,7 @@ void SyntaxAnalyzer::_statement(SyntaxTreeNode * father_node) {
 
 /**
  * @brief 处理表达式
+ * @author Keyi Li
  */
 void SyntaxAnalyzer::_expression(SyntaxTreeNode * father_node, TOKEN_TYPE_ENUM stop_sign) {
     stack<SyntaxTree *> op_stack;
@@ -497,6 +409,7 @@ void SyntaxAnalyzer::_expression(SyntaxTreeNode * father_node, TOKEN_TYPE_ENUM s
 
 /**
  * @brief 处理include语句
+ * @author Keyi Li
  */
 void SyntaxAnalyzer::_include(SyntaxTreeNode * father_node) {
     SyntaxTree * include_tree = new SyntaxTree(new SyntaxTreeNode("Include"));
@@ -522,6 +435,7 @@ void SyntaxAnalyzer::_include(SyntaxTreeNode * father_node) {
 
 /**
  * @brief 处理函数声明
+ * @author Keyi Li
  */
 void SyntaxAnalyzer::_functionStatement(SyntaxTreeNode * father_node) {
     SyntaxTree * func_state_tree = new SyntaxTree(new SyntaxTreeNode("FunctionStatement"));
@@ -596,6 +510,7 @@ void SyntaxAnalyzer::_functionStatement(SyntaxTreeNode * father_node) {
 
 /**
  * @brief 处理return
+ * @author Keyi Li
  */
 void SyntaxAnalyzer::_return(SyntaxTreeNode * father_node) {
     SyntaxTree * return_tree = new SyntaxTree();
@@ -626,9 +541,10 @@ void SyntaxAnalyzer::_return(SyntaxTreeNode * father_node) {
 
 /**
  * @brief 处理大括号
+ * @author Keyi Li
  */
 void SyntaxAnalyzer::_block(SyntaxTreeNode * father_node) {
-    SyntaxTree * block_tree = new SyntaxTree(new SyntaxTreeNode("Sentence"));
+    SyntaxTree * block_tree = new SyntaxTree(new SyntaxTreeNode("Block"));
     tree -> addChildNode(block_tree -> root, father_node);
 
     index ++;
@@ -676,8 +592,9 @@ void SyntaxAnalyzer::_functionCall(SyntaxTreeNode * father_node) {
 
 /**
  * @brief 处理赋值语句
+ * @author Keyi Li
  */
-void SyntaxAnalyzer::_assignment(SyntaxTreeNode * father_node) {
+void SyntaxAnalyzer::_assignment(SyntaxTreeNode * father_node, TOKEN_TYPE_ENUM stop_token) {
     SyntaxTree * assign_tree = new SyntaxTree(new SyntaxTreeNode("Assignment"));
     tree -> addChildNode(assign_tree -> root, father_node);
 
@@ -694,15 +611,16 @@ void SyntaxAnalyzer::_assignment(SyntaxTreeNode * father_node) {
         else
             throw Error("in assignment, expected `=` after an identifier", line_number_map[index]);
     }
-    else if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::SEMICOLON)
+    else if (index < len && tokens[index].type == stop_token)
         index ++;
     else
-        throw Error("in assignment, expected an identifier.", line_number_map[index]);
+        throw Error("in assignment, expected a `" + token2string(stop_token) + "` after", line_number_map[index]);
 }
 
 
 /**
  * @brief 处理控制语句
+ * @author Keyi Li
  */
 void SyntaxAnalyzer::_control(SyntaxTreeNode * father_node) {
     int cur_type = int(tokens[index].type);
@@ -724,6 +642,7 @@ void SyntaxAnalyzer::_control(SyntaxTreeNode * father_node) {
 
 /**
  * @brief 处理for
+ * @author Keyi Li
  */
 void SyntaxAnalyzer::_for(SyntaxTreeNode * father_node) {
     SyntaxTree * for_tree = new SyntaxTree(new SyntaxTreeNode("ForControl"));
@@ -744,7 +663,7 @@ void SyntaxAnalyzer::_for(SyntaxTreeNode * father_node) {
         _expression(for_tree -> root);
 
         // 读取第三个赋值语句
-        _assignment(for_tree -> root);
+        _assignment(for_tree -> root, TOKEN_TYPE_ENUM::RL_BRACKET);
 
         // 读取 ）
         if (tokens[index].type == TOKEN_TYPE_ENUM::RL_BRACKET) {
@@ -766,6 +685,7 @@ void SyntaxAnalyzer::_for(SyntaxTreeNode * father_node) {
 
 /**
  * @brief 处理while
+ * @author Keyi Li
  */
 void SyntaxAnalyzer::_while(SyntaxTreeNode * father_node) {
     SyntaxTree * while_tree = new SyntaxTree(new SyntaxTreeNode("WhileControl"));
@@ -812,4 +732,11 @@ void SyntaxAnalyzer::_else_if(SyntaxTreeNode * father_node) {
  */
 void SyntaxAnalyzer::_else(SyntaxTreeNode * father_node) {
     // TODO 处理else
+}
+
+/**
+ * @brief 返回生成的语法🌲
+ */
+SyntaxTree * SyntaxAnalyzer::getSyntaxTree() {
+    return tree;
 }

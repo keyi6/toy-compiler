@@ -1,14 +1,13 @@
-/* this is main
- * function
- * test of mulitiline
- * comment
- * */
+/*
+ * this is a simple demo using awesomeCC
+ * created from scratch by Keyi Li & Hanwen Liu
+ */
 
 int main() {
-	int a, b, c[20];
+	int a, b;
+	/*int a, b, c[20];*/
 
-	a = 1 + 2 * (3 - 4);
+	a = 1 + 2 * 3;
+
 	print a;
-
-	return 0;
 }

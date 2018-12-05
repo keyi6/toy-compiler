@@ -11,6 +11,7 @@
 #include "../../awesomeCC/lib/include/str_tools.h"
 #include "../../awesomeCC/lib/include/token.h"
 
+
 TEST(string2int_test, string2int_test_case) {
     EXPECT_EQ(string2int("1123"), 1123);
     EXPECT_EQ(string2int("-991303"), -991303);
@@ -32,16 +33,4 @@ TEST(char2string_test, char2string_test_case) {
 TEST(token2string_test, token2string_test_case) {
     EXPECT_EQ(token2string(TOKEN_TYPE_ENUM::SELF_MINUS), "--" );
     EXPECT_EQ(token2string(TOKEN_TYPE_ENUM::LL_BRACKET), "(");
-}
-
-
-
-TEST(isExpOpe_test, isExpOpe_test_case) {
-    EXPECT_EQ(Token::isExpressionOperator(TOKEN_TYPE_ENUM::LL_BRACKET), true);
-    EXPECT_EQ(Token::isExpressionOperator(TOKEN_TYPE_ENUM::RL_BRACKET), true);
-    EXPECT_EQ(Token::isExpressionOperator(TOKEN_TYPE_ENUM::LB_BRACKET), false);
-    EXPECT_EQ(Token::isExpressionOperator(TOKEN_TYPE_ENUM::PLUS), true);
-    EXPECT_EQ(Token::isExpressionOperator(TOKEN_TYPE_ENUM::MINUS), true);
-    EXPECT_EQ(Token::isExpressionOperator(TOKEN_TYPE_ENUM::MUL), true);
-    EXPECT_EQ(Token::isExpressionOperator(TOKEN_TYPE_ENUM::DIV), true);
 }
