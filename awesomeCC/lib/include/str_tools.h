@@ -10,6 +10,8 @@
 #ifndef AWESOMECC_STRTOOLS_H
 #define AWESOMECC_STRTOOLS_H
 
+#include "token.h"
+
 #include <string>
 #include <sstream>
 using std::string;
@@ -21,7 +23,7 @@ using std::stringstream;
  * @param ch char, 输入字符
  * @return string, 返回字符串
  */
-string char2string(char ch) {
+inline string char2string(char ch) {
     stringstream ss;
     ss << ch;
 
@@ -34,10 +36,10 @@ string char2string(char ch) {
 
 /**
  * @brief 将字符转化为int
- * @str string，输入字符串
+ * @param string，输入字符串
  * @return int，返回int
  */
-int string2int(string str) {
+inline int string2int(string str) {
     int ret = 0, len = str.length(), i = 0;
     bool flag = true;
 
@@ -57,10 +59,10 @@ int string2int(string str) {
 
 /**
  * @brief 将字符转化为double
- * @str string，输入字符串
+ * @param string，输入字符串
  * @return double，返回double
  */
- double string2double(string str) {
+ inline double string2double(string str) {
     double ret = 0, base = 0.1;
     bool meet_dot = false, flag = true;
     int len = str.length(), i = 0;
@@ -84,6 +86,23 @@ int string2int(string str) {
     }
 
     return flag ? ret : -ret;
+}
+
+
+/**
+ * @brief 将Token type化为string
+ * @param type, TOKEN_TYPE_ENUM
+ * @return string，返回string
+ */
+inline string token2string(TOKEN_TYPE_ENUM type) {
+    if (int(type) < int(Token::TOKEN_TYPE.size()))
+    return Token::TOKEN_TYPE[int(type)];
+
+    for (auto iter = Token::DETAIL_TOKEN_TYPE.begin(); iter != Token::DETAIL_TOKEN_TYPE.end(); iter ++)
+        if (iter -> second == type)
+            return iter -> first;
+
+    return "";
 }
 
 

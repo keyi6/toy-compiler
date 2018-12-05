@@ -19,7 +19,6 @@ using std::map;
 using std::ostream;
 
 
-
 enum class TOKEN_TYPE_ENUM {
     KEYWORD = 0,
     IDENTIFIER,
@@ -41,23 +40,29 @@ enum class TOKEN_TYPE_ENUM {
     DO,
     RETURN,
     /* detailed operator type */
-    PLUS,
-    MINUS,
+    // 按优先级排序的
+    ASSIGN,
+    // 优先级0
+    AND,
+    OR,
     LT,
     GT,
-    NOT,
-    ASSIGN,
-    OR,
-    ADDRESS,
-    MUL,
-    DIV,
-    SELF_PLUS,
-    SELF_MINUS,
-    RIGHT_SHIFT,
-    LEFT_SHIFT,
     GET,
     LET,
+    EQUAL,
     NOT_EQUAL,
+    // 优先级1
+    PLUS,
+    MINUS,
+    // 优先级2
+    MUL,
+    DIV,
+    // 优先级3
+    RIGHT_SHIFT,
+    LEFT_SHIFT,
+    SELF_PLUS,
+    SELF_MINUS,
+    NOT,
     /* detailed separator type */
     LL_BRACKET,
     RL_BRACKET,
@@ -75,7 +80,9 @@ enum class TOKEN_TYPE_ENUM {
 };
 
 
-// Token 类
+/**
+ * @brief Token 类
+ */
 class Token {
 public:
     string value;
@@ -89,6 +96,9 @@ public:
     static vector<string> KEYWORDS;               // 关键字
     static vector<string> OPERATORS;              // 运算符
     static vector<char> SEPARATORS;               // 分隔符
+
+    static bool isExpressionOperator(TOKEN_TYPE_ENUM t);
+    static bool isUniOperator(TOKEN_TYPE_ENUM t);
 
     friend ostream & operator << (ostream &out, Token & t);
 };

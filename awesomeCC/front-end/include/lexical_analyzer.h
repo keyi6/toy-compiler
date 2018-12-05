@@ -6,18 +6,23 @@
  * @author Keyi Li
  *
  */
+
 #ifndef AWESOMECC_LEXICAL_ANALYZER_HPP
 #define AWESOMECC_LEXICAL_ANALYZER_HPP
 
 #include "../../lib/include/token.h"
 #include "../../lib/include/error.h"
+#include "../../lib/include/str_tools.h"
 
 #include <string>
 #include <vector>
 #include <iostream>
 #include <iomanip>
-using std::vector;
+
 using std::string;
+using std::cout;
+using std::endl;
+using std::vector;
 
 
 class LexicalAnalyzer {

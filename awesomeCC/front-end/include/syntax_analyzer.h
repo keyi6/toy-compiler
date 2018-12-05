@@ -9,9 +9,16 @@
 #ifndef AWESOMECC_SYNTAX_ANALYZER_HPP
 #define AWESOMECC_SYNTAX_ANALYZER_HPP
 
+#include "../../lib/include/str_tools.h"
 #include "../../lib/include/token.h"
 #include "../../lib/include/error.h"
+#include "../include/lexical_analyzer.h"
 
+#include <stack>
+#include <iostream>
+using std::cout;
+using std::endl;
+using std::stack;
 
 enum class SENTENCE_PATTERN_ENUM {
     STATEMENT,
@@ -70,7 +77,7 @@ private:
     void _functionCall(SyntaxTreeNode * father_node);
     void _block(SyntaxTreeNode * father_node);
     void _return(SyntaxTreeNode * father_node);
-    void _expression(SyntaxTreeNode * father_node);
+    void _expression(SyntaxTreeNode * father_node, TOKEN_TYPE_ENUM stop_token = TOKEN_TYPE_ENUM::SEMICOLON);
     void _assignment(SyntaxTreeNode * father_node);
     void _control(SyntaxTreeNode * father_node);
     void _for(SyntaxTreeNode * father_node);

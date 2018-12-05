@@ -43,8 +43,9 @@ map<string, TOKEN_TYPE_ENUM> Token::DETAIL_TOKEN_TYPE = {
         {">", TOKEN_TYPE_ENUM::GT},
         {"!", TOKEN_TYPE_ENUM::NOT},
         {"=", TOKEN_TYPE_ENUM::ASSIGN},
-        {"|", TOKEN_TYPE_ENUM::OR},
-        {"&", TOKEN_TYPE_ENUM::ADDRESS},
+        {"||", TOKEN_TYPE_ENUM::OR},
+        {"&&", TOKEN_TYPE_ENUM::AND},
+        {"==", TOKEN_TYPE_ENUM::EQUAL},
         {"*", TOKEN_TYPE_ENUM::MUL},
         {"/", TOKEN_TYPE_ENUM::DIV},
         {"++", TOKEN_TYPE_ENUM::SELF_PLUS},
@@ -75,13 +76,17 @@ vector<string> Token::KEYWORDS = {
 };
 
 
-vector<string> Token::OPERATORS = {"+",  "-",  "<",  ">", "!", "=", "|", "&", "*", "/",  // 0 - 9
+vector<string> Token::OPERATORS = {"+",  "-",  "<",  ">", "!", "=", "||", "&&", "*", "/",  // 0 - 9
                                    "++", "--", "<<", ">>",                               // 10 - 13
-                                   "<=", ">=", "!="};                        // 14 - 16
+                                   "<=", ">=", "!=", "=="};                        // 14 - 16
+
 
 vector<char> Token::SEPARATORS = {'(', ')', '{', '}', '[', ']', ',', '\'', ';' };
 
 
+/**
+ * @brief Token狗仔函数
+ */
 Token::Token(string _value, TOKEN_TYPE_ENUM _type, int _pos) {
     value = _value;
     type = _type;
@@ -92,11 +97,36 @@ Token::Token(string _value, TOKEN_TYPE_ENUM _type, int _pos) {
 }
 
 
+/**
+ * @brief 判断是不是表达式中的运算符
+ * @param t TOKEN_TYPE_ENUM
+ * @return
+ *      -<em>true</em> 是
+ *      -<em>false</em> 否
+ */
+bool Token::isExpressionOperator(TOKEN_TYPE_ENUM t) {
+    int _ = int(t);
+    return int(TOKEN_TYPE_ENUM::ASSIGN) + 1 <= _ && _ <= int(TOKEN_TYPE_ENUM::RL_BRACKET);
+}
+
+
+/**
+ * @brief 判断是不是单目运算符
+ * @param t TOKEN_TYPE_ENUM
+ * @return
+ *      -<em>true</em> 是
+ *      -<em>false</em> 否
+ */
+bool Token::isUniOperator(TOKEN_TYPE_ENUM t) {
+    return t == TOKEN_TYPE_ENUM::NOT || t == TOKEN_TYPE_ENUM::SELF_MINUS || t == TOKEN_TYPE_ENUM::SELF_PLUS;
+}
+
+
 ostream & operator << (ostream & out, Token & t) {
     int _ = int(t.type);
     if (int(TOKEN_TYPE_ENUM::SEPARATOR) <= _ && _ <= int(TOKEN_TYPE_ENUM::RETURN))
         _ = int(TOKEN_TYPE_ENUM::KEYWORD);
-    else if (int(TOKEN_TYPE_ENUM::PLUS) <= _ && _ <= int(TOKEN_TYPE_ENUM::NOT_EQUAL))
+    else if (int(TOKEN_TYPE_ENUM::ASSIGN) <= _ && _ <= int(TOKEN_TYPE_ENUM::NOT))
         _ = int(TOKEN_TYPE_ENUM::OPERATOR);
     else if (int(TOKEN_TYPE_ENUM::LL_BRACKET) <= _ && _ <= int(TOKEN_TYPE_ENUM::SHARP))
         _ = int(TOKEN_TYPE_ENUM::SEPARATOR);

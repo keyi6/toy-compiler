@@ -1,9 +1,5 @@
 #include <stdio.h>
 
-/* this is a function */
-int add(int x, int y) {
-	return 0;
-}
 
 /* this is main
  * function
@@ -12,5 +8,5 @@ int add(int x, int y) {
  * */
 int main() {
 	int a, b, c[20];
-	return 0;
+	a = 2 * (b + 3) + c[i * 2] - (43 << 4);
 }

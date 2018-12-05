@@ -8,12 +8,6 @@
  */
 
 #include "../include/syntax_analyzer.h"
-#include "../include/lexical_analyzer.h"
-
-#include <iostream>
-using std::cout;
-using std::endl;
-
 
 /**
  * @brief 语法树节点构造函数
@@ -283,7 +277,7 @@ void SyntaxAnalyzer::_statement(SyntaxTreeNode * father_node) {
                     if (tokens[index].type == TOKEN_TYPE_ENUM::RM_BRACKET) {
                         index ++;
 
-                        TOKEN_TYPE_ENUM n_type = tokens[index].type;
+                        n_type = tokens[index].type;
                         // 如果是，或者；就直接读取
                         if (n_type == TOKEN_TYPE_ENUM::COMMA || n_type == TOKEN_TYPE_ENUM::SEMICOLON) {
                             state_tree -> addChildNode(new SyntaxTreeNode(cur_value, variable_type, size), state_tree -> root);
@@ -320,15 +314,160 @@ void SyntaxAnalyzer::_statement(SyntaxTreeNode * father_node) {
 /**
  * @brief 处理表达式
  */
-void SyntaxAnalyzer::_expression(SyntaxTreeNode * father_node) {
-    SyntaxTree * exp_tree = new SyntaxTree(new SyntaxTreeNode("Expression"));
-    tree -> addChildNode(exp_tree -> root, tree -> cur_node);
+void SyntaxAnalyzer::_expression(SyntaxTreeNode * father_node, TOKEN_TYPE_ENUM stop_sign) {
+    stack<SyntaxTree *> op_stack;
+    vector<SyntaxTree *> reverse_polish_exp;
 
-    // 返回第一个操作数的值，测试用
-    exp_tree -> addChildNode(new SyntaxTreeNode(tokens[index].value), exp_tree -> root);
+    TOKEN_TYPE_ENUM cur_type;
+    while (index < len && tokens[index].type != stop_sign) {
+        cur_type = tokens[index].type;
+
+        // 常量
+        if (cur_type == TOKEN_TYPE_ENUM::DIGIT_CONSTANT) {
+            SyntaxTree * new_tree = new SyntaxTree(new SyntaxTreeNode("Expression-Constant"));
+            new_tree -> addChildNode(new SyntaxTreeNode(tokens[index].value), new_tree -> root);
+
+            reverse_polish_exp.emplace_back(new_tree);
+            index ++;
+        }
+        // 变量
+        else if (cur_type == TOKEN_TYPE_ENUM::IDENTIFIER) {
+            // 数组下标
+            if (index + 3 < len && tokens[index + 1].type == TOKEN_TYPE_ENUM::LM_BRACKET) {
+                SyntaxTree * new_tree = new SyntaxTree(new SyntaxTreeNode("Expression-ArrayItem"));
+
+                // 数组名字
+                new_tree -> addChildNode(new SyntaxTreeNode("Array"), new_tree -> root);
+                new_tree -> addChildNode(new SyntaxTreeNode(tokens[index].value), new_tree -> cur_node);
+
+                // 读取 名字 和 [
+                index += 2;
+
+                // 数组下标
+                SyntaxTreeNode * index_node = new SyntaxTreeNode("Index");
+                new_tree -> addChildNode(index_node, new_tree -> root);
+                _expression(index_node, TOKEN_TYPE_ENUM::RM_BRACKET);
+
+                reverse_polish_exp.emplace_back(new_tree);
+            }
+            // 一般的变量
+            else {
+                SyntaxTree * new_tree = new SyntaxTree(new SyntaxTreeNode("Expression-Variable"));
+                new_tree -> addChildNode(new SyntaxTreeNode(tokens[index].value), new_tree -> root);
+
+                reverse_polish_exp.emplace_back(new_tree);
+                index ++;
+            }
+        }
+        // 运算符
+        else if (Token::isExpressionOperator(cur_type)) {
+            SyntaxTree * new_tree = new SyntaxTree(new SyntaxTreeNode("Expression-Operator"));
+            new_tree -> addChildNode(new SyntaxTreeNode(tokens[index].value), new_tree -> root);
+
+            // 如果是 (
+            if (cur_type == TOKEN_TYPE_ENUM::LL_BRACKET) {
+                op_stack.push(new_tree);
+            }
+            // 如果是 ）
+            else if (cur_type == TOKEN_TYPE_ENUM::RL_BRACKET) {
+                SyntaxTree * temp_t;
+                while (! op_stack.empty()) {
+                    temp_t = op_stack.top();
+                    op_stack.pop();
+
+                    if (temp_t -> root -> first_son -> value == token2string(TOKEN_TYPE_ENUM::LL_BRACKET))
+                        break;
+
+                    reverse_polish_exp.emplace_back(temp_t);
+                }
+
+            }
+            // 如果是其他的 + - * / > < 那些
+            else {
+                SyntaxTree * temp_t;
+                int cur_pio = int(tokens[index].type), t_pio;
+                while (! op_stack.empty()) {
+                    temp_t = op_stack.top();
+                    t_pio = temp_t -> root -> first_son -> value == "(" ? -1 :
+                            int(Token::DETAIL_TOKEN_TYPE[temp_t -> root -> first_son -> value]);
+
+                    if (t_pio <= cur_pio)
+                        break;
+
+                    reverse_polish_exp.emplace_back(temp_t);
+                    op_stack.pop();
+                }
+
+                op_stack.push(new_tree);
+            }
+
+            index ++;
+        }
+        else
+            throw Error("in expression, unrecognized symbols", line_number_map[index]);
+    }
+
+    if (!(len < index || tokens[index].type == stop_sign))
+        throw Error("in expression, expected token `" + token2string(stop_sign) + "`", line_number_map[index]);
+
     index ++;
 
-    // TODO 处理表达式
+    while (! op_stack.empty()) {
+        reverse_polish_exp.emplace_back(op_stack.top());
+        op_stack.pop();
+    }
+
+    cout << "---\n";
+    for (auto it = reverse_polish_exp.begin(); it != reverse_polish_exp.end(); it ++) {
+        (*it) -> display() ;
+    }
+
+    // 这里把op_stack 做成操作数栈
+    SyntaxTree * temp_t, * a, * b;
+    for (auto it = reverse_polish_exp.begin(); it != reverse_polish_exp.end(); it ++) {
+        temp_t = * it;
+
+        // 如果是运算符
+        if (temp_t -> root -> value == "Expression-Operator") {
+            // 如果是单目运算符
+            if (Token::isUniOperator(Token::DETAIL_TOKEN_TYPE[temp_t -> root -> first_son -> value])) {
+                a = op_stack.top();
+                op_stack.pop();
+
+                SyntaxTree * new_tree = new SyntaxTree(new SyntaxTreeNode("Expression-UniOp"));
+                // 添加操作符
+                new_tree -> addChildNode(temp_t -> root, new_tree -> root);
+                // 添加操作数
+                new_tree -> addChildNode(a -> root, new_tree -> root);
+
+                op_stack.push(new_tree);
+            }
+            // 如果是双目运算符
+            else {
+                b = op_stack.top();
+                op_stack.pop();
+
+                a = op_stack.top();
+                op_stack.pop();
+
+                SyntaxTree * new_tree = new SyntaxTree(new SyntaxTreeNode("Expression-DoubleOp"));
+                // 添加操作数
+                new_tree -> addChildNode(a -> root, new_tree -> root);
+                // 添加操作符
+                new_tree -> addChildNode(temp_t -> root, new_tree -> root);
+                // 添加操作数
+                new_tree -> addChildNode(b -> root, new_tree -> root);
+
+                op_stack.push(new_tree);
+            }
+        }
+        // 不是运算符
+        else
+            op_stack.push(temp_t);
+    }
+
+    temp_t = op_stack.top();
+    tree -> addChildNode(temp_t -> root, father_node);
 }
 
 
@@ -452,11 +591,6 @@ void SyntaxAnalyzer::_return(SyntaxTreeNode * father_node) {
 
             return_tree -> addChildNode(new SyntaxTreeNode(tokens[index - 1].value), return_tree -> cur_node);
             _expression(return_tree -> root);
-
-            if (tokens[index].type == TOKEN_TYPE_ENUM::SEMICOLON)
-                index ++;
-            else
-                throw Error("in return, expected `;`", line_number_map[index]);
             return;
         }
 
@@ -516,8 +650,27 @@ void SyntaxAnalyzer::_functionCall(SyntaxTreeNode * father_node) {
 /**
  * @brief 处理赋值语句
  */
-void SyntaxAnalyzer::_assignment(SyntaxTreeNode *father_node) {
-    // TODO 处理赋值语句
+void SyntaxAnalyzer::_assignment(SyntaxTreeNode * father_node) {
+    SyntaxTree * assign_tree = new SyntaxTree(new SyntaxTreeNode("Assignment"));
+    tree -> addChildNode(assign_tree -> root, father_node);
+
+
+    if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::IDENTIFIER) {
+        assign_tree -> addChildNode(new SyntaxTreeNode(tokens[index].value), assign_tree -> root);
+        index ++;
+
+        if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::ASSIGN) {
+            index ++;
+
+            _expression(assign_tree -> root);
+        }
+        else
+            throw Error("in assignment, expected `=` after an identifier", line_number_map[index]);
+    }
+    else if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::SEMICOLON)
+        index ++;
+    else
+        throw Error("in assignment, expected an identifier.", line_number_map[index]);
 }
 
 
@@ -597,21 +750,14 @@ void SyntaxAnalyzer::_while(SyntaxTreeNode * father_node) {
     if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::LL_BRACKET) {
         index ++;
 
-        // TODO 要看expression需不需要长度
-        _expression(while_tree -> root);
+        // 读取 表达式 直到遇到）
+        _expression(while_tree -> root, TOKEN_TYPE_ENUM::RL_BRACKET);
 
-        // 读取 ）
-        if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::RL_BRACKET) {
-            index ++;
-
-            // 读取 {
-            if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::LB_BRACKET)
-                _block(while_tree -> root);
-            else
-                throw Error("Expected `{` after `while (condition)`", line_number_map[index]);
-        }
+        // 读取 {
+        if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::LB_BRACKET)
+            _block(while_tree -> root);
         else
-            throw Error("Expected `)` after", line_number_map[index]);
+            throw Error("Expected `{` after `while (condition)`", line_number_map[index]);
     }
     else
         throw Error("Expected `(` after `while`", line_number_map[index]);

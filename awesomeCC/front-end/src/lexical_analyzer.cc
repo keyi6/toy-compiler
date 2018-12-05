@@ -7,18 +7,7 @@
  *
  */
 
-
-#include "../../lib/include/str_tools.h"
 #include "../include/lexical_analyzer.h"
-
-#include <string>
-#include <vector>
-#include <iostream>
-using std::string;
-using std::vector;
-using std::cout;
-using std::endl;
-
 
 /**
  * @brief LexicalAnalyzer类构造函数
