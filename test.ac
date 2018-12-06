@@ -8,9 +8,5 @@
 
 
 void main() {
-    int a[5] = {1, 2, 34};
-    int i;
-
-
-    print a[4];
+    print "Hello, awesomeCC";
 }

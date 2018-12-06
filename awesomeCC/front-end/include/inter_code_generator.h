@@ -15,6 +15,7 @@
 #include "../../lib/include/syntax_tree.h"
 
 #include <map>
+#include <regex>
 #include <string>
 #include <iomanip>
 #include <fstream>
@@ -25,10 +26,12 @@ using std::cout;
 using std::move;
 using std::setw;
 using std::endl;
+using std::regex;
 using std::string;
 using std::setfill;
 using std::ostream;
 using std::ofstream;
+using std::regex_replace;
 
 
 enum class VARIABLE_INFO_ENUM {

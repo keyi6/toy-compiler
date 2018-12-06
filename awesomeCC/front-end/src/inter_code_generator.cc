@@ -175,8 +175,15 @@ string InterCodeGenerator::_expression(SyntaxTreeNode * cur) {
         // TODO
     }
     // 常量
-    else if (cur -> value == "Expression-Constant" || cur -> value == "Expression-String") {
+    else if (cur -> value == "Expression-Constant"){
         return cur -> first_son -> value;
+    }
+    // 字符串常量
+    else if (cur -> value == "Expression-String") {
+        string temp = cur -> first_son -> value;
+        temp = regex_replace(temp, regex(","), "\\,");
+
+        return temp;
     }
     // 变量
     else if (cur -> value == "Expression-Variable") {

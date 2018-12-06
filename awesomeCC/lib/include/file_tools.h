@@ -13,16 +13,19 @@
 #include "quadruple.h"
 #include "str_tools.h"
 
+#include <regex>
 #include <string>
 #include <vector>
 #include <fstream>
 #include <iostream>
 
+using std::cout;
+using std::endl;
+using std::regex;
 using std::vector;
 using std::string;
 using std::ifstream;
-using std::cout;
-using std::endl;
+using std::regex_replace;
 
 
 /**
@@ -78,9 +81,9 @@ vector<Quadruple> readInterCodeFile(string path) {
 
             start += len + 1;
             len = 0;
-            while (start + len < line_len && line[start + len] != ',')
+            while (start + len < line_len && ! (line[start + len] == ',' && line[start + len - 1] != '\\'))
                 len ++;
-            string arg1 = line.substr(start, len);
+            string arg1 = regex_replace(line.substr(start, len), regex("\\\\"), "");
 
             start += len + 1;
             len = 0;
