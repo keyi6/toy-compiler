@@ -1,7 +1,7 @@
 /**
  *
  * @file main.cc
- * @brief 入口文件
+ * @brief 运行入口文件
  *
  * @author Keyi Li
  *
@@ -11,6 +11,6 @@
 
 
 int main() {
-    //code_generator("../../test.ac");
+    code_generator("../../test.ac");
     interpreter("../../test.ac.ic");
 }

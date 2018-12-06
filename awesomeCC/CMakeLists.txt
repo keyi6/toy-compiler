@@ -12,22 +12,22 @@ aux_source_directory(back-end/src B_INC)
 aux_source_directory(lib/src LIB_SRC)
 aux_source_directory(lib/include LIB_INC)
 
+
+# 生成库文件 awesomeCC
+add_library(
+        ${PROJECT_NAME}
+        SHARED
+        ${LIB_SRC} ${LIB_INC}
+        ${F_SRC} ${F_INC}
+        ${B_SRC} ${B_INC}
+        encapsulation.h
+)
+
+link_libraries(${PROJECT_NAME})
+
+
 # 生成可执行文件 awesomeCC_exe
 add_executable(
         ${PROJECT_NAME}_exe
-        ${LIB_SRC} ${LIB_INC}
-        ${F_SRC} ${F_INC}
-        ${B_SRC} ${B_INC}
         main.cc
-        encapsulation.h
 )
-
-# 生成库文件 awesomeCC_lib
-add_library(
-        ${PROJECT_NAME}_lib
-        ${LIB_SRC} ${LIB_INC}
-        ${F_SRC} ${F_INC}
-        ${B_SRC} ${B_INC}
-        encapsulation.h
-)
-
