@@ -15,19 +15,19 @@ aux_source_directory(lib/include LIB_INC)
 # 生成可执行文件 awesomeCC_exe
 add_executable(
         ${PROJECT_NAME}_exe
-        main.cc
-        encapsulation.h
+        ${LIB_SRC} ${LIB_INC}
         ${F_SRC} ${F_INC}
         ${B_SRC} ${B_INC}
-        ${LIB_SRC} ${LIB_INC}
-        front-end/src/inter_code_generator.cc front-end/include/inter_code_generator.h)
+        main.cc
+        encapsulation.h
+)
 
 # 生成库文件 awesomeCC_lib
 add_library(
         ${PROJECT_NAME}_lib
-        encapsulation.h
+        ${LIB_SRC} ${LIB_INC}
         ${F_SRC} ${F_INC}
         ${B_SRC} ${B_INC}
-        ${LIB_SRC} ${LIB_INC}
+        encapsulation.h
 )
 

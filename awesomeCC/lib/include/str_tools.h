@@ -89,6 +89,38 @@ inline int string2int(string str) {
 }
 
 
+/*
+ * @brief 将int转为字符穿
+ * @param x, 输入int
+ * @return string，输入字符串
+ */
+inline string int2string(int x) {
+    stringstream ss;
+    ss << x;
+
+    string ret = ss.str();
+    ss.clear();
+
+    return ret;
+}
+
+
+/*
+ * @brief 将int转为字符穿
+ * @param x, 输入int
+ * @return string，输入字符串
+ */
+inline string double2string(double x) {
+    stringstream ss;
+    ss << x;
+
+    string ret = ss.str();
+    ss.clear();
+
+    return ret;
+}
+
+
 /**
  * @brief 将Token type化为string
  * @param type, TOKEN_TYPE_ENUM

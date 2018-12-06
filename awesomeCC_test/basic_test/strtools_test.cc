@@ -34,3 +34,15 @@ TEST(token2string_test, token2string_test_case) {
     EXPECT_EQ(token2string(TOKEN_TYPE_ENUM::SELF_MINUS), "--" );
     EXPECT_EQ(token2string(TOKEN_TYPE_ENUM::LL_BRACKET), "(");
 }
+
+
+TEST(int2string_test, int2string_test_case) {
+    EXPECT_EQ(int2string(10), "10");
+    EXPECT_EQ(int2string(-123456), "-123456");
+}
+
+
+TEST(double2string_test, doublet2string_test_case) {
+    EXPECT_EQ(double2string(10.5), "10.5");
+    EXPECT_EQ(double2string(-12.25), "-12.25");
+}

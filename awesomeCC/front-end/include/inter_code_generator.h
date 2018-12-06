@@ -9,27 +9,26 @@
 #ifndef AWESOMECC_INTER_CODE_GENERATOR_H
 #define AWESOMECC_INTER_CODE_GENERATOR_H
 
+#include "../../lib/include/error.h"
 #include "../../lib/include/str_tools.h"
+#include "../../lib/include/quadruple.h"
 #include "../../lib/include/syntax_tree.h"
 
 #include <map>
 #include <string>
+#include <iomanip>
+#include <fstream>
+#include <iostream>
+
 using std::map;
+using std::cout;
+using std::move;
+using std::setw;
+using std::endl;
 using std::string;
-
-
-enum class INTER_CODE_OP_ENUM {
-    ADD,
-    SUB,
-    DIV,
-    MUL,
-    JZ,  // 满足条件跳转
-    JNZ, // 不满足条件跳转
-    JLE, // arg1 < arg2 跳转
-    JGE, // arg1 > arg2 跳转
-    ASSIGN, // 赋值
-    PRINT // 输出
-};
+using std::setfill;
+using std::ostream;
+using std::ofstream;
 
 
 enum class VARIABLE_INFO_ENUM {
@@ -54,48 +53,7 @@ public:
     int place;
 
     Info();
-    Info(string _name, VARIABLE_INFO_ENUM _type);
-};
-
-
-/**
- * @brief Operand parent类
- * @author Keyi Li
- */
-class Operand {
-};
-
-
-class Variable : public Operand {
-public:
-    string name;
-};
-
-
-class Const : public Operand {
-public:
-    int int_value;
-    double double_value;
-};
-
-
-class InterCodeIndex : public Operand {
-public:
-    int index;
-};
-
-
-/**
- * @brief 四元式类
- * @author Keyi Li
- */
-class Quadruple {
-public:
-    INTER_CODE_OP_ENUM op;
-    Operand arg1, arg2;
-    Variable res;
-
-    Quadruple(INTER_CODE_OP_ENUM _op, Operand _arg1, Operand _arg2, Variable _res);
+    Info(string _name, VARIABLE_INFO_ENUM _type, int var_index);
 };
 
 
@@ -106,24 +64,28 @@ public:
 class InterCodeGenerator {
 private:
     SyntaxTree * tree; // 语法树
-    int index; // 四元式个数统计
+    int temp_var_index; // 临时变量栈顶
+    int var_index; // 用户的变量栈顶
     int context_index; // 局部变量区分
     map<string, Info> table; // 变量表
     vector<Quadruple> inter_code; // 生成的四元式
 
     void _analyze(SyntaxTreeNode * cur);
 
-    bool _lookUp(string identifier);
-    void _emit(INTER_CODE_OP_ENUM op, Operand arg1, Operand arg2, Variable res);
+    string _lookUp(string name);
+    void _emit(INTER_CODE_OP_ENUM op, string arg1,
+               string arg2, string res);
 
+    string _expression(SyntaxTreeNode * cur);
     void _block(SyntaxTreeNode * cur);
-    void _expression(SyntaxTreeNode * cur);
+    void _print(SyntaxTreeNode * cur);
     void _statement(SyntaxTreeNode * cur);
     void _assignment(SyntaxTreeNode * cur);
 
 public:
     InterCodeGenerator();
-    void analyze(SyntaxTree * _tree);
+    void analyze(SyntaxTree * _tree, bool verbose = false);
+    void saveToFile(string path);
 };
 
 

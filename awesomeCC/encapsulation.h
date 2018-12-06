@@ -10,7 +10,10 @@
 #include "front-end/include/lexical_analyzer.h"
 #include "front-end/include/syntax_analyzer.h"
 #include "front-end/include/inter_code_generator.h"
+#include "back-end/include/interpreter.h"
 
+
+// TODO 注释
 void lexer(string path) {
     vector<string> source_file = readSourceFile(path);
 
@@ -34,7 +37,16 @@ void code_generator(string path) {
     sa.analyze(source_file, false);
 
     InterCodeGenerator icg;
-    icg.analyze(sa.getSyntaxTree());
+    icg.analyze(sa.getSyntaxTree(), true);
+    icg.saveToFile(path + ".ic");
+}
+
+
+void interpreter(string path) {
+    vector<Quadruple> inter_code_file = readInterCodeFile(path);
+
+    Interpreter intp;
+    intp.execute(inter_code_file);
 }
 
 

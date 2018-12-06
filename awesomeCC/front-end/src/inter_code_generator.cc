@@ -20,17 +20,11 @@ Info::Info() = default;
  * @brief Info构造函数
  * @param _name 变量名字
  * @param _type 种类
+ * @author Keyi Li
  */
-Info::Info(string _name, VARIABLE_INFO_ENUM _type) {
-    name = _name;
+Info::Info(string _name, VARIABLE_INFO_ENUM _type, int var_index) {
+    name = "v" + int2string(var_index);
     type = _type;
-}
-
-
-/**
- * @brief 四元式构造函数
- */
-Quadruple::Quadruple(INTER_CODE_OP_ENUM _op, Operand _arg1, Operand _arg2, Variable _res) : op(_op), arg1(_arg1), arg2(_arg2), res(_res) {
 }
 
 
@@ -46,15 +40,29 @@ InterCodeGenerator::InterCodeGenerator() = default;
  * @param _tree SyntaxTree *
  * @author Keyi Li
  */
-void InterCodeGenerator::analyze(SyntaxTree * _tree) {
+void InterCodeGenerator::analyze(SyntaxTree * _tree, bool verbose) {
     tree = _tree;
     inter_code.clear();
-    index = 0;
+    temp_var_index = 0;
     context_index = 0;
 
-    tree -> display(true);
+    if (verbose)
+        tree -> display(true);
 
-    _analyze(tree -> root);
+    try {
+        _analyze(tree -> root -> first_son);
+    }
+    catch (Error & e) {
+        cout << "Semantic analyze errors" << endl;
+        cout << e;
+        exit(0);
+    }
+
+    if (verbose) {
+        cout << "Generated " << inter_code.size() << " inter codes" << endl;
+        for (auto q: inter_code)
+            cout << q;
+    }
 }
 
 
@@ -103,6 +111,8 @@ void InterCodeGenerator::_block(SyntaxTreeNode * cur) {
             _statement(cs);
         else if (cs -> value == "Assignment")
             _assignment(cs);
+        else if (cs -> value == "Print")
+            _print(cs);
 
         cs = cs -> right;
     }
@@ -110,22 +120,65 @@ void InterCodeGenerator::_block(SyntaxTreeNode * cur) {
 
 
 /**
+ * @brief 翻译Print
+ * @author Keyi Li
+ */
+void InterCodeGenerator::_print(SyntaxTreeNode * cur) {
+    string print_place = _expression(cur -> first_son);
+    _emit(INTER_CODE_OP_ENUM::PRINT, print_place, "", "");
+}
+
+
+/**
  * @brief 翻译赋值语句
  * @author Keyi Li
  */
-void InterCodeGenerator::_assignment(SyntaxTreeNode *cur) {
+void InterCodeGenerator::_assignment(SyntaxTreeNode * cur) {
     SyntaxTreeNode * cs = cur -> first_son;
 
-    _expression(cs -> right);
-    //_emit(INTER_CODE_OP_ENUM::ASSIGN, , , 0);
+    string r_value_place = _expression(cs -> right);
+    string store_place = _lookUp(cur -> first_son -> value);
+
+    _emit(INTER_CODE_OP_ENUM::ASSIGN, r_value_place, "", store_place);
 }
 
 
 /**
  * @brief 翻译表达式
  * @author Keyi Li
+ * @param cur 一个Expression-*节点执政
+ * @return place, string
  */
-void InterCodeGenerator::_expression(SyntaxTreeNode * cur) {
+string InterCodeGenerator::_expression(SyntaxTreeNode * cur) {
+    // 双目运算符
+    if (cur -> value == "Expression-DoubleOp") {
+        SyntaxTreeNode * a = cur -> first_son;
+        SyntaxTreeNode * op = a -> right;
+        SyntaxTreeNode * b = op -> right;
+
+        string a_place = _expression(a);
+        string b_place = _expression(b);
+
+        string temp_var_place = "t" + int2string(++ temp_var_index);
+        _emit(Quadruple::INTER_CODE_MAP[op -> first_son -> value], a_place, b_place, temp_var_place);
+
+        return temp_var_place;
+    }
+    // 单目运算符
+    else if (cur -> value == "Expression-UniOp") {
+        // TODO
+    }
+    // 常量
+    else if (cur -> value == "Expression-Constant") {
+        return cur -> first_son -> value;
+    }
+    // 变量
+    else if (cur -> value == "Expression-Variable") {
+        return _lookUp(cur -> first_son -> value);;;;
+    }
+    else {
+        throw Error("How can you step into this place???");
+    }
 }
 
 
@@ -138,15 +191,15 @@ void InterCodeGenerator::_statement(SyntaxTreeNode * cur) {
 
     while (cs) {
         if (cs -> type == "double" || cs -> type == "float") {
-            Info info(cs -> value, VARIABLE_INFO_ENUM::DOUBLE);
+            Info info(cs -> value, VARIABLE_INFO_ENUM::DOUBLE, ++ var_index);
             table[cs -> value] = info;
         }
         else if (cs -> type == "int") {
-            Info info(cs -> value, VARIABLE_INFO_ENUM::INT);
+            Info info(cs -> value, VARIABLE_INFO_ENUM::INT, ++ var_index);
             table[cs -> value] = info;
         }
         else {
-            // TODO;
+            throw Error("type `" + cs -> type + "` are not supported yet");
         }
 
         cs = cs -> right;
@@ -156,11 +209,15 @@ void InterCodeGenerator::_statement(SyntaxTreeNode * cur) {
 
 /**
  * @brief 寻找标识符
- * @param identifier 标识符
+ * @param name 标识符
+ * @return code var
  * @author Keyi Li
  */
-bool InterCodeGenerator::_lookUp(string name) {
-    return table.find(name) != table.end();
+string InterCodeGenerator::_lookUp(string name) {
+    if (table.find(name) == table.end())
+        throw Error("variable `" + name + "` is not defined before use");
+
+    return table[name].name;
 }
 
 
@@ -172,6 +229,16 @@ bool InterCodeGenerator::_lookUp(string name) {
  * @param res 结果
  * @author Keyi Li
  */
-void InterCodeGenerator::_emit(INTER_CODE_OP_ENUM op, Operand arg1, Operand arg2, Variable res) {
-    inter_code.emplace_back(Quadruple(op, arg1, arg2, res));
+void InterCodeGenerator::_emit(INTER_CODE_OP_ENUM op, string arg1, string arg2, string res) {
+    inter_code.emplace_back(Quadruple(op, move(arg1), move(arg2), move(res)));
+}
+
+
+void InterCodeGenerator::saveToFile(string path) {
+    ofstream out_file;
+    out_file.open(path, ofstream::out | ofstream::trunc);
+    for (auto ic: inter_code)
+        out_file << int(ic.op) << "," << ic.arg1 << "," << ic.arg2 << "," << ic.res << endl;
+
+    out_file.close();
 }
