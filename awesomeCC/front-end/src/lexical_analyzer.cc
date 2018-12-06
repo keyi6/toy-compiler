@@ -237,6 +237,7 @@ void LexicalAnalyzer::_analyze() {
                 if (cur_pos + temp_len >= len || sentence[cur_pos + temp_len] != cur_char)
                     throw Error("in string constant, lack of " + char2string(cur_char), cur_line_number);
 
+
                 tokens.emplace_back(Token(sentence.substr(cur_pos, temp_len), TOKEN_TYPE_ENUM::STRING_CONSTANT, cur_pos + 1));
                 cur_pos += temp_len;
                 tokens.emplace_back(Token(temp_str, TOKEN_TYPE_ENUM::SEPARATOR, cur_pos + 1));

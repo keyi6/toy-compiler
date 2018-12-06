@@ -44,6 +44,8 @@ void Interpreter::_execute() {
         case int(INTER_CODE_OP_ENUM::PRINT):
             _print();
             index ++;
+            break;
+            // TODO;
         default:
             break;
     }
@@ -124,5 +126,3 @@ double Interpreter::_getValue(string value_str) {
     else
         return string2double(value_str);
 }
-
-

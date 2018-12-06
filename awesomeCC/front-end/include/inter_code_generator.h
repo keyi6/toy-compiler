@@ -46,14 +46,10 @@ class Info {
 public:
     string name;
     VARIABLE_INFO_ENUM type;
-
-    int int_value;
-    double double_value;
-
     int place;
 
     Info();
-    Info(string _name, VARIABLE_INFO_ENUM _type, int var_index);
+    Info(VARIABLE_INFO_ENUM _type, int _place);
 };
 
 
@@ -76,6 +72,7 @@ private:
     void _emit(INTER_CODE_OP_ENUM op, string arg1,
                string arg2, string res);
 
+    string _locateArrayItem(string arr_name, int arr_i);
     string _expression(SyntaxTreeNode * cur);
     void _block(SyntaxTreeNode * cur);
     void _print(SyntaxTreeNode * cur);

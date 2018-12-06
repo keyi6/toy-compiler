@@ -22,8 +22,9 @@ Info::Info() = default;
  * @param _type 种类
  * @author Keyi Li
  */
-Info::Info(string _name, VARIABLE_INFO_ENUM _type, int var_index) {
-    name = "v" + int2string(var_index);
+Info::Info(VARIABLE_INFO_ENUM _type, int _place) {
+    name = "v" + int2string(_place);
+    place = _place;
     type = _type;
 }
 
@@ -190,16 +191,50 @@ void InterCodeGenerator::_statement(SyntaxTreeNode * cur) {
     SyntaxTreeNode * cs = cur -> first_son;
 
     while (cs) {
-        if (cs -> type == "double" || cs -> type == "float") {
-            Info info(cs -> value, VARIABLE_INFO_ENUM::DOUBLE, ++ var_index);
+        string type = cs -> type;
+        if (type == "double" || type == "float") {
+            Info info(VARIABLE_INFO_ENUM::DOUBLE, ++ var_index);
             table[cs -> value] = info;
         }
-        else if (cs -> type == "int") {
-            Info info(cs -> value, VARIABLE_INFO_ENUM::INT, ++ var_index);
+        else if (type == "int") {
+            Info info(VARIABLE_INFO_ENUM::INT, ++ var_index);
             table[cs -> value] = info;
+        }
+        else if (type.size() > 6 && type.substr(0, 6) == "array-") {
+            Info info(VARIABLE_INFO_ENUM::ARRAY, ++ var_index);
+            table[cs -> value] = info;
+
+            string extra_info = cs -> extra_info;
+            int extra_info_len = extra_info.size();
+
+            int cur_i = 0;
+            if (cur_i < extra_info_len && extra_info.substr(cur_i, 5) == "size=") {
+                cur_i += 5;
+                int len = 0;
+                while (cur_i + len < extra_info_len && extra_info[cur_i + len] != '&')
+                    len ++;
+
+                var_index += string2int(extra_info.substr(cur_i, len));
+                cur_i += len;
+            }
+            if (cur_i < extra_info_len && extra_info.substr(cur_i, 3) == "&v=") {
+                cur_i += 3;
+
+                int len, arr_i = 0;
+                while (cur_i < extra_info_len) {
+                    len = 0;
+                    while (cur_i + len < extra_info_len && extra_info[cur_i + len] != ',')
+                        len ++;
+
+                    _emit(INTER_CODE_OP_ENUM::ASSIGN, extra_info.substr(cur_i, len), "", _locateArrayItem(cs -> value, arr_i));
+
+                    cur_i += len + 1;
+                    arr_i ++;
+                }
+            }
         }
         else {
-            throw Error("type `" + cs -> type + "` are not supported yet");
+            throw Error("type `" + type + "` are not supported yet");
         }
 
         cs = cs -> right;
@@ -233,7 +268,11 @@ void InterCodeGenerator::_emit(INTER_CODE_OP_ENUM op, string arg1, string arg2, 
     inter_code.emplace_back(Quadruple(op, move(arg1), move(arg2), move(res)));
 }
 
-
+/**
+ * @brief 保存到文件
+ * @param 路径
+ * @author Keyi Li
+ */
 void InterCodeGenerator::saveToFile(string path) {
     ofstream out_file;
     out_file.open(path, ofstream::out | ofstream::trunc);
@@ -241,4 +280,16 @@ void InterCodeGenerator::saveToFile(string path) {
         out_file << int(ic.op) << "," << ic.arg1 << "," << ic.arg2 << "," << ic.res << endl;
 
     out_file.close();
+}
+
+
+/**
+ * @brief 数组第i项的地址
+ * @author Keyi Li
+ */
+string InterCodeGenerator::_locateArrayItem(string arr_name, int arr_i) {
+    if (table.find(arr_name) == table.end())
+        throw Error("array variable `" + arr_name + "` is not defined before use");
+
+    return "v" + int2string(table[arr_name].place + arr_i);
 }

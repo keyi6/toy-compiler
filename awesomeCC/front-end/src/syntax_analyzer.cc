@@ -220,7 +220,7 @@ void SyntaxAnalyzer::_statement(SyntaxTreeNode * father_node) {
                     index ++;
 
                     // 读取数组大小
-                    string size = tokens[index].value;
+                    string size = "size=" + tokens[index].value;
                     index ++;
 
                     // 读取 ]
@@ -230,21 +230,55 @@ void SyntaxAnalyzer::_statement(SyntaxTreeNode * father_node) {
                         n_type = tokens[index].type;
                         // 如果是，或者；就直接读取
                         if (n_type == TOKEN_TYPE_ENUM::COMMA || n_type == TOKEN_TYPE_ENUM::SEMICOLON) {
-                            state_tree -> addChildNode(new SyntaxTreeNode(cur_value, variable_type, size), state_tree -> root);
+                            state_tree -> addChildNode(new SyntaxTreeNode(cur_value, "array-" + variable_type, size),
+                                                       state_tree -> root);
                             if (tokens[index ++].type == TOKEN_TYPE_ENUM::COMMA)
                                 break;
                             else
                                 return;
                         }
-                        // 如果是{ 那么就读取那些初始化信息
-                        else if (n_type == TOKEN_TYPE_ENUM::LL_BRACKET) {
-                            while (index < len &&
-                                   (tokens[index].type != TOKEN_TYPE_ENUM::COMMA ||
-                                    tokens[index].type != TOKEN_TYPE_ENUM::SEMICOLON)) {
-                                // TODO 读取数组的初始化值
+                        // 如果是 = 那么就读取那些初始化信息
+                        else if (n_type == TOKEN_TYPE_ENUM::ASSIGN) {
+                            index ++;
+
+                            TOKEN_TYPE_ENUM nn_type = tokens[index].type;
+                            // 如果是 {
+                            if (nn_type == TOKEN_TYPE_ENUM::LB_BRACKET) {
+                                // 读取 {
                                 index ++;
+
+                                string init_v = "&v=";
+                                do {
+                                    if (tokens[index].type == TOKEN_TYPE_ENUM::DIGIT_CONSTANT)
+                                        init_v += tokens[index].value;
+
+                                    index ++;
+                                    if (tokens[index].type == TOKEN_TYPE_ENUM::RB_BRACKET)
+                                        break;
+                                    if (tokens[index].type == TOKEN_TYPE_ENUM::COMMA) {
+                                        init_v += ",";
+                                        index ++;
+                                    }
+                                    else
+                                        throw Error(
+                                                "in array initialization, expected `,` or `}` after a digital constant",
+                                                line_number_map[index]);
+                                } while (index < len && tokens[index].type != TOKEN_TYPE_ENUM::RB_BRACKET);
+
+                                index ++;
+                                n_type = tokens[index].type;
+                                if (n_type == TOKEN_TYPE_ENUM::COMMA || n_type == TOKEN_TYPE_ENUM::SEMICOLON) {
+                                    state_tree -> addChildNode(
+                                            new SyntaxTreeNode(cur_value, "array-" + variable_type, size + init_v),
+                                            state_tree -> root);
+                                    if (tokens[index ++].type == TOKEN_TYPE_ENUM::COMMA)
+                                        break;
+                                    else
+                                        return;
+                                }
                             }
-                            break;
+                            else
+                                throw Error("in array initialization, expected `{}`", line_number_map[index]);
                         }
                         else
                             throw Error("Unrecognized symbol in statement", line_number_map[index]);
@@ -754,6 +788,7 @@ void SyntaxAnalyzer::_else_if(SyntaxTreeNode * father_node) {
 void SyntaxAnalyzer::_else(SyntaxTreeNode * father_node) {
     // TODO 处理else
 }
+
 
 /**
  * @brief 返回生成的语法🌲

@@ -4,12 +4,9 @@
  */
 
 int main() {
-	int a, b;
+	int c, a[20] = {1, 2, 34}, b;
 
-	print "I can print a string";
+	c = 10;
+	b=  4;
 
-    b = 10;
-	a = (1 + 2) * 3 + b;
-
-	print a;
 }

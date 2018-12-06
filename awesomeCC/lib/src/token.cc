@@ -125,7 +125,7 @@ bool Token::isUniOperator(TOKEN_TYPE_ENUM t) {
 
 ostream & operator << (ostream & out, Token & t) {
     int _ = int(t.type);
-    if (int(TOKEN_TYPE_ENUM::SEPARATOR) <= _ && _ <= int(TOKEN_TYPE_ENUM::RETURN))
+    if (int(TOKEN_TYPE_ENUM::INCLUDE) <= _ && _ <= int(TOKEN_TYPE_ENUM::RETURN))
         _ = int(TOKEN_TYPE_ENUM::KEYWORD);
     else if (int(TOKEN_TYPE_ENUM::ASSIGN) <= _ && _ <= int(TOKEN_TYPE_ENUM::NOT))
         _ = int(TOKEN_TYPE_ENUM::OPERATOR);
