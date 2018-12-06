@@ -169,12 +169,12 @@ string InterCodeGenerator::_expression(SyntaxTreeNode * cur) {
         // TODO
     }
     // 常量
-    else if (cur -> value == "Expression-Constant") {
+    else if (cur -> value == "Expression-Constant" || cur -> value == "Expression-String") {
         return cur -> first_son -> value;
     }
     // 变量
     else if (cur -> value == "Expression-Variable") {
-        return _lookUp(cur -> first_son -> value);;;;
+        return _lookUp(cur -> first_son -> value);
     }
     else {
         throw Error("How can you step into this place???");

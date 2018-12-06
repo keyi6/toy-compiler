@@ -51,7 +51,11 @@ void Interpreter::_execute() {
 
 
 void Interpreter::_print() {
-    cout << _getValue(code[index].arg1) << endl;
+    string value_str = code[index].arg1;
+    if (value_str[0] == '\"' || value_str[0] == '\'')
+        cout << value_str.substr(1, value_str.size() - 2) << endl;
+    else
+        cout << _getValue(value_str) << endl;
 }
 
 

@@ -158,7 +158,28 @@ void SyntaxAnalyzer::_print(SyntaxTreeNode * father_node) {
     tree -> addChildNode(print_tree -> root, father_node);
 
     index ++;
-    _expression(print_tree -> root);
+    if (tokens[index].type == TOKEN_TYPE_ENUM::DOUBLE_QUOTE) {
+
+        // 读取 "
+        index ++;
+
+        print_tree -> addChildNode(new SyntaxTreeNode("Expression-String"), print_tree -> root);
+        print_tree -> addChildNode(new SyntaxTreeNode("\"" + tokens[index].value + "\"" ), print_tree -> cur_node);
+
+        // 读取 "
+        index ++;
+        if (tokens[index].type != TOKEN_TYPE_ENUM::DOUBLE_QUOTE)
+            throw Error("excepted `\"` appears in pairs", line_number_map[index]);
+
+        index ++;
+        if (tokens[index].type != TOKEN_TYPE_ENUM::SEMICOLON)
+            throw Error("excepted `;` after `print`", line_number_map[index]);
+
+        index ++;
+    }
+    else {
+        _expression(print_tree -> root);
+    }
 }
 
 
@@ -571,7 +592,7 @@ void SyntaxAnalyzer::_block(SyntaxTreeNode * father_node) {
                 _print(block_tree -> root);
                 break;
             default:
-                throw Error("in block, unidentified symbols found", line_number_map[index]);
+                throw Error("in block, unidentified symbols `" + tokens[index].value + "`  found", line_number_map[index]);
         }
     }
 

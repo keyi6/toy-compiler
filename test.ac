@@ -5,7 +5,8 @@
 
 int main() {
 	int a, b;
-	/*int a, b, c[20];*/
+
+	print "I can print a string";
 
     b = 10;
 	a = (1 + 2) * 3 + b;
