@@ -28,6 +28,7 @@ vector<string> Token::TOKEN_TYPE = {
 map<string, TOKEN_TYPE_ENUM> Token::DETAIL_TOKEN_TYPE = {
         {"include", TOKEN_TYPE_ENUM::INCLUDE},
         {"print", TOKEN_TYPE_ENUM::PRINT},
+        {"void", TOKEN_TYPE_ENUM::VOID},
         {"int", TOKEN_TYPE_ENUM::INT},
         {"float", TOKEN_TYPE_ENUM::FLOAT},
         {"char", TOKEN_TYPE_ENUM::CHAR},

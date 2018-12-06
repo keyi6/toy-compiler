@@ -1,12 +1,16 @@
 /*
  * this is a simple demo using awesomeCC
- * created from scratch by Keyi Li & Hanwen Liu
+ * a new language designed and created
+ * by Keyi Li & Hanwen Liu
+ *
+ * LICENSE: GPL V3.0
  */
 
-int main() {
-	int c, a[20] = {1, 2, 34}, b;
 
-	c = 10;
-	b=  4;
+void main() {
+    int a[5] = {1, 2, 34};
+    int i;
 
+
+    print a[4];
 }

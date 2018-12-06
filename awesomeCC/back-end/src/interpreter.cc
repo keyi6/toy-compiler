@@ -30,7 +30,7 @@ void Interpreter::_execute() {
     int op = int(code[index].op);
 
     switch (op) {
-        case int(INTER_CODE_OP_ENUM::ASSIGN):
+        case int(INTER_CODE_OP_ENUM::MOV):
             _assign();
             index ++;
             break;
@@ -101,28 +101,54 @@ void Interpreter::_assign() {
     // 先读取右值
     double r_value = _getValue(code[index].arg1);
 
+    int temp_index = _getAddress(res);
     // 再读取左值
-    if (res[0] == 'v') {
-        int temp_index = string2int(res.substr(1));
+    if (res[0] == 'v')
         v_stack[temp_index] = r_value;
+    else
+        t_stack[temp_index] = r_value;
+}
+
+
+int Interpreter::_getAddress(string value_str) {
+    if (value_str[0] == 'v') {
+        int len = value_str.size();
+        for (int i = 0; i < len; i ++)
+            if (value_str[i] == '[') {
+                // 相对寻址
+                int offset = _getValue(value_str.substr(i + 1, len - i - 2));
+                int base = _getValue(value_str.substr(1, i - 1));
+                return offset + base;
+            }
     }
     else {
-        int temp_index = string2int(res.substr(1));
-        t_stack[temp_index] = r_value;
+        return string2int(value_str.substr(1));
     }
 }
 
 
-
 double Interpreter::_getValue(string value_str) {
+    // 寻址
     if (value_str[0] == 'v') {
+        int len = value_str.size();
+        for (int i = 0; i < len; i ++)
+            if (value_str[i] == '[') {
+                // 相对寻址
+                int offset = _getValue(value_str.substr(i + 1, len - i - 2));
+                int base = _getValue(value_str.substr(1, i - 1));
+                return v_stack[offset + base];
+            }
+
+        // 立即数寻址
         int temp_index = string2int(value_str.substr(1));
         return v_stack[temp_index];
     }
+    // 临时变量
     if (value_str[0] == 't') {
         int temp_index = string2int(value_str.substr(1));
         return t_stack[temp_index];
     }
+    // 立即数
     else
         return string2double(value_str);
 }

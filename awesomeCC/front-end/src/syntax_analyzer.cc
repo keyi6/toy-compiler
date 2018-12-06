@@ -132,7 +132,7 @@ SENTENCE_PATTERN_ENUM SyntaxAnalyzer::_judgeSentencePattern() {
         case int(TOKEN_TYPE_ENUM::IDENTIFIER):
             if (index + 1 < len) {
                 TOKEN_TYPE_ENUM n_type = tokens[index + 1].type;
-                if (n_type == TOKEN_TYPE_ENUM::ASSIGN)        // sum = 10
+                if (n_type == TOKEN_TYPE_ENUM::ASSIGN || n_type == TOKEN_TYPE_ENUM::LM_BRACKET)        // sum = 10
                     return SENTENCE_PATTERN_ENUM::ASSIGNMENT;
                 if (n_type == TOKEN_TYPE_ENUM::LL_BRACKET)    // sum(10);
                     return SENTENCE_PATTERN_ENUM::FUNCTION_CALL;
@@ -159,7 +159,6 @@ void SyntaxAnalyzer::_print(SyntaxTreeNode * father_node) {
 
     index ++;
     if (tokens[index].type == TOKEN_TYPE_ENUM::DOUBLE_QUOTE) {
-
         // 读取 "
         index ++;
 
@@ -322,14 +321,13 @@ void SyntaxAnalyzer::_expression(SyntaxTreeNode * father_node, TOKEN_TYPE_ENUM s
                 SyntaxTree * new_tree = new SyntaxTree(new SyntaxTreeNode("Expression-ArrayItem"));
 
                 // 数组名字
-                new_tree -> addChildNode(new SyntaxTreeNode("Array"), new_tree -> root);
                 new_tree -> addChildNode(new SyntaxTreeNode(tokens[index].value), new_tree -> cur_node);
 
                 // 读取 名字 和 [
                 index += 2;
 
                 // 数组下标
-                SyntaxTreeNode * index_node = new SyntaxTreeNode("Index");
+                SyntaxTreeNode * index_node = new SyntaxTreeNode("Array-Index");
                 new_tree -> addChildNode(index_node, new_tree -> root);
                 _expression(index_node, TOKEN_TYPE_ENUM::RM_BRACKET);
 
@@ -653,18 +651,29 @@ void SyntaxAnalyzer::_assignment(SyntaxTreeNode * father_node, TOKEN_TYPE_ENUM s
     SyntaxTree * assign_tree = new SyntaxTree(new SyntaxTreeNode("Assignment"));
     tree -> addChildNode(assign_tree -> root, father_node);
 
-
     if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::IDENTIFIER) {
         assign_tree -> addChildNode(new SyntaxTreeNode(tokens[index].value), assign_tree -> root);
         index ++;
 
+        // a[0] = 10;
+        if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::LM_BRACKET) {
+            assign_tree -> cur_node -> value = "Expression-ArrayItem";
+
+            index ++;
+            assign_tree -> addChildNode(new SyntaxTreeNode(tokens[index - 2].value), assign_tree -> root -> first_son);
+            assign_tree -> addChildNode(new SyntaxTreeNode("Array-Index"), assign_tree -> root -> first_son);
+            _expression(assign_tree -> cur_node, TOKEN_TYPE_ENUM::RM_BRACKET);
+        }
+
+        // a = 10;
         if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::ASSIGN) {
             index ++;
 
             _expression(assign_tree -> root);
         }
-        else
+        else {
             throw Error("in assignment, expected `=` after an identifier", line_number_map[index]);
+        }
     }
     else if (index < len && tokens[index].type == stop_token)
         index ++;

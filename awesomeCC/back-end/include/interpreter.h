@@ -24,6 +24,8 @@ private:
     vector<double> v_stack;
 
     double _getValue(string value_str);
+    int _getAddress(string value_str);
+
     void _calc(int op);
     void _execute();
     void _print();

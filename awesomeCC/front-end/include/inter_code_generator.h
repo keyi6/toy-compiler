@@ -69,10 +69,11 @@ private:
     void _analyze(SyntaxTreeNode * cur);
 
     string _lookUp(string name);
+    string _lookUp(SyntaxTreeNode * arr_pointer);
     void _emit(INTER_CODE_OP_ENUM op, string arg1,
                string arg2, string res);
 
-    string _locateArrayItem(string arr_name, int arr_i);
+    string _locateArrayItem(string arr_name, string arr_i);
     string _expression(SyntaxTreeNode * cur);
     void _block(SyntaxTreeNode * cur);
     void _print(SyntaxTreeNode * cur);

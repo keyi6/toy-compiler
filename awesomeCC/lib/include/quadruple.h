@@ -37,7 +37,7 @@ enum class INTER_CODE_OP_ENUM {
     JNZ, // 不满足条件跳转
     JL, // arg1 < arg2 跳转
     JG, // arg1 > arg2 跳转
-    ASSIGN, // 赋值
+    MOV, // 赋值
     PRINT // 输出
 };
 

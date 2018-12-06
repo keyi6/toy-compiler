@@ -138,9 +138,14 @@ void InterCodeGenerator::_assignment(SyntaxTreeNode * cur) {
     SyntaxTreeNode * cs = cur -> first_son;
 
     string r_value_place = _expression(cs -> right);
-    string store_place = _lookUp(cur -> first_son -> value);
 
-    _emit(INTER_CODE_OP_ENUM::ASSIGN, r_value_place, "", store_place);
+    string store_place;
+    if (cs -> value == "Expression-ArrayItem")
+        store_place = _lookUp(cs);
+    else
+        store_place = _lookUp(cur -> first_son -> value);
+
+    _emit(INTER_CODE_OP_ENUM::MOV, r_value_place, "", store_place);
 }
 
 
@@ -177,7 +182,11 @@ string InterCodeGenerator::_expression(SyntaxTreeNode * cur) {
     else if (cur -> value == "Expression-Variable") {
         return _lookUp(cur -> first_son -> value);
     }
+    else if (cur -> value == "Expression-ArrayItem") {
+        return _lookUp(cur);
+    }
     else {
+        cout << cur -> value << endl;
         throw Error("How can you step into this place???");
     }
 }
@@ -226,7 +235,10 @@ void InterCodeGenerator::_statement(SyntaxTreeNode * cur) {
                     while (cur_i + len < extra_info_len && extra_info[cur_i + len] != ',')
                         len ++;
 
-                    _emit(INTER_CODE_OP_ENUM::ASSIGN, extra_info.substr(cur_i, len), "", _locateArrayItem(cs -> value, arr_i));
+                    _emit(INTER_CODE_OP_ENUM::MOV,
+                            extra_info.substr(cur_i, len),
+                            "",
+                            info.name + "[" + int2string(arr_i) + "]");
 
                     cur_i += len + 1;
                     arr_i ++;
@@ -257,6 +269,20 @@ string InterCodeGenerator::_lookUp(string name) {
 
 
 /**
+ * @brief 寻找标识符
+ * @param name 标识符
+ * @return code var
+ * @author Keyi Li
+ */
+string InterCodeGenerator::_lookUp(SyntaxTreeNode * arr_pointer) {
+    string base = arr_pointer -> first_son -> value;
+    string index_place = _expression(arr_pointer -> first_son -> right -> first_son);
+
+    return _lookUp(base) + "[" + index_place + "]";
+}
+
+
+/**
  * @brief 生成一个四元式
  * @param op 操作符
  * @param arg1 参数1
@@ -267,6 +293,7 @@ string InterCodeGenerator::_lookUp(string name) {
 void InterCodeGenerator::_emit(INTER_CODE_OP_ENUM op, string arg1, string arg2, string res) {
     inter_code.emplace_back(Quadruple(op, move(arg1), move(arg2), move(res)));
 }
+
 
 /**
  * @brief 保存到文件
@@ -287,9 +314,9 @@ void InterCodeGenerator::saveToFile(string path) {
  * @brief 数组第i项的地址
  * @author Keyi Li
  */
-string InterCodeGenerator::_locateArrayItem(string arr_name, int arr_i) {
+string InterCodeGenerator::_locateArrayItem(string arr_name, string arr_i) {
     if (table.find(arr_name) == table.end())
         throw Error("array variable `" + arr_name + "` is not defined before use");
 
-    return "v" + int2string(table[arr_name].place + arr_i);
+    return "v" + int2string(table[arr_name].place) + "[" + arr_i + "]";
 }

@@ -13,7 +13,7 @@
 vector<string> Quadruple::INTER_CODE_OP = {
         "ADD", "SUB", "DIV", "MUL",
         "JZ", "JNZ", "JLE", "JGE",
-        "ASSIGN", "PRINT"
+        "MOV", "PRINT"
 };
 
 map<string, INTER_CODE_OP_ENUM> Quadruple::INTER_CODE_MAP = {
