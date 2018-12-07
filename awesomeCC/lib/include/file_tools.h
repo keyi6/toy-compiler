@@ -77,7 +77,7 @@ vector<Quadruple> readInterCodeFile(string path) {
             while (start + len < line_len && line[start + len] != ',')
                 len ++;
 
-            INTER_CODE_OP_ENUM op = INTER_CODE_OP_ENUM(string2int(line.substr(start, len)));
+            INTER_CODE_OP_ENUM op = Quadruple::INTER_CODE_MAP[line.substr(start, len)];
 
             start += len + 1;
             len = 0;

@@ -20,7 +20,15 @@ map<string, INTER_CODE_OP_ENUM> Quadruple::INTER_CODE_MAP = {
         {"+", INTER_CODE_OP_ENUM::ADD},
         {"-", INTER_CODE_OP_ENUM::SUB},
         {"*", INTER_CODE_OP_ENUM::MUL},
-        {"/", INTER_CODE_OP_ENUM::DIV}
+        {"/", INTER_CODE_OP_ENUM::DIV},
+        {"ADD", INTER_CODE_OP_ENUM::ADD},
+        {"SUB", INTER_CODE_OP_ENUM::SUB},
+        {"MUL", INTER_CODE_OP_ENUM::MOV},
+        {"DIV", INTER_CODE_OP_ENUM::DIV},
+        {"JZ", INTER_CODE_OP_ENUM::JZ},
+        {"JNZ", INTER_CODE_OP_ENUM::JNZ},
+        {"MOV", INTER_CODE_OP_ENUM::MOV},
+        {"PRINT", INTER_CODE_OP_ENUM::PRINT},
 };
 
 

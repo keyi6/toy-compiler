@@ -311,7 +311,7 @@ void InterCodeGenerator::saveToFile(string path) {
     ofstream out_file;
     out_file.open(path, ofstream::out | ofstream::trunc);
     for (auto ic: inter_code)
-        out_file << int(ic.op) << "," << ic.arg1 << "," << ic.arg2 << "," << ic.res << endl;
+        out_file << Quadruple::INTER_CODE_OP[int(ic.op)] << "," << ic.arg1 << "," << ic.arg2 << "," << ic.res << endl;
 
     out_file.close();
 }

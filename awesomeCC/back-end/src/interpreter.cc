@@ -83,16 +83,12 @@ void Interpreter::_calc(int op) {
     }
 
     string res = code[index].res;
-    int temp_index;
+    int temp_index = _getAddress(res);
     // 读取res
-    if (res[0] == 'v') {
-        temp_index = string2int(res.substr(1));
+    if (res[0] == 'v')
         v_stack[temp_index] = value;
-    }
-    else {
-        temp_index = string2int(res.substr(1));
+    else
         t_stack[temp_index] = value;
-    }
 }
 
 
