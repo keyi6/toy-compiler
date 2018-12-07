@@ -33,7 +33,7 @@ SyntaxTree::SyntaxTree(SyntaxTreeNode * _root) {
  * @brief 悬挂一个节点
  * @author Keyi Li
  */
-void SyntaxTree::addChildNode(SyntaxTreeNode * child_node, SyntaxTreeNode * father_node) {
+void SyntaxTree::addNode(SyntaxTreeNode * child_node, SyntaxTreeNode * father_node) {
     child_node -> father = father_node;
 
     cur_node = father_node -> first_son;
@@ -55,19 +55,14 @@ void SyntaxTree::addChildNode(SyntaxTreeNode * child_node, SyntaxTreeNode * fath
  * @brief 交换左右两个相邻节点
  * @author Keyi Li
  */
-void SyntaxTree::switchNode(SyntaxTreeNode * left, SyntaxTreeNode * right) {
-    SyntaxTreeNode * ll = left -> left, * rr = right -> right;
+void SyntaxTree::switchNode(SyntaxTreeNode * center) {
+    SyntaxTreeNode * l = center -> left, * r = center -> right;
+    if (center -> father && center -> father -> first_son == l)
+        center -> father -> first_son = r;
 
-    left -> left = right;
-    left -> right = rr;
-
-    right -> right = ll;
-    right -> right = left;
-
-    if (ll)
-        ll -> right = right;
-    if (rr)
-        rr -> left = left;
+    swap(center -> left, center -> right);
+    swap(center -> left -> left, center -> right -> left);
+    swap(center -> left -> right, center -> right -> right);
 }
 
 

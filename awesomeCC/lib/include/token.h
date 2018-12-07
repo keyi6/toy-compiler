@@ -57,6 +57,7 @@ enum class TOKEN_TYPE_ENUM {
     MINUS,
     // 优先级2
     MUL,
+    MOD,
     DIV,
     // 优先级3
     RIGHT_SHIFT,
@@ -99,6 +100,7 @@ public:
     static vector<char> SEPARATORS;               // 分隔符
 
     static bool isExpressionOperator(TOKEN_TYPE_ENUM t);
+    static bool isBoolOperator(TOKEN_TYPE_ENUM t);
     static bool isUniOperator(TOKEN_TYPE_ENUM t);
 
     friend ostream & operator << (ostream &out, Token & t);

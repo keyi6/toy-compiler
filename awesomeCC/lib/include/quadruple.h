@@ -29,14 +29,19 @@ using std::ostream;
 using std::ofstream;
 
 enum class INTER_CODE_OP_ENUM {
+    /* arithmetic */
     ADD,
     SUB,
     DIV,
     MUL,
-    JZ,  // 满足条件跳转
-    JNZ, // 不满足条件跳转
+    MOD,
+    /* jump */
+    J, // 啥都不管 直接跳
+    JE, // arg1 == arg2 跳转
+    JNE, // arg1 == arg2 跳转
     JL, // arg1 < arg2 跳转
     JG, // arg1 > arg2 跳转
+    /* other */
     MOV, // 赋值
     PRINT // 输出
 };
@@ -50,6 +55,7 @@ class Quadruple {
 public:
     static vector<string> INTER_CODE_OP;
     static map<string, INTER_CODE_OP_ENUM> INTER_CODE_MAP;
+    static map<string, INTER_CODE_OP_ENUM> COUNTERPART_INTER_CODE_MAP;
 
     INTER_CODE_OP_ENUM op;
     string res, arg1, arg2;

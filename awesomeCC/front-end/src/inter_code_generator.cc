@@ -42,10 +42,13 @@ InterCodeGenerator::InterCodeGenerator() = default;
  * @author Keyi Li
  */
 void InterCodeGenerator::analyze(SyntaxTree * _tree, bool verbose) {
-    tree = _tree;
     inter_code.clear();
     temp_var_index = 0;
     context_index = 0;
+    while (not zipper_stack.empty())
+        zipper_stack.pop();
+
+    tree = _tree;
 
     if (verbose)
         tree -> display(true);
@@ -114,6 +117,49 @@ void InterCodeGenerator::_block(SyntaxTreeNode * cur) {
             _assignment(cs);
         else if (cs -> value == "Print")
             _print(cs);
+        else if (cs -> value == "Control-If")
+            _if(cs);
+
+        // TODO 其他
+
+        cs = cs -> right;
+    }
+}
+
+/**
+ * @brief 翻译Print
+ * @author Keyi Li
+ */
+void InterCodeGenerator::_if(SyntaxTreeNode * cur) {
+    SyntaxTreeNode * cs = cur -> first_son;
+    while (cs) {
+        if (cs -> value == "Control-Condition") {
+            // 读取条件语句
+            _expression(cs -> first_son);
+
+            // 读取紧随其后的执行语句
+            cs = cs -> right;
+            _block(cs);
+
+            // 回填一下
+            // TODO 要不要while呢？🤔
+            int ic_index = zipper_stack.top();
+            zipper_stack.pop();
+            inter_code[ic_index].res = int2string(inter_code.size());
+
+
+            // 入回填栈
+            zipper_stack.push(inter_code.size());
+            _emit(INTER_CODE_OP_ENUM::J, "", "", "");
+        }
+        else {
+            _block(cs);
+
+            // 回填一下
+            int ic_index = zipper_stack.top();
+            zipper_stack.pop();
+            inter_code[ic_index].res = int2string(inter_code.size());
+        }
 
         cs = cs -> right;
     }
@@ -157,7 +203,7 @@ void InterCodeGenerator::_assignment(SyntaxTreeNode * cur) {
  */
 string InterCodeGenerator::_expression(SyntaxTreeNode * cur) {
     // 双目运算符
-    if (cur -> value == "Expression-DoubleOp") {
+    if (cur -> value == "Expression-DoubleOp" || cur -> value == "Expression-Bool-DoubleOp") {
         SyntaxTreeNode * a = cur -> first_son;
         SyntaxTreeNode * op = a -> right;
         SyntaxTreeNode * b = op -> right;
@@ -165,13 +211,30 @@ string InterCodeGenerator::_expression(SyntaxTreeNode * cur) {
         string a_place = _expression(a);
         string b_place = _expression(b);
 
-        string temp_var_place = "t" + int2string(++ temp_var_index);
-        _emit(Quadruple::INTER_CODE_MAP[op -> first_son -> value], a_place, b_place, temp_var_place);
+        // 如果是数字运算的话
+        if (cur -> value == "Expression-DoubleOp") {
+            string temp_var_place = "t" + int2string(++ temp_var_index);
+            _emit(Quadruple::INTER_CODE_MAP[op -> first_son -> value], a_place, b_place, temp_var_place);
 
-        return temp_var_place;
+            return temp_var_place;
+        }
+        // bool运算要考虑拉链回填
+        else {
+            // TODO
+            zipper_stack.push(inter_code.size());
+            _emit(Quadruple::COUNTERPART_INTER_CODE_MAP[op -> first_son -> value],
+                    a_place,
+                    b_place,
+                    "");
+
+            return "";
+        }
     }
     // 单目运算符
     else if (cur -> value == "Expression-UniOp") {
+        // TODO
+    }
+    else if (cur -> value == "Expression-Bool-UniOp"){
         // TODO
     }
     // 常量
@@ -181,7 +244,9 @@ string InterCodeGenerator::_expression(SyntaxTreeNode * cur) {
     // 字符串常量
     else if (cur -> value == "Expression-String") {
         string temp = cur -> first_son -> value;
+        // 转义
         temp = regex_replace(temp, regex(","), "\\,");
+        temp = regex_replace(temp, regex("\\\\"), "\\\\");
 
         return temp;
     }
@@ -189,13 +254,13 @@ string InterCodeGenerator::_expression(SyntaxTreeNode * cur) {
     else if (cur -> value == "Expression-Variable") {
         return _lookUp(cur -> first_son -> value);
     }
+    // 数组项
     else if (cur -> value == "Expression-ArrayItem") {
         return _lookUp(cur);
     }
-    else {
-        cout << cur -> value << endl;
-        throw Error("How can you step into this place???");
-    }
+
+    cout << "debug >> " << cur -> value << endl;
+    throw Error("How can you step into this place???");
 }
 
 

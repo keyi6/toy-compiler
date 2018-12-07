@@ -11,26 +11,46 @@
 
 
 vector<string> Quadruple::INTER_CODE_OP = {
-        "ADD", "SUB", "DIV", "MUL",
-        "JZ", "JNZ", "JLE", "JGE",
+        "ADD", "SUB", "DIV", "MUL", "MOD",
+        "J", "JE", "JNE", "JL", "JG",
         "MOV", "PRINT"
 };
+
 
 map<string, INTER_CODE_OP_ENUM> Quadruple::INTER_CODE_MAP = {
         {"+", INTER_CODE_OP_ENUM::ADD},
         {"-", INTER_CODE_OP_ENUM::SUB},
         {"*", INTER_CODE_OP_ENUM::MUL},
+        {"%", INTER_CODE_OP_ENUM::MOD},
         {"/", INTER_CODE_OP_ENUM::DIV},
+
+        {"==", INTER_CODE_OP_ENUM::JE},
+        {"!=", INTER_CODE_OP_ENUM::JNE},
+        {">", INTER_CODE_OP_ENUM::JG},
+        {"<", INTER_CODE_OP_ENUM::JL},
+
         {"ADD", INTER_CODE_OP_ENUM::ADD},
         {"SUB", INTER_CODE_OP_ENUM::SUB},
         {"MUL", INTER_CODE_OP_ENUM::MOV},
+        {"MOD", INTER_CODE_OP_ENUM::MOD},
         {"DIV", INTER_CODE_OP_ENUM::DIV},
-        {"JZ", INTER_CODE_OP_ENUM::JZ},
-        {"JNZ", INTER_CODE_OP_ENUM::JNZ},
+
+        {"J", INTER_CODE_OP_ENUM::J},
+        {"JE", INTER_CODE_OP_ENUM::JE},
+        {"JNE", INTER_CODE_OP_ENUM::JNE},
+        {"JG", INTER_CODE_OP_ENUM::JG},
+        {"JL", INTER_CODE_OP_ENUM::JL},
         {"MOV", INTER_CODE_OP_ENUM::MOV},
         {"PRINT", INTER_CODE_OP_ENUM::PRINT},
 };
 
+
+map<string, INTER_CODE_OP_ENUM> Quadruple::COUNTERPART_INTER_CODE_MAP = {
+        {"==", INTER_CODE_OP_ENUM::JNE},
+        {"!=", INTER_CODE_OP_ENUM::JE},
+        {">", INTER_CODE_OP_ENUM::JL},
+        {"<", INTER_CODE_OP_ENUM::JG},
+};
 
 /**
  * @brief 四元式构造函数
@@ -50,7 +70,7 @@ Quadruple::Quadruple(INTER_CODE_OP_ENUM _op, string _arg1, string _arg2, string 
  */
 ostream & operator << (ostream & out, Quadruple & q) {
     out << "(";
-    out << setw(6) << setfill (' ') << Quadruple::INTER_CODE_OP[int(q.op)] << ", ";
+    out << setw(5) << setfill (' ') << Quadruple::INTER_CODE_OP[int(q.op)] << ", ";
     out << setw(5) << setfill (' ') << q.arg1 << ", ";
     out << setw(5) << setfill (' ') << q.arg2 << ", ";
     out << setw(5) << setfill (' ') << q.res;

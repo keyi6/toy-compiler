@@ -15,6 +15,7 @@
 #include "../../lib/include/syntax_tree.h"
 
 #include <map>
+#include <stack>
 #include <regex>
 #include <string>
 #include <iomanip>
@@ -26,6 +27,7 @@ using std::cout;
 using std::move;
 using std::setw;
 using std::endl;
+using std::stack;
 using std::regex;
 using std::string;
 using std::setfill;
@@ -69,6 +71,8 @@ private:
     map<string, Info> table; // 变量表
     vector<Quadruple> inter_code; // 生成的四元式
 
+    stack<int> zipper_stack; // 拉链回填的栈
+
     void _analyze(SyntaxTreeNode * cur);
 
     string _lookUp(string name);
@@ -82,6 +86,7 @@ private:
     void _print(SyntaxTreeNode * cur);
     void _statement(SyntaxTreeNode * cur);
     void _assignment(SyntaxTreeNode * cur);
+    void _if(SyntaxTreeNode * cur);
 
 public:
     InterCodeGenerator();

@@ -14,6 +14,7 @@ Interpreter::Interpreter() = default;
 
 
 void Interpreter::execute(vector<Quadruple> _code) {
+    cout << endl << endl << endl << endl << endl << endl << "----- running -----" << endl;
     code = _code;
     index = 0;
 
@@ -38,6 +39,7 @@ void Interpreter::_execute() {
         case int(INTER_CODE_OP_ENUM::ADD):
         case int(INTER_CODE_OP_ENUM::SUB):
         case int(INTER_CODE_OP_ENUM::MUL):
+        case int(INTER_CODE_OP_ENUM::MOD):
         case int(INTER_CODE_OP_ENUM::DIV):
             _calc(op);
             index ++;
@@ -46,7 +48,13 @@ void Interpreter::_execute() {
             _print();
             index ++;
             break;
-            // TODO;
+        case int(INTER_CODE_OP_ENUM::J):
+        case int(INTER_CODE_OP_ENUM::JE):
+        case int(INTER_CODE_OP_ENUM::JNE):
+        case int(INTER_CODE_OP_ENUM::JL):
+        case int(INTER_CODE_OP_ENUM::JG):
+            _jump();
+            break;
         default:
             break;
     }
@@ -80,6 +88,9 @@ void Interpreter::_calc(int op) {
         case int(INTER_CODE_OP_ENUM::DIV):
             value = a / b;
             break;
+        case int(INTER_CODE_OP_ENUM::MOD):
+            value = int(a) % int(b);
+            break;
     }
 
     string res = code[index].res;
@@ -104,6 +115,26 @@ void Interpreter::_assign() {
         v_stack[temp_index] = r_value;
     else
         t_stack[temp_index] = r_value;
+}
+
+
+void Interpreter::_jump() {
+    INTER_CODE_OP_ENUM op = code[index].op;
+    if (op == INTER_CODE_OP_ENUM::J) {
+        index = int(_getValue(code[index].res));
+        return;
+    }
+
+    double a = _getValue(code[index].arg1);
+    double b = _getValue(code[index].arg2);
+
+    if ((op == INTER_CODE_OP_ENUM::JE  && a == b) ||
+        (op == INTER_CODE_OP_ENUM::JNE && a != b) ||
+        (op == INTER_CODE_OP_ENUM::JG  && a > b) ||
+        (op == INTER_CODE_OP_ENUM::JL  && a < b))
+        index = int(_getValue(code[index].res));
+    else
+        index ++;
 }
 
 
@@ -149,3 +180,5 @@ double Interpreter::_getValue(string value_str) {
     else
         return string2double(value_str);
 }
+
+

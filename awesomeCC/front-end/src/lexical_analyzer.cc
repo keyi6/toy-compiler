@@ -54,6 +54,7 @@ bool LexicalAnalyzer::_isCommentEnd() {
             sentence[cur_pos + 1] == '/');
 }
 
+
 /**
  * @brief 自增curPos直到不为空
  */
@@ -126,8 +127,8 @@ bool LexicalAnalyzer::_isSeparator(char ch) {
  *      -<em>false</em> 不是运算符
  */
 bool LexicalAnalyzer::_isOperator(char ch) {
-    for (int i = 0; i < 10; i ++)
-        if (ch == Token::OPERATORS[i][0])
+    for (auto o: Token::OPERATORS)
+        if (ch == o[0])
             return true;
 
     return false;
@@ -248,8 +249,10 @@ void LexicalAnalyzer::_analyze() {
         }
         // 运算符
         else if (_isOperator(cur_char)) {
-            // ++ -- << >>
-            if ((cur_char == '+' || cur_char == '-' || cur_char == '<' || cur_char == '>') && cur_pos + 1 < len && sentence[cur_pos + 1] == cur_char) {
+            // ++ -- << >> && || ==
+            if ((cur_char == '+' || cur_char == '-' || cur_char == '<' || cur_char == '>' ||
+                 cur_char == '&' || cur_char == '|' || cur_char == '=')
+            && cur_pos + 1 < len && sentence[cur_pos + 1] == cur_char) {
                 tokens.emplace_back(Token(sentence.substr(cur_pos, 2), TOKEN_TYPE_ENUM::OPERATOR, cur_pos));
                 cur_pos += 2;
             }

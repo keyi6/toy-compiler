@@ -11,8 +11,10 @@
 
 #include <string>
 #include <iostream>
+#include <algorithm>
 using std::cout;
 using std::endl;
+using std::swap;
 using std::string;
 
 
@@ -37,8 +39,8 @@ public:
     SyntaxTreeNode * root, * cur_node;
     SyntaxTree(SyntaxTreeNode * _root = nullptr);
 
-    void addChildNode(SyntaxTreeNode * child_node, SyntaxTreeNode * father_node = nullptr);
-    void switchNode(SyntaxTreeNode * left, SyntaxTreeNode * right);
+    void addNode(SyntaxTreeNode * child_node, SyntaxTreeNode * father_node = nullptr);
+    void switchNode(SyntaxTreeNode * center);
     void display(bool verbose = false);
 };
 

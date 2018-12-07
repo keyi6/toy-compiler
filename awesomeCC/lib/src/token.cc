@@ -49,6 +49,7 @@ map<string, TOKEN_TYPE_ENUM> Token::DETAIL_TOKEN_TYPE = {
         {"&&", TOKEN_TYPE_ENUM::AND},
         {"==", TOKEN_TYPE_ENUM::EQUAL},
         {"*", TOKEN_TYPE_ENUM::MUL},
+        {"%", TOKEN_TYPE_ENUM::MOD},
         {"/", TOKEN_TYPE_ENUM::DIV},
         {"++", TOKEN_TYPE_ENUM::SELF_PLUS},
         {"--", TOKEN_TYPE_ENUM::SELF_MINUS},
@@ -78,9 +79,9 @@ vector<string> Token::KEYWORDS = {
 };
 
 
-vector<string> Token::OPERATORS = {"+",  "-",  "<",  ">", "!", "=", "||", "&&", "*", "/",  // 0 - 9
-                                   "++", "--", "<<", ">>",                               // 10 - 13
-                                   "<=", ">=", "!=", "=="};                        // 14 - 16
+vector<string> Token::OPERATORS = {"+",  "-",  "<",  ">", "!", "=", "||", "&&", "*", "/", "%",
+                                   "++", "--", "<<", ">>",
+                                   "<=", ">=", "!=", "=="};
 
 
 vector<char> Token::SEPARATORS = {'(', ')', '{', '}', '[', ']', ',', '\'', ';' , '\'', '\"'};
@@ -88,6 +89,7 @@ vector<char> Token::SEPARATORS = {'(', ')', '{', '}', '[', ']', ',', '\'', ';' ,
 
 /**
  * @brief Token狗仔函数
+ * @author Keyi Li
  */
 Token::Token(string _value, TOKEN_TYPE_ENUM _type, int _pos) {
     value = _value;
@@ -101,19 +103,21 @@ Token::Token(string _value, TOKEN_TYPE_ENUM _type, int _pos) {
 
 /**
  * @brief 判断是不是表达式中的运算符
+ * @author Keyi Li
  * @param t TOKEN_TYPE_ENUM
  * @return
  *      -<em>true</em> 是
  *      -<em>false</em> 否
  */
 bool Token::isExpressionOperator(TOKEN_TYPE_ENUM t) {
-    int _ = int(t);
-    return int(TOKEN_TYPE_ENUM::ASSIGN) + 1 <= _ && _ <= int(TOKEN_TYPE_ENUM::RL_BRACKET);
+    int detail_type = int(t);
+    return int(TOKEN_TYPE_ENUM::ASSIGN) + 1 <= detail_type && detail_type <= int(TOKEN_TYPE_ENUM::RL_BRACKET);
 }
 
 
 /**
  * @brief 判断是不是单目运算符
+ * @author Keyi Li
  * @param t TOKEN_TYPE_ENUM
  * @return
  *      -<em>true</em> 是
@@ -124,16 +128,32 @@ bool Token::isUniOperator(TOKEN_TYPE_ENUM t) {
 }
 
 
+/**
+ * @brief 判断是不是逻辑运算符
+ * @author Keyi Li
+ * @param t TOKEN_TYPE_ENUM
+ * @return
+ *      -<em>true</em> 是
+ *      -<em>false</em> 否
+ */
+bool Token::isBoolOperator(TOKEN_TYPE_ENUM t) {
+    return t == TOKEN_TYPE_ENUM::NOT || (TOKEN_TYPE_ENUM::AND <= t && t <= TOKEN_TYPE_ENUM::NOT_EQUAL);
+}
+
+
 ostream & operator << (ostream & out, Token & t) {
-    int _ = int(t.type);
-    if (int(TOKEN_TYPE_ENUM::INCLUDE) <= _ && _ <= int(TOKEN_TYPE_ENUM::RETURN))
-        _ = int(TOKEN_TYPE_ENUM::KEYWORD);
-    else if (int(TOKEN_TYPE_ENUM::ASSIGN) <= _ && _ <= int(TOKEN_TYPE_ENUM::NOT))
-        _ = int(TOKEN_TYPE_ENUM::OPERATOR);
-    else if (int(TOKEN_TYPE_ENUM::LL_BRACKET) <= _ && _ <= int(TOKEN_TYPE_ENUM::SHARP))
-        _ = int(TOKEN_TYPE_ENUM::SEPARATOR);
+    TOKEN_TYPE_ENUM detail_type = t.type;
+    int general_type = int(detail_type);
+
+    if (TOKEN_TYPE_ENUM::INCLUDE <= detail_type && detail_type <= TOKEN_TYPE_ENUM::RETURN)
+        general_type = int(TOKEN_TYPE_ENUM::KEYWORD);
+    else if (TOKEN_TYPE_ENUM::ASSIGN <= detail_type && detail_type <= TOKEN_TYPE_ENUM::NOT)
+        general_type = int(TOKEN_TYPE_ENUM::OPERATOR);
+    else if (TOKEN_TYPE_ENUM::LL_BRACKET <= detail_type && detail_type <= TOKEN_TYPE_ENUM::SHARP)
+        general_type = int(TOKEN_TYPE_ENUM::SEPARATOR);
 
     out << setw(10) << setfill(' ') << t.value;
-    out << setw(10) << setfill(' ') << "type: " << Token::TOKEN_TYPE[_] << endl;
+    out << setw(10) << setfill(' ') << "type: " << Token::TOKEN_TYPE[general_type];
+    out << endl;
     return out;
 }

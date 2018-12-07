@@ -8,15 +8,23 @@
 
 
 void main() {
-    int age;
+    int year;
 
+    year = 2008;
 
-    age = 120;
-
-    if (age > 18) {
-        print "you are an adult";
+    if (year % 4 == 0) {
+        print "It is a leap year";
     }
     else {
-        print "you are a child!";
+        print "不是闰年哦";
     }
+
+/*
+    if (year % 4 == 0 && year % 100 != 0 || year % 400 == 0) {
+        print "It is a leap year";
+    }
+    else {
+        print "不是闰年哦";
+    }
+*/
 }

@@ -13,6 +13,7 @@
 #include "../../lib/include/quadruple.h"
 
 #include <vector>
+
 using std::vector;
 
 
@@ -30,6 +31,7 @@ private:
     void _execute();
     void _print();
     void _assign();
+    void _jump();
 
 public:
     Interpreter();
