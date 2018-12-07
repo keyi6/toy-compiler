@@ -17,6 +17,7 @@ void Interpreter::execute(vector<Quadruple> _code) {
     code = _code;
     index = 0;
 
+    // TODO 我们需要动态区域
     t_stack.resize(100);
     v_stack.resize(100);
 

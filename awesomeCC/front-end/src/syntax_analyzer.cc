@@ -306,6 +306,7 @@ void SyntaxAnalyzer::_expression(SyntaxTreeNode * father_node, TOKEN_TYPE_ENUM s
     while (index < len && tokens[index].type != stop_sign) {
         cur_type = tokens[index].type;
 
+
         // 常量
         if (cur_type == TOKEN_TYPE_ENUM::DIGIT_CONSTANT) {
             SyntaxTree * new_tree = new SyntaxTree(new SyntaxTreeNode("Expression-Constant"));
@@ -669,7 +670,7 @@ void SyntaxAnalyzer::_assignment(SyntaxTreeNode * father_node, TOKEN_TYPE_ENUM s
         if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::ASSIGN) {
             index ++;
 
-            _expression(assign_tree -> root);
+            _expression(assign_tree -> root, stop_token);
         }
         else {
             throw Error("in assignment, expected `=` after an identifier", line_number_map[index]);
@@ -729,18 +730,11 @@ void SyntaxAnalyzer::_for(SyntaxTreeNode * father_node) {
         // 读取第三个赋值语句
         _assignment(for_tree -> root, TOKEN_TYPE_ENUM::RL_BRACKET);
 
-        // 读取 ）
-        if (tokens[index].type == TOKEN_TYPE_ENUM::RL_BRACKET) {
-            index ++;
-
-            // 读取 {
-            if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::LB_BRACKET)
-                _block(for_tree -> root);
-            else
-                throw Error("Expected `{` after `for (assignment; condition; assignment)`", line_number_map[index]);
-        }
+        // 读取 {
+        if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::LB_BRACKET)
+            _block(for_tree -> root);
         else
-            throw Error("Expected `)`", line_number_map[index]);
+            throw Error("in for, Expected `{` after `for (assignment; condition; assignment)`", line_number_map[index]);
     }
     else
         throw Error("Expected `(` after `for`", line_number_map[index]);
@@ -779,7 +773,41 @@ void SyntaxAnalyzer::_while(SyntaxTreeNode * father_node) {
  * @brief 处理if
  */
 void SyntaxAnalyzer::_if(SyntaxTreeNode * father_node) {
+    SyntaxTree * if_tree = new SyntaxTree(new SyntaxTreeNode("Control-If"));
+    tree -> addChildNode(if_tree -> root, father_node);
+
+    // 读取 if
+    index ++;
+
     // TODO 处理if
+    if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::LL_BRACKET) {
+        // 读取 (
+        index ++;
+
+        if_tree -> addChildNode(new SyntaxTreeNode("Control-Condition"), if_tree -> root);
+        _expression(if_tree -> cur_node, TOKEN_TYPE_ENUM::RL_BRACKET);
+
+        // 如果是 {
+        if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::LB_BRACKET) {
+            _block(if_tree -> root);
+
+            // 如果还有else 和 else if
+            if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::ELSE) {
+                if (index + 1 < len && tokens[index].type == TOKEN_TYPE_ENUM::IF) {
+                    throw Error("In if, `else if` is not supported yet", line_number_map[index]);
+                }
+                else {
+                    _else(if_tree -> root);
+                }
+            }
+        }
+        else {
+            throw Error("in if, expected `{` after `if (condition)`", line_number_map[index]);
+        }
+    }
+    else {
+        throw Error("in if, expected `(` after `if`", line_number_map[index]);
+    }
 }
 
 
@@ -795,7 +823,18 @@ void SyntaxAnalyzer::_else_if(SyntaxTreeNode * father_node) {
  * @brief 处理else
  */
 void SyntaxAnalyzer::_else(SyntaxTreeNode * father_node) {
-    // TODO 处理else
+    // TODO
+    if (tokens[index].type == TOKEN_TYPE_ENUM::ELSE) {
+        index ++;
+        if (tokens[index].type == TOKEN_TYPE_ENUM::LB_BRACKET) {
+            _block(father_node);
+        }
+        else {
+            throw Error("in if, expected `{` after `else` or `if`", line_number_map[index]);
+        }
+    }
+    else
+        throw Error("in if, how can you do this???", line_number_map[index]);
 }
 
 
@@ -805,3 +844,4 @@ void SyntaxAnalyzer::_else(SyntaxTreeNode * father_node) {
 SyntaxTree * SyntaxAnalyzer::getSyntaxTree() {
     return tree;
 }
+
