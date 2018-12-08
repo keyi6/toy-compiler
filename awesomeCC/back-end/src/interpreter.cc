@@ -15,7 +15,7 @@ Interpreter::Interpreter() = default;
 
 void Interpreter::execute(vector<Quadruple> _code) {
     cout << endl << endl << endl << endl << endl << endl << "----- running -----" << endl;
-    code = _code;
+    code = move(_code);
     index = 0;
 
     // TODO 我们需要动态区域

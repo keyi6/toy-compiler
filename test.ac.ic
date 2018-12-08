@@ -1,6 +1,6 @@
 MOV,2008,,v1
 MOD,v1,4,t1
-JNE,t1,0,4
+JNE,t1,0,3
 PRINT,"It is a leap year",,
-J,,,6
+J,,,5
 PRINT,"不是闰年哦",,

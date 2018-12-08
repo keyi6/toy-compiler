@@ -64,8 +64,10 @@ void InterCodeGenerator::analyze(SyntaxTree * _tree, bool verbose) {
 
     if (verbose) {
         cout << "Generated " << inter_code.size() << " inter codes" << endl;
-        for (auto q: inter_code)
-            cout << q;
+        for (int i = 0; i < inter_code.size(); i ++) {
+            cout << "#" << setw(2) << setfill(' ') << i;
+            cout << inter_code[i];
+        }
     }
 }
 
@@ -126,6 +128,9 @@ void InterCodeGenerator::_block(SyntaxTreeNode * cur) {
     }
 }
 
+
+
+
 /**
  * @brief 翻译Print
  * @author Keyi Li
@@ -142,23 +147,17 @@ void InterCodeGenerator::_if(SyntaxTreeNode * cur) {
             _block(cs);
 
             // 回填一下
-            // TODO 要不要while呢？🤔
-            int ic_index = zipper_stack.top();
-            zipper_stack.pop();
-            inter_code[ic_index].res = int2string(inter_code.size());
-
+            zipperFill(inter_code.size() - 1);
 
             // 入回填栈
-            zipper_stack.push(inter_code.size());
+            zipper_stack.push(make_pair(inter_code.size(), 1));
             _emit(INTER_CODE_OP_ENUM::J, "", "", "");
         }
         else {
-            _block(cs);
-
             // 回填一下
-            int ic_index = zipper_stack.top();
-            zipper_stack.pop();
-            inter_code[ic_index].res = int2string(inter_code.size());
+            zipperFill(inter_code.size());
+
+            _block(cs);
         }
 
         cs = cs -> right;
@@ -201,18 +200,19 @@ void InterCodeGenerator::_assignment(SyntaxTreeNode * cur) {
  * @param cur 一个Expression-*节点执政
  * @return place, string
  */
-string InterCodeGenerator::_expression(SyntaxTreeNode * cur) {
+string InterCodeGenerator::_expression(SyntaxTreeNode * cur, string previous) {
     // 双目运算符
     if (cur -> value == "Expression-DoubleOp" || cur -> value == "Expression-Bool-DoubleOp") {
         SyntaxTreeNode * a = cur -> first_son;
         SyntaxTreeNode * op = a -> right;
         SyntaxTreeNode * b = op -> right;
 
-        string a_place = _expression(a);
-        string b_place = _expression(b);
 
         // 如果是数字运算的话
         if (cur -> value == "Expression-DoubleOp") {
+            string a_place = _expression(a);
+            string b_place = _expression(b);
+
             string temp_var_place = "t" + int2string(++ temp_var_index);
             _emit(Quadruple::INTER_CODE_MAP[op -> first_son -> value], a_place, b_place, temp_var_place);
 
@@ -220,12 +220,36 @@ string InterCodeGenerator::_expression(SyntaxTreeNode * cur) {
         }
         // bool运算要考虑拉链回填
         else {
-            // TODO
-            zipper_stack.push(inter_code.size());
-            _emit(Quadruple::COUNTERPART_INTER_CODE_MAP[op -> first_son -> value],
-                    a_place,
-                    b_place,
-                    "");
+            string temp_op = op -> first_son -> value;
+
+            if (temp_op == "&&") {
+                string a_place = _expression(a, "N");
+                zipper_stack.push(make_pair(inter_code.size() - 1, 1));
+
+                string b_place = _expression(b, "N");
+                zipper_stack.push(make_pair(inter_code.size() - 1, 2));
+            }
+            else if (temp_op == "||") {
+                string a_place = _expression(a, "P");
+                zipper_stack.push(make_pair(inter_code.size() - 1, 1));
+
+                string b_place = _expression(b, "N");
+                // 回填一下
+                zipperFill(inter_code.size() - 1);
+
+                zipper_stack.push(make_pair(inter_code.size() - 1, 1));
+            }
+            else {
+                string a_place = _expression(a);
+                string b_place = _expression(b);
+                zipper_stack.push(make_pair(inter_code.size(), 1));
+
+                if (previous == "P")
+                    _emit(Quadruple::INTER_CODE_MAP[temp_op], a_place, b_place, "");
+                else
+                    _emit(Quadruple::COUNTERPART_INTER_CODE_MAP[temp_op], a_place, b_place, "");
+            }
+
 
             return "";
         }
@@ -391,4 +415,29 @@ string InterCodeGenerator::_locateArrayItem(string arr_name, string arr_i) {
         throw Error("array variable `" + arr_name + "` is not defined before use");
 
     return "v" + int2string(table[arr_name].place) + "[" + arr_i + "]";
+}
+
+
+/**
+ * @brief 拉链回填
+ * @author Keyi Li
+ */
+void InterCodeGenerator::zipperFill(int cur) {
+    if (zipper_stack.empty()) {
+        cout << "debug " << " the zipper stack is empty?" << endl;
+        return;
+    }
+
+    int cnt = zipper_stack.top().second, temp_idx;
+    cout << "total" << cnt << endl;
+    while (cnt --) {
+        temp_idx = zipper_stack.top().first;
+        zipper_stack.pop();
+
+        cout << "to be filled index = " << temp_idx << " , res = " << cur << endl;
+
+        inter_code[temp_idx].res = int2string(cur);
+    }
+
+    cout << endl;
 }

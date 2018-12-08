@@ -1,5 +1,3 @@
-# 将awesomeCC文件夹下的所有文件存到ACC_SOURCE中
-
 # front end
 aux_source_directory(front-end/include F_SRC)
 aux_source_directory(front-end/src F_INC)
@@ -13,21 +11,23 @@ aux_source_directory(lib/src LIB_SRC)
 aux_source_directory(lib/include LIB_INC)
 
 
-# 生成库文件 awesomeCC
-add_library(
-        ${PROJECT_NAME}
-        SHARED
+
+# 生成可执行文件 awesomeCC_exe
+add_executable(
+        ${PROJECT_NAME}_exe
+        test.cc
         ${LIB_SRC} ${LIB_INC}
         ${F_SRC} ${F_INC}
         ${B_SRC} ${B_INC}
         encapsulation.h
 )
 
-link_libraries(${PROJECT_NAME})
-
-
-# 生成可执行文件 awesomeCC_exe
+# 生成可执行文件 acc
 add_executable(
-        ${PROJECT_NAME}_exe
+        acc
         main.cc
+        encapsulation.h
+        ${LIB_SRC} ${LIB_INC}
+        ${F_SRC} ${F_INC}
+        ${B_SRC} ${B_INC}
 )
