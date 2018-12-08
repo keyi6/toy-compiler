@@ -12,7 +12,7 @@ void main() {
 
     year = 2008;
 
-    if (year % 4 == 0 ) {
+    if (year % 4 == 0) {
         print "It is a leap year";
     }
     else {

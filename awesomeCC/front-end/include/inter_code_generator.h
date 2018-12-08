@@ -27,14 +27,12 @@ using std::cout;
 using std::move;
 using std::setw;
 using std::endl;
-using std::pair;
 using std::stack;
 using std::regex;
 using std::string;
 using std::setfill;
 using std::ostream;
 using std::ofstream;
-using std::make_pair;
 using std::regex_replace;
 
 
@@ -73,17 +71,17 @@ private:
     map<string, Info> table; // 变量表
     vector<Quadruple> inter_code; // 生成的四元式
 
-    stack< pair<int, int> > zipper_stack; // 拉链回填的栈
+    stack<int> zipper_stack; // 拉链回填的栈
 
     void _analyze(SyntaxTreeNode * cur);
 
     string _lookUp(string name);
     string _lookUp(SyntaxTreeNode * arr_pointer);
-    void _emit(INTER_CODE_OP_ENUM op, string arg1, string arg2, string res);
-    void zipperFill(int cur);
+    void _emit(INTER_CODE_OP_ENUM op, string arg1,
+               string arg2, string res);
 
     string _locateArrayItem(string arr_name, string arr_i);
-    string _expression(SyntaxTreeNode * cur, string previous = "");
+    string _expression(SyntaxTreeNode * cur);
     void _block(SyntaxTreeNode * cur);
     void _print(SyntaxTreeNode * cur);
     void _statement(SyntaxTreeNode * cur);

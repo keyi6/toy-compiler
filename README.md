@@ -9,21 +9,11 @@ awesome C Compiler
 ## TODO
 
 1. 语法分析
-
    - [ ] 函数调用处理
    - [ ] Expression-Bool
-   - [x] 控制语句
-
-      - [x] if
-      - [x] else
-      - [ ] else if
-      - [x] while
-      - [ ] do
-      - [x] for
-
 
 3. 其他
-   - [ ] unit test
+   - [x] unit test
    - [ ] build test
    - [ ] 堆栈的存储区🤔
      - [ ] 内存监控🤔

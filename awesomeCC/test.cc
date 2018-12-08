@@ -12,5 +12,5 @@
 
 int main() {
     code_generator("../../test.ac");
-    //interpreter("../../test.ac.ic");
+    interpreter("../../test.ac.ic");
 }
