@@ -109,6 +109,7 @@ void Interpreter::_assign() {
     double r_value = _getValue(code[index].arg1);
 
     int temp_index = _getAddress(res);
+
     // 再读取左值
     if (res[0] == 'v')
         v_stack[temp_index] = r_value;
@@ -147,6 +148,7 @@ int Interpreter::_getAddress(string value_str) {
                 int base = _getValue(value_str.substr(1, i - 1));
                 return offset + base;
             }
+        return string2int(value_str.substr(1));
     }
     else {
         return string2int(value_str.substr(1));

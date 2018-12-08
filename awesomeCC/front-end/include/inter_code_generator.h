@@ -87,7 +87,7 @@ private:
     void _statement(SyntaxTreeNode * cur);
     void _assignment(SyntaxTreeNode * cur);
     void _if(SyntaxTreeNode * cur);
-    void _for(SyntaxTreeNode * cur);
+    void _while(SyntaxTreeNode * cur);
 
     void _backpatch(vector<int> v, int dest_index);
 

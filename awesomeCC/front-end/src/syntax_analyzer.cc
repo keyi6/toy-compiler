@@ -735,9 +735,7 @@ void SyntaxAnalyzer::_control(SyntaxTreeNode * father_node) {
  * @author Keyi Li
  */
 void SyntaxAnalyzer::_for(SyntaxTreeNode * father_node) {
-    SyntaxTree * for_tree = new SyntaxTree(new SyntaxTreeNode("Control-For"));
-    tree -> addNode(for_tree -> root, father_node);
-
+    SyntaxTree * psudo_while_tree = new SyntaxTree(new SyntaxTreeNode("Control-While"));
     // 读取 for
     index ++;
 
@@ -746,17 +744,23 @@ void SyntaxAnalyzer::_for(SyntaxTreeNode * father_node) {
         index ++;
 
         // 读取第一个赋值语句
-        _assignment(for_tree -> root);
+        // 直接执行
+        _assignment(father_node);
 
         // 读取第二个条件语句
-        _expression(for_tree -> root);
+        psudo_while_tree -> addNode(new SyntaxTreeNode("Condition"), psudo_while_tree -> root);
+        _expression(psudo_while_tree -> cur_node);
 
         // 读取第三个赋值语句
-        _assignment(for_tree -> root, TOKEN_TYPE_ENUM::RL_BRACKET);
+        SyntaxTreeNode * temp = new SyntaxTreeNode("");
+        _assignment(temp, TOKEN_TYPE_ENUM::RL_BRACKET);
 
         // 读取 {
-        if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::LB_BRACKET)
-            _block(for_tree -> root);
+        if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::LB_BRACKET) {
+            _block(psudo_while_tree -> root);
+            psudo_while_tree -> addNode(temp -> first_son, psudo_while_tree -> root -> first_son -> right);
+            tree -> addNode(psudo_while_tree -> root, father_node);
+        }
         else
             throw Error("in for, Expected `{` after `for (assignment; condition; assignment)`", line_number_map[index]);
     }
@@ -770,7 +774,7 @@ void SyntaxAnalyzer::_for(SyntaxTreeNode * father_node) {
  * @author Keyi Li
  */
 void SyntaxAnalyzer::_while(SyntaxTreeNode * father_node) {
-    SyntaxTree * while_tree = new SyntaxTree(new SyntaxTreeNode("WhileControl"));
+    SyntaxTree * while_tree = new SyntaxTree(new SyntaxTreeNode("Control-While"));
     tree -> addNode(while_tree -> root, father_node);
 
     // 读取while
@@ -780,7 +784,8 @@ void SyntaxAnalyzer::_while(SyntaxTreeNode * father_node) {
         index ++;
 
         // 读取 表达式 直到遇到）
-        _expression(while_tree -> root, TOKEN_TYPE_ENUM::RL_BRACKET);
+        while_tree -> addNode(new SyntaxTreeNode("Condition"), while_tree -> root);
+        _expression(while_tree -> cur_node, TOKEN_TYPE_ENUM::RL_BRACKET);
 
         // 读取 {
         if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::LB_BRACKET)

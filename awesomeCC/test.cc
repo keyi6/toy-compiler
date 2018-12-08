@@ -18,8 +18,10 @@ int main() {
     sa.analyze(source_file, false);
 
     InterCodeGenerator icg;
-    icg.analyze(sa.getSyntaxTree(), false);
+    icg.analyze(sa.getSyntaxTree(), true);
     icg.saveToFile(path + ".ic");
+
+    sa.getSyntaxTree() -> display(true);
 
 
     interpreter("../../test.ac.ic");

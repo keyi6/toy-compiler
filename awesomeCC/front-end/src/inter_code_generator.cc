@@ -108,9 +108,9 @@ void InterCodeGenerator::_analyze(SyntaxTreeNode * cur) {
  */
 void InterCodeGenerator::_block(SyntaxTreeNode * cur) {
     context_index ++;
-    vector<int> m_inst;
 
     SyntaxTreeNode * cs = cur -> first_son;
+    cur ->  next_list = cs -> next_list;
     while (cs) {
         if (cs -> value == "Statement")
             _statement(cs);
@@ -120,21 +120,23 @@ void InterCodeGenerator::_block(SyntaxTreeNode * cur) {
             _print(cs);
         else if (cs -> value == "Control-If")
             _if(cs);
-        else if (cs -> value == "Control-For")
-            _for(cs);
+        else if (cs -> value == "Control-While")
+            _while(cs);
+        else if (cs -> value == "Block") {
+            _block(cs);
+            cur -> next_list = cs -> next_list;
+        }
         // TODO 其他
 
-        m_inst.emplace_back(inter_code.size());
-        cs = cs -> right;
-    }
+        _backpatch(cs -> next_list, inter_code.size());
 
-    cs = cur -> first_son -> right;
-    int temp_idx = 0;
-    while (cs) {
-        _backpatch(cs -> next_list, m_inst[++ temp_idx]);
         cs = cs -> right;
+
+        if (cs)
+        cur -> next_list = cs -> next_list;
     }
 }
+
 
 /**
  * @brief 翻译Print
@@ -157,14 +159,17 @@ void InterCodeGenerator::_if(SyntaxTreeNode * cur) {
             cs = cs -> right;
             _block(cs);
 
+            // 只有if
             if (! cs -> right) {
                 _backpatch(pre -> true_list, m1_inst);
-                cs -> next_list.insert(cs -> next_list.end(), V(cs -> first_son -> false_list));
-                cs -> next_list.insert(cs -> next_list.end(), V(cs -> next_list));
+                cur -> next_list.insert(cur -> next_list.end(), V(cs -> left -> first_son -> false_list));
+                cur -> next_list.insert(cur -> next_list.end(), V(cs -> next_list));
             }
             else {
                 cur -> next_list.emplace_back(inter_code.size());
                 _emit(INTER_CODE_OP_ENUM::J, "", "", "");
+
+                cur -> next_list.insert(cur -> next_list.end(), V(cs -> next_list));
             }
         }
         else {
@@ -174,6 +179,8 @@ void InterCodeGenerator::_if(SyntaxTreeNode * cur) {
 
             _backpatch(pre -> true_list, m1_inst);
             _backpatch(pre -> false_list, m2_inst);
+
+            cur -> next_list.insert(cur -> next_list.end(), V(cs -> next_list));
         }
 
         cs = cs -> right;
@@ -265,10 +272,11 @@ string InterCodeGenerator::_expression(SyntaxTreeNode * cur) {
             else {
                 a_place = _expression(a);
                 b_place = _expression(b);
-                cur -> true_list.emplace_back(inter_code.size());
-                cur -> false_list.emplace_back(inter_code.size() + 1);
 
+                cur -> true_list.emplace_back(inter_code.size());
                 _emit(Quadruple::INTER_CODE_MAP[op -> first_son -> value], a_place, b_place, "");
+
+                cur -> false_list.emplace_back(inter_code.size());
                 _emit(INTER_CODE_OP_ENUM::J, "", "", "");
             }
 
@@ -310,29 +318,23 @@ string InterCodeGenerator::_expression(SyntaxTreeNode * cur) {
 
 
 /**
- * @brief 翻译for语句
+ * @brief 翻译while语句
  * @author Keyi Li
  */
-void InterCodeGenerator::_for(SyntaxTreeNode * cur) {
-    // TODO
-
-    SyntaxTreeNode * init_assignment = cur -> first_son;
-    SyntaxTreeNode * condition_tree = init_assignment -> right;
-    SyntaxTreeNode * assignment_tree = condition_tree -> right;
-    SyntaxTreeNode * block_tree = assignment_tree -> right;
-
-    // 执行for(A; B; C) { D } 中的A
-    _assignment(init_assignment);
-
-    // 判断一下B
+void InterCodeGenerator::_while(SyntaxTreeNode * cur) {
+    int m_inst1 = inter_code.size();
+    SyntaxTreeNode * condition_tree = cur -> first_son -> first_son;
     _expression(condition_tree);
 
-    // 然后翻译一下D
-    // TODO 这个index回填到B的跳转语句里面
-    int temp_index = 0;
+    int m_inst2 = inter_code.size();
+    SyntaxTreeNode * block_tree = cur -> first_son -> right;
     _block(block_tree);
 
-    //
+    _backpatch(block_tree -> next_list, m_inst1);
+    _backpatch(condition_tree -> true_list, m_inst2);
+
+    cur -> next_list = condition_tree -> false_list;
+    _emit(INTER_CODE_OP_ENUM::J, "", "", int2string(m_inst1));
 }
 
 
