@@ -6,41 +6,24 @@
  * LICENSE: GPL V3.0
  */
 
-void main() {
-    int i, j, t;
-    int a[5] = {651, 54, 409, 13, 4};
+class Main {
+    void main() {
+        int i, j, t;
+        int a[5] = {651, 54, 409, 13, 4};
 
-    for (i = 0; i < 5; i = i + 1) {
-        for (j = i; j < 5; j = j + 1) {
-            if (a[i] > a[j]) {
-                t = a[i];
-                a[i] = a[j];
-                a[j] = t;
+        for (i = 0; i < 5; i = i + 1) {
+            for (j = i; j < 5; j = j + 1) {
+                if (a[i] > a[j]) {
+                    t = a[i];
+                    a[i] = a[j];
+                    a[j] = t;
+                }
             }
         }
-    }
 
-
-    for (i = 0; i < 5; i = i + 1) {
-        print a[i];
-    }
-
-}
-
-/*
-void main() {
-    int year;
-
-    year = 3000;
-
-    if (year % 4 == 0 && year % 100 != 0 || year % 400 == 0) {
-        print "leap year";
-    }
-    else {
-        print "not leap year";
+        for (i = 0; i < 5; i = i + 1) {
+            print a[i];
+        }
     }
 }
-*/
-
-
 

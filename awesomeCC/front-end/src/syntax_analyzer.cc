@@ -30,11 +30,11 @@ bool SyntaxAnalyzer::analyze(vector<string> sentences, bool verbose) {
     LexicalAnalyzer la;
     // 如果能通过词法分析
     if (la.analyze(sentences, verbose)) {
-        index = 0;
-        tree = new SyntaxTree();
+        // for oo check
+        index = 3;
 
         tokens = la.getAllTokens();
-        len = tokens.size();
+        len = tokens.size() - 1;
         line_number_map = la.getLineNumberMap();
 
         try {
@@ -61,7 +61,11 @@ bool SyntaxAnalyzer::analyze(vector<string> sentences, bool verbose) {
  * @author Keyi Li
  */
 void SyntaxAnalyzer::_analyze() {
-    tree -> cur_node = tree -> root = new SyntaxTreeNode("Program");
+    if (tokens[0].type != TOKEN_TYPE_ENUM::CLASS)
+        throw Error("Everything should be wrapped in a class.");
+
+    tree = new SyntaxTree(new SyntaxTreeNode("Class-" + tokens[1].value));
+
 
     while (index < len) {
         int sentence_pattern = int(_judgeSentencePattern());

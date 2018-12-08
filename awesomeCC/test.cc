@@ -15,13 +15,11 @@ int main() {
     vector<string> source_file = readSourceFile(path);
 
     SyntaxAnalyzer sa;
-    sa.analyze(source_file, false);
+    sa.analyze(source_file);
 
     InterCodeGenerator icg;
-    icg.analyze(sa.getSyntaxTree(), true);
+    icg.analyze(sa.getSyntaxTree(), false);
     icg.saveToFile(path + ".ic");
-
-    sa.getSyntaxTree() -> display(true);
 
 
     interpreter("../../test.ac.ic");
