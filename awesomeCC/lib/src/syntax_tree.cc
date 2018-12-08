@@ -14,9 +14,14 @@
  */
 SyntaxTreeNode::SyntaxTreeNode(string _value, string _type, string _extra_info) {
     left = right = father = first_son = nullptr;
-    value = _value;
-    type = _type;
-    extra_info = _extra_info;
+
+    value = move(_value);
+    type = move(_type);
+    extra_info = move(_extra_info);
+
+    true_list.clear();
+    false_list.clear();
+    next_list.clear();
 }
 
 
@@ -86,6 +91,25 @@ void SyntaxTree::switchNode(SyntaxTreeNode * center) {
              cout << " (type: " << cur -> type << ")";
          else if (cur -> extra_info != "")
              cout << " (extra_info: " << cur -> extra_info << ")";
+
+         if (! cur -> true_list.empty()) {
+             cout << " true_list = { ";
+             for (auto tl: cur -> true_list)
+                 cout << tl << ", ";
+             cout << "} ";
+         }
+         if (! cur -> false_list.empty()) {
+             cout << " false_list = { ";
+             for (auto tl: cur -> false_list)
+                 cout << tl << ", ";
+             cout << "} ";
+         }
+         if (! cur -> next_list.empty()) {
+             cout << " next_list = { ";
+             for (auto tl: cur -> next_list)
+                 cout << tl << ", ";
+             cout << "} ";
+         }
      }
 
      cout << endl;

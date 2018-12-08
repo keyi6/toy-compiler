@@ -54,9 +54,6 @@ void code_generator(string path) {
     SyntaxAnalyzer sa;
     sa.analyze(source_file, false);
 
-    // debug use
-    //sa.getSyntaxTree() -> display(true);
-
     InterCodeGenerator icg;
     icg.analyze(sa.getSyntaxTree(), true);
     icg.saveToFile(path + ".ic");

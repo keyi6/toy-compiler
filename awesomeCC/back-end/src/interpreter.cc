@@ -14,7 +14,6 @@ Interpreter::Interpreter() = default;
 
 
 void Interpreter::execute(vector<Quadruple> _code) {
-    cout << endl << endl << endl << endl << endl << endl << "----- running -----" << endl;
     code = move(_code);
     index = 0;
 

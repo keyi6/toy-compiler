@@ -94,7 +94,7 @@ void getVersion() {
  */
 int main(int argc, char * argv[]) {
     if (argc <= 1) {
-        cout << "please specify am input file!" << endl << endl << endl;
+        cout << "please specify an input file!" << endl << endl << endl;
         getHelp();
     }
     else {

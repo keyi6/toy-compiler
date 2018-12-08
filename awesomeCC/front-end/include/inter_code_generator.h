@@ -9,6 +9,8 @@
 #ifndef AWESOMECC_INTER_CODE_GENERATOR_H
 #define AWESOMECC_INTER_CODE_GENERATOR_H
 
+#define V(x) (x).begin(),(x).end()
+
 #include "../../lib/include/error.h"
 #include "../../lib/include/str_tools.h"
 #include "../../lib/include/quadruple.h"
@@ -71,8 +73,6 @@ private:
     map<string, Info> table; // 变量表
     vector<Quadruple> inter_code; // 生成的四元式
 
-    stack<int> zipper_stack; // 拉链回填的栈
-
     void _analyze(SyntaxTreeNode * cur);
 
     string _lookUp(string name);
@@ -87,6 +87,10 @@ private:
     void _statement(SyntaxTreeNode * cur);
     void _assignment(SyntaxTreeNode * cur);
     void _if(SyntaxTreeNode * cur);
+    void _for(SyntaxTreeNode * cur);
+
+    void _backpatch(vector<int> v, int dest_index);
+
 
 public:
     InterCodeGenerator();

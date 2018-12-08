@@ -1,7 +1,13 @@
-MOV,2008,,v1
-MOD,v1,4,t1
-SUB,3,3,t2
-JNE,t1,t2,5
-PRINT,"It is a leap year",,
+MOV,2000,,v0
+MOD,v0,4,t0
+JE,t0,0,4
+J,,,12
+MOD,v0,100,t1
+JNE,t1,0,10
 J,,,7
-PRINT,"不是闰年哦",,
+MOD,v0,400,t2
+JE,t2,0,10
+J,,,12
+PRINT,"leap year",,
+J,,,13
+PRINT,"not leap year",,

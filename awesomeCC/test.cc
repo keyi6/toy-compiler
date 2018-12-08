@@ -11,6 +11,16 @@
 
 
 int main() {
-    code_generator("../../test.ac");
+    string path = "../../test.ac";
+    vector<string> source_file = readSourceFile(path);
+
+    SyntaxAnalyzer sa;
+    sa.analyze(source_file, false);
+
+    InterCodeGenerator icg;
+    icg.analyze(sa.getSyntaxTree(), false);
+    icg.saveToFile(path + ".ic");
+
+
     interpreter("../../test.ac.ic");
 }

@@ -423,11 +423,14 @@ void SyntaxAnalyzer::_expression(SyntaxTreeNode * father_node, TOKEN_TYPE_ENUM s
                 a = op_stack.top();
                 op_stack.pop();
 
-                SyntaxTree * new_tree = new SyntaxTree(new SyntaxTreeNode(
-                        Token::isBoolOperator(Token::DETAIL_TOKEN_TYPE[temp_t -> root -> first_son -> value]) ?
-                        "Expression-Bool-UniOp" :
-                        "Expression-UniOp"
-                        ));
+                SyntaxTree * new_tree;
+                if (Token::isBoolOperator(Token::DETAIL_TOKEN_TYPE[temp_t -> root -> first_son -> value])) {
+                    new_tree = new SyntaxTree(new SyntaxTreeNode( "Expression-Bool-UniOp"));
+                }
+                else {
+                    new_tree = new SyntaxTree(new SyntaxTreeNode( "Expression-UniOp"));
+                }
+
                 // 添加操作符
                 new_tree -> addNode(temp_t -> root, new_tree -> root);
                 // 添加操作数
@@ -443,11 +446,13 @@ void SyntaxAnalyzer::_expression(SyntaxTreeNode * father_node, TOKEN_TYPE_ENUM s
                 a = op_stack.top();
                 op_stack.pop();
 
-                SyntaxTree * new_tree = new SyntaxTree(new SyntaxTreeNode(
-                        Token::isBoolOperator(Token::DETAIL_TOKEN_TYPE[temp_t -> root -> first_son -> value]) ?
-                        "Expression-Bool-DoubleOp" :
-                        "Expression-DoubleOp"
-                ));
+                SyntaxTree * new_tree;
+                if (Token::isBoolOperator(Token::DETAIL_TOKEN_TYPE[temp_t -> root -> first_son -> value])) {
+                    new_tree = new SyntaxTree(new SyntaxTreeNode( "Expression-Bool-DoubleOp"));
+                }
+                else {
+                    new_tree = new SyntaxTree(new SyntaxTreeNode( "Expression-DoubleOp"));
+                }
 
                 if (Token::isBoolOperator(Token::DETAIL_TOKEN_TYPE[temp_t -> root -> first_son -> value])) {
                     string temp_op = temp_t -> root -> first_son -> value;
@@ -730,14 +735,13 @@ void SyntaxAnalyzer::_control(SyntaxTreeNode * father_node) {
  * @author Keyi Li
  */
 void SyntaxAnalyzer::_for(SyntaxTreeNode * father_node) {
-    SyntaxTree * for_tree = new SyntaxTree(new SyntaxTreeNode("ForControl"));
+    SyntaxTree * for_tree = new SyntaxTree(new SyntaxTreeNode("Control-For"));
     tree -> addNode(for_tree -> root, father_node);
 
     // 读取 for
     index ++;
 
     if (tokens[index].type == TOKEN_TYPE_ENUM::LL_BRACKET) {
-        // TODO 看看expression需不需要读取 ；
         // 读取 (
         index ++;
 
