@@ -17,7 +17,7 @@ using std::cout;
 using std::endl;
 
 
-const map<string, string> OPT = {
+map<string, string> OPT = {
         {"-h", "help"},
         {"--help", "help"},
         {"-v", "version"},
@@ -35,7 +35,7 @@ const map<string, string> OPT = {
 };
 
 
-const map<string, string> HELP_TEXT = {
+map<string, string> HELP_TEXT = {
         {"help", "get help on awesomeCC command line arguments"},
         {"version", "display awesomeCC version"},
         {"output", "the output file path"},
@@ -71,7 +71,9 @@ void getHelp() {
     cout << "acc source.ac -p" << endl;
     cout << "acc source.ac -a" << endl;
     cout << "acc source.ac.ic -i" << endl;
-    cout << "acc source.ac.ic" << endl;
+    cout << "acc source.ac" << endl;
+    cout << "acc -h" << endl;
+    cout << "acc -v" << endl;
 }
 
 
@@ -86,6 +88,10 @@ void getVersion() {
 }
 
 
+/**
+ * @brief 接受命令行参数
+ * @author Keyi Li
+ */
 int main(int argc, char * argv[]) {
     if (argc <= 1) {
         cout << "please specify am input file!" << endl << endl << endl;
@@ -106,6 +112,7 @@ int main(int argc, char * argv[]) {
         else {
             for (int i = 2; i < argc; i ++) {
                 string opt = argv[i];
+                opt = OPT[opt];
                 if (opt == "lexer")
                     lexer(path);
                 else if (opt == "parser")

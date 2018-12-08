@@ -12,6 +12,7 @@
 
 /**
  * @brief Info构造函数
+ * @author Keyi Li
  */
 Info::Info() = default;
 
@@ -127,8 +128,6 @@ void InterCodeGenerator::_block(SyntaxTreeNode * cur) {
         cs = cs -> right;
     }
 }
-
-
 
 
 /**
