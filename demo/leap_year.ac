@@ -1,0 +1,24 @@
+/*
+ * this is a simple demo using awesomeCC
+ * a new language designed and created
+ * by Keyi Li & Hanwen Liu
+ *
+ * LICENSE: GPL V3.0
+ */
+
+class Main {
+    void main() {
+		int year;
+		year = 3000;
+
+		if (year % 4 == 0 && year % 100 != 0 || year % 400 == 0) {
+			print year;
+			print "is leap year\n";
+		}
+		else {
+			print year;
+			print "is not leap year\n";
+		}
+    }
+}
+

@@ -7,7 +7,9 @@
  *
  */
 
-#include "encapsulation.h"
+#include "front-end/frontend_api.h"
+#include "back-end/backend_api.h"
+#include "all_api.h"
 
 #include <map>
 #include <iostream>

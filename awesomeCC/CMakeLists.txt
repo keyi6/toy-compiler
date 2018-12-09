@@ -19,15 +19,28 @@ add_executable(
         ${LIB_SRC} ${LIB_INC}
         ${F_SRC} ${F_INC}
         ${B_SRC} ${B_INC}
-        encapsulation.h
+        all_api.h
+        front-end/frontend_api.h
+        back-end/backend_api.h
 )
 
 # 生成可执行文件 acc
 add_executable(
         acc
-        main.cc
-        encapsulation.h
+        interpreter.cc
+        all_api.h
+        front-end/frontend_api.h
+        back-end/backend_api.h
         ${LIB_SRC} ${LIB_INC}
         ${F_SRC} ${F_INC}
+        ${B_SRC} ${B_INC}
+)
+
+# 生成 interpreter
+add_executable(
+        acc_interpreter
+        back-end/main.cc
+        back-end/backend_api.h
+        ${LIB_SRC} ${LIB_INC}
         ${B_SRC} ${B_INC}
 )

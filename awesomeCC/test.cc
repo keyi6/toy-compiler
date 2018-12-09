@@ -7,11 +7,12 @@
  *
  */
 
-#include "encapsulation.h"
+#include "front-end/frontend_api.h"
+#include "back-end/backend_api.h"
 
 
 int main() {
-    string path = "../../test.ac";
+    string path = "/Users/cjhahaha/Workspace/CompilePrinciple/awesomeCC/demo/leap_year.ac";
     vector<string> source_file = readSourceFile(path);
 
     SyntaxAnalyzer sa;
@@ -22,5 +23,5 @@ int main() {
     icg.saveToFile(path + ".ic");
 
 
-    interpreter("../../test.ac.ic");
+    interpreter(path + ".ic");
 }
