@@ -36,13 +36,13 @@ enum class INTER_CODE_OP_ENUM {
     MUL,
     MOD,
     /* jump */
-    J, // 啥都不管 直接跳
-    JE, // arg1 == arg2 跳转
-    JNE, // arg1 == arg2 跳转
-    JL, // arg1 < arg2 跳转
-    JG, // arg1 > arg2 跳转
+    J,    // 啥都不管 直接跳
+    JE,   // arg1 == arg2 跳转
+    JNE,  // arg1 == arg2 跳转
+    JL,   // arg1 < arg2 跳转
+    JG,   // arg1 > arg2 跳转
     /* other */
-    MOV, // 赋值
+    MOV,  // 赋值
     PRINT // 输出
 };
 

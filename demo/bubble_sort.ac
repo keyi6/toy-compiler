@@ -12,7 +12,7 @@ class Main {
         int a[5] = {651, 54, 409, 13, 4};
 
         for (i = 0; i < 5; i = i + 1) {
-            for (j = i; j < 5; j = j + 1) {
+            for (j = i; j<5; j = j + 1) {
                 if (a[i] > a[j]) {
                     t = a[i];
                     a[i] = a[j];

@@ -162,7 +162,7 @@ double Interpreter::_getValue(string value_str) {
         int len = value_str.size();
         for (int i = 0; i < len; i ++)
             if (value_str[i] == '[') {
-                // 相对寻址
+                // 相对寻址 || 相对变址寻址
                 int offset = _getValue(value_str.substr(i + 1, len - i - 2));
                 int base = _getValue(value_str.substr(1, i - 1));
                 return v_stack[offset + base];

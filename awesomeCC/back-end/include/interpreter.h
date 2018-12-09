@@ -19,7 +19,7 @@ using std::vector;
 
 class Interpreter {
 private:
-    int index; // 我的pc指针哈哈哈哈哈
+    int index; // 我的pc指针
     vector<Quadruple> code;
     vector<double> t_stack;
     vector<double> v_stack;

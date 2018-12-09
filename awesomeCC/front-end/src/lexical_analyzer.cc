@@ -266,6 +266,8 @@ void LexicalAnalyzer::_analyze() {
                 tokens.emplace_back(Token(sentence.substr(cur_pos, 1), TOKEN_TYPE_ENUM::OPERATOR, cur_pos));
                 cur_pos ++;
             }
+
+            continue;
         }
 
         cur_pos ++;
