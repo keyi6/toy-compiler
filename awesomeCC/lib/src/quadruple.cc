@@ -70,10 +70,10 @@ Quadruple::Quadruple(INTER_CODE_OP_ENUM _op, string _arg1, string _arg2, string 
  */
 ostream & operator << (ostream & out, Quadruple & q) {
     out << "(";
-    out << setw(5) << setfill (' ') << Quadruple::INTER_CODE_OP[int(q.op)] << ", ";
-    out << setw(5) << setfill (' ') << q.arg1 << ", ";
-    out << setw(5) << setfill (' ') << q.arg2 << ", ";
-    out << setw(5) << setfill (' ') << q.res;
+    out << setw(6) << setfill (' ') << Quadruple::INTER_CODE_OP[int(q.op)] << ", ";
+    out << setw(6) << setfill (' ') << q.arg1 << ", ";
+    out << setw(6) << setfill (' ') << q.arg2 << ", ";
+    out << setw(6) << setfill (' ') << q.res;
     out << ")" << endl;
 
     return out;

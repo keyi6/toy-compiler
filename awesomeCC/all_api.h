@@ -7,6 +7,8 @@
 
 #include "front-end/include/syntax_analyzer.h"
 #include "front-end/include/inter_code_generator.h"
+#include "back-end/include/interpreter.h"
+#include "lib/include/file_tools.h"
 
 
 /**

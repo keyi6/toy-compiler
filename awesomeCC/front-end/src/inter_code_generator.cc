@@ -43,13 +43,11 @@ InterCodeGenerator::InterCodeGenerator() = default;
  */
 void InterCodeGenerator::analyze(SyntaxTree * _tree, bool verbose) {
     inter_code.clear();
+    var_index = 0;
     temp_var_index = 0;
     context_index = 0;
 
     tree = _tree;
-
-    if (verbose)
-        tree -> display(true);
 
     try {
         _analyze(tree -> root -> first_son);

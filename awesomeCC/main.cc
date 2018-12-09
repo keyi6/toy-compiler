@@ -124,7 +124,7 @@ int main(int argc, char * argv[]) {
                 else if (opt == "interpreter")
                     interpreter(path);
                 else {
-                    cout << endl << "Error: unknown argument: `" << opt << "`" << endl;
+                    cout << endl << "Error: unknown argument: `" << argv[i] << "`" << endl;
                     return 0;
                 }
             }
