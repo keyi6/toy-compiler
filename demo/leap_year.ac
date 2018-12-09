@@ -9,7 +9,7 @@
 class Main {
     public void main() {
 		int year;
-		year = 3000;
+		year = 2000;
 
 		if (year % 4 == 0 && year % 100 != 0 || year % 400 == 0) {
 			print year;

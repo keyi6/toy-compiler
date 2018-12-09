@@ -10,6 +10,10 @@
 #include "back-end/include/interpreter.h"
 #include "lib/include/file_tools.h"
 
+#include <ctime>
+#include <iostream>
+using std::cout;
+using std::endl;
 
 /**
  * @brief 解释执行中间代码
@@ -19,6 +23,9 @@
 inline void compile_and_execute(string path) {
     vector<string> source_file = readSourceFile(path);
 
+    time_t start_time = time(nullptr);
+    cout << "start compiling " << path << "..." << endl << endl;
+
     SyntaxAnalyzer sa;
     sa.analyze(source_file, false);
 
@@ -26,6 +33,10 @@ inline void compile_and_execute(string path) {
     icg.analyze(sa.getSyntaxTree(), false);
     icg.saveToFile(path + ".ic");
 
+    time_t end_time = time(nullptr);
+    cout << "compile finish in " << (end_time - start_time) << " sec(s)." << endl << endl;
+
+    cout << "------ start executing ------" << endl;
     vector<Quadruple> inter_code_file = readInterCodeFile(path + ".ic");
     Interpreter intp;
     intp.execute(inter_code_file);
