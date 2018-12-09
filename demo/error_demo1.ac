@@ -8,7 +8,11 @@
 
 class Main {
     public void main() {
+		/*
+		what will happen if we forget to define i?
 		int i;
+		*/
+
 		int year[2] = {2000, 3000};
 
 		for (i = 0; i < 2; i = i + 1) {

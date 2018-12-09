@@ -43,6 +43,7 @@ bool SyntaxAnalyzer::analyze(vector<string> sentences, bool verbose) {
         catch (Error & e) {
             cout << "Syntax analyze errors" << endl;
             cout << e;
+            exit(0);
             return false;
         }
 
