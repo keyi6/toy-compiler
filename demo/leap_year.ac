@@ -7,7 +7,7 @@
  */
 
 class Main {
-    void main() {
+    public void main() {
 		int year;
 		year = 3000;
 

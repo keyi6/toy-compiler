@@ -7,7 +7,7 @@
  */
 
 class Main {
-    void main() {
+    public void main() {
         int i, j, t;
         int a[5] = {651, 54, 409, 13, 4};
 
