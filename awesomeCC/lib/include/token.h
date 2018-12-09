@@ -30,6 +30,7 @@ enum class TOKEN_TYPE_ENUM {
     INCLUDE,
     VOID,
     CLASS,
+    PUBLIC,
     PRINT,
     INT,
     FLOAT,

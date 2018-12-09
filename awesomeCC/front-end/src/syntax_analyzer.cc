@@ -31,7 +31,7 @@ bool SyntaxAnalyzer::analyze(vector<string> sentences, bool verbose) {
     // 如果能通过词法分析
     if (la.analyze(sentences, verbose)) {
         // for oo check
-        index = 3;
+        index = 4;
 
         tokens = la.getAllTokens();
         len = tokens.size() - 1;

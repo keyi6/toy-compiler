@@ -27,7 +27,7 @@ add_executable(
 # 生成可执行文件 acc
 add_executable(
         acc
-        interpreter.cc
+        main.cc
         all_api.h
         front-end/frontend_api.h
         back-end/backend_api.h
