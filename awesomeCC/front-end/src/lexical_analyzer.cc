@@ -313,10 +313,6 @@ void LexicalAnalyzer::_analyze() {
 
             continue;
         }
-        // 以上都不是
-        else
-            throw Error("unidentified symbol `" + char2string(sentence[cur_char]) + "`",
-                        cur_pos, cur_line_number);
 
         cur_pos ++;
     }

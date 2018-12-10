@@ -44,7 +44,7 @@ InterCodeGenerator::InterCodeGenerator() = default;
 void InterCodeGenerator::analyze(SyntaxTree * _tree, bool verbose) {
     inter_code.clear();
     var_index = 0;
-    temp_var_index = 0;
+    temp_var_index = pre_temp_var_index = 0;
     context_index = 0;
 
     tree = _tree;
@@ -83,8 +83,9 @@ void InterCodeGenerator::_analyze(SyntaxTreeNode * cur) {
                 name_tree = cs -> first_son;
             else if (cs -> value == "Type")
                 type_tree = cs -> first_son;
-            else if (cs -> value == "Block")
+            else if (cs -> value == "Block") {
                 block_tree = cs;
+            }
             else if (cs -> value == "ParameterList")
                 param_tree = cs;
 
@@ -105,6 +106,7 @@ void InterCodeGenerator::_analyze(SyntaxTreeNode * cur) {
  * @author Keyi Li
  */
 void InterCodeGenerator::_block(SyntaxTreeNode * cur) {
+    int _pre_var_index = var_index;
     context_index ++;
 
     SyntaxTreeNode * cs = cur -> first_son;
@@ -133,6 +135,8 @@ void InterCodeGenerator::_block(SyntaxTreeNode * cur) {
         if (cs)
         cur -> next_list = cs -> next_list;
     }
+
+    var_index = _pre_var_index ;
 }
 
 

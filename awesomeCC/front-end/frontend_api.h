@@ -25,7 +25,7 @@ inline void lexer(string path) {
     vector<string> source_file = readSourceFile(path);
 
     LexicalAnalyzer la;
-    la.analyze(source_file);
+    la.analyze(source_file, true);
 }
 
 
@@ -38,7 +38,7 @@ inline void parser(string path) {
     vector<string> source_file = readSourceFile(path);
 
     SyntaxAnalyzer sa;
-    sa.analyze(source_file);
+    sa.analyze(source_file, true);
 }
 
 

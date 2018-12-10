@@ -68,7 +68,9 @@ class InterCodeGenerator {
 private:
     SyntaxTree * tree; // 语法树
     int temp_var_index; // 临时变量栈顶
+    int pre_temp_var_index; // 上一个临时变量栈顶
     int var_index; // 用户的变量栈顶
+    int pre_var_index; // 上一个变量栈顶
     int context_index; // 局部变量区分
     map<string, Info> table; // 变量表
     vector<Quadruple> inter_code; // 生成的四元式

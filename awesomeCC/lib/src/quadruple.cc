@@ -31,7 +31,7 @@ map<string, INTER_CODE_OP_ENUM> Quadruple::INTER_CODE_MAP = {
 
         {"ADD", INTER_CODE_OP_ENUM::ADD},
         {"SUB", INTER_CODE_OP_ENUM::SUB},
-        {"MUL", INTER_CODE_OP_ENUM::MOV},
+        {"MUL", INTER_CODE_OP_ENUM::MUL},
         {"MOD", INTER_CODE_OP_ENUM::MOD},
         {"DIV", INTER_CODE_OP_ENUM::DIV},
 

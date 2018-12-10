@@ -27,8 +27,9 @@ void SyntaxAnalyzer::analyze(vector<string> sentences, bool verbose) {
     LexicalAnalyzer la;
     // 如果能通过词法分析
     la.analyze(sentences, false);
-    // for oo check
-    index = 4;
+
+    // for oo check 需要被包含再类中
+    index = 3;
 
     tokens = la.getAllTokens();
     len = tokens.size() - 1;
@@ -54,7 +55,7 @@ void SyntaxAnalyzer::analyze(vector<string> sentences, bool verbose) {
  */
 void SyntaxAnalyzer::_analyze() {
     if (tokens[0].type != TOKEN_TYPE_ENUM::CLASS)
-        throw Error("Everything should be wrapped in a class.");
+        throw Error("Everything should be wrapped in a class.", tokens[0].line_number, tokens[0].pos);
 
     tree = new SyntaxTree(new SyntaxTreeNode("Class-" + tokens[1].value));
 
@@ -805,7 +806,7 @@ void SyntaxAnalyzer::_if(SyntaxTreeNode * father_node) {
     // 读取 if
     index ++;
 
-    // TODO 处理if
+    // 处理if
     if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::LL_BRACKET) {
         // 读取 (
         index ++;
@@ -879,7 +880,6 @@ void SyntaxAnalyzer::_else_if(SyntaxTreeNode * father_node) {
  * @author Keyi Li
  */
 void SyntaxAnalyzer::_else(SyntaxTreeNode * father_node) {
-    // TODO
     if (tokens[index].type == TOKEN_TYPE_ENUM::ELSE) {
         index ++;
         if (tokens[index].type == TOKEN_TYPE_ENUM::LB_BRACKET) {
