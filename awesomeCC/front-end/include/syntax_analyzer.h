@@ -64,7 +64,7 @@ private:
 
 public:
     SyntaxAnalyzer();
-    bool analyze(vector<string> sentences, bool verbose = true);
+    void analyze(vector<string> sentences, bool verbose = true);
     SyntaxTree * getSyntaxTree();
 };
 

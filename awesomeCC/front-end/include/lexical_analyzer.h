@@ -1,7 +1,7 @@
 /**
  *
  * @file lexical_analyzer.h
- * @brief 词法分析器类生成Token列表和Error列表
+ * @brief 词法分析器类
  *
  * @author Keyi Li
  *
@@ -27,28 +27,31 @@ using std::vector;
 
 class LexicalAnalyzer {
 private:
-    vector<Token> tokens, all_tokens;
-    vector<int> line_number_map;
-    string sentence;
-    bool in_comment;
-    int cur_pos, cur_line_number, len;
+    vector<Token> tokens; // 当前句子的token列表
+    vector<Token> all_tokens; // 所有token
+    vector<int> line_number_map; // token index 和 行号的映射
+    string sentence; // 目前分析的橘子
+    int len; // 目前在分析的橘子的长度
+    bool in_comment; // 现在是否在注释中的标识
+    int cur_pos; // 目前的位置
+    int cur_line_number; // 目前的行号
 
-    bool _isBlank();
-    bool _isCommentStart();
-    bool _isCommentEnd();
-    bool _isKeyword(string word);
-    bool _isSeparator(char ch);
-    bool _isOperator(char ch);
+    bool _isBlank(); // 判断是不是空白字符
+    bool _isCommentStart(); // 判断是不是评论开始
+    bool _isCommentEnd(); // 判断是不是评论结束
+    bool _isKeyword(string word); // 判断是不是关键字
+    bool _isSeparator(char ch); // 判断是不是分隔符
+    bool _isOperator(char ch);// 判断是不是预算符
 
-    void _skipBlank();
-    void _init(string _sentence);
-    void _analyze();
+    void _skipBlank();// 跳过空白和注释
+    void _init(string _sentence); // 设置分析的橘子
+    void _analyze(); // 进行词法分析
 
 public:
     LexicalAnalyzer();
-    vector<Token> getAllTokens();
+    vector<Token> getAllTokens(); // 获得所有all_token
     vector<int> getLineNumberMap();
-    bool analyze(vector<string> _sentences, bool verbose = true);
+    void analyze(vector<string> _sentences,bool verbose = true); // 词法分析
 };
 
 

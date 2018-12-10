@@ -81,9 +81,9 @@ vector<string> Token::KEYWORDS = {
 };
 
 
-vector<string> Token::OPERATORS = {"+",  "-",  "<",  ">", "!", "=", "||", "&&", "*", "/", "%",
-                                   "++", "--", "<<", ">>",
-                                   "<=", ">=", "!=", "=="};
+vector<string> Token::OPERATORS = {"+",  "-",  "<",  ">", "!", "=", "*", "/", "%",
+                                   "++", "--", "<<", ">>","||", "&&", "==",
+                                   "<=", ">=", "!="};
 
 
 vector<char> Token::SEPARATORS = {'(', ')', '{', '}', '[', ']', ',', '\'', ';' , '\'', '\"'};
@@ -93,12 +93,16 @@ vector<char> Token::SEPARATORS = {'(', ')', '{', '}', '[', ']', ',', '\'', ';' ,
  * @brief Token狗仔函数
  * @author Keyi Li
  */
-Token::Token(string _value, TOKEN_TYPE_ENUM _type, int _pos) {
+Token::Token(string _value, TOKEN_TYPE_ENUM _type, int _pos, int _line_number) {
     value = _value;
     type = _type;
     pos = _pos;
+    line_number = _line_number;
 
-    if (_type == TOKEN_TYPE_ENUM::SEPARATOR || _type == TOKEN_TYPE_ENUM::KEYWORD || _type == TOKEN_TYPE_ENUM::OPERATOR)
+    // 如果是分隔符、关键字和运算符的话，获取详细类别
+    if (_type == TOKEN_TYPE_ENUM::SEPARATOR ||
+        _type == TOKEN_TYPE_ENUM::KEYWORD ||
+        _type == TOKEN_TYPE_ENUM::OPERATOR)
         type = Token::DETAIL_TOKEN_TYPE[_value];
 }
 
@@ -112,8 +116,8 @@ Token::Token(string _value, TOKEN_TYPE_ENUM _type, int _pos) {
  *      -<em>false</em> 否
  */
 bool Token::isExpressionOperator(TOKEN_TYPE_ENUM t) {
-    int detail_type = int(t);
-    return int(TOKEN_TYPE_ENUM::ASSIGN) + 1 <= detail_type && detail_type <= int(TOKEN_TYPE_ENUM::RL_BRACKET);
+    return TOKEN_TYPE_ENUM::AND <= t &&
+           t <= TOKEN_TYPE_ENUM::RL_BRACKET;
 }
 
 
@@ -126,7 +130,9 @@ bool Token::isExpressionOperator(TOKEN_TYPE_ENUM t) {
  *      -<em>false</em> 否
  */
 bool Token::isUniOperator(TOKEN_TYPE_ENUM t) {
-    return t == TOKEN_TYPE_ENUM::NOT || t == TOKEN_TYPE_ENUM::SELF_MINUS || t == TOKEN_TYPE_ENUM::SELF_PLUS;
+    return t == TOKEN_TYPE_ENUM::NOT||
+           t == TOKEN_TYPE_ENUM::SELF_MINUS ||
+           t == TOKEN_TYPE_ENUM::SELF_PLUS;
 }
 
 
@@ -139,23 +145,33 @@ bool Token::isUniOperator(TOKEN_TYPE_ENUM t) {
  *      -<em>false</em> 否
  */
 bool Token::isBoolOperator(TOKEN_TYPE_ENUM t) {
-    return t == TOKEN_TYPE_ENUM::NOT || (TOKEN_TYPE_ENUM::AND <= t && t <= TOKEN_TYPE_ENUM::NOT_EQUAL);
+    return t == TOKEN_TYPE_ENUM::NOT ||
+           (TOKEN_TYPE_ENUM::AND <= t &&
+           t <= TOKEN_TYPE_ENUM::NOT_EQUAL);
 }
 
 
+/**
+ * @brief 重载token输出流
+ */
 ostream & operator << (ostream & out, Token & t) {
     TOKEN_TYPE_ENUM detail_type = t.type;
     int general_type = int(detail_type);
 
-    if (TOKEN_TYPE_ENUM::INCLUDE <= detail_type && detail_type <= TOKEN_TYPE_ENUM::RETURN)
+    // 输出detail type太啰嗦 这里对应回去 输出general type就好
+    if (TOKEN_TYPE_ENUM::INCLUDE <= detail_type &&
+        detail_type <= TOKEN_TYPE_ENUM::RETURN)
         general_type = int(TOKEN_TYPE_ENUM::KEYWORD);
-    else if (TOKEN_TYPE_ENUM::ASSIGN <= detail_type && detail_type <= TOKEN_TYPE_ENUM::NOT)
+    else if (TOKEN_TYPE_ENUM::ASSIGN <= detail_type &&
+        detail_type <= TOKEN_TYPE_ENUM::NOT)
         general_type = int(TOKEN_TYPE_ENUM::OPERATOR);
-    else if (TOKEN_TYPE_ENUM::LL_BRACKET <= detail_type && detail_type <= TOKEN_TYPE_ENUM::SHARP)
+    else if (TOKEN_TYPE_ENUM::LL_BRACKET <= detail_type &&
+        detail_type <= TOKEN_TYPE_ENUM::SHARP)
         general_type = int(TOKEN_TYPE_ENUM::SEPARATOR);
 
     out << setw(10) << setfill(' ') << t.value;
-    out << setw(10) << setfill(' ') << "type: " << Token::TOKEN_TYPE[general_type];
+    out << setw(10) << setfill(' ') << "type: ";
+    out << Token::TOKEN_TYPE[general_type];
     out << endl;
     return out;
 }

@@ -89,11 +89,12 @@ enum class TOKEN_TYPE_ENUM {
  */
 class Token {
 public:
-    string value;
-    int pos;
+    string value; // 值
+    int line_number; // 行号
+    int pos;  // 行中位置
     TOKEN_TYPE_ENUM type;
 
-    Token(string _value = "", TOKEN_TYPE_ENUM = TOKEN_TYPE_ENUM::NONE, int _pos = 0);
+    Token(string _value = "", TOKEN_TYPE_ENUM = TOKEN_TYPE_ENUM::NONE, int _pos = -1, int _line_number  = -1);
 
     static vector<string> TOKEN_TYPE;             // Token 种类
     static map<string, TOKEN_TYPE_ENUM> DETAIL_TOKEN_TYPE; // 将关键字、运算符、分隔符进行具体化
@@ -101,9 +102,9 @@ public:
     static vector<string> OPERATORS;              // 运算符
     static vector<char> SEPARATORS;               // 分隔符
 
-    static bool isExpressionOperator(TOKEN_TYPE_ENUM t);
-    static bool isBoolOperator(TOKEN_TYPE_ENUM t);
-    static bool isUniOperator(TOKEN_TYPE_ENUM t);
+    static bool isExpressionOperator(TOKEN_TYPE_ENUM t); // 是否是表达式中的运算符
+    static bool isBoolOperator(TOKEN_TYPE_ENUM t); // 是否是bool运算符
+    static bool isUniOperator(TOKEN_TYPE_ENUM t); // 是不是一元输入法
 
     friend ostream & operator << (ostream &out, Token & t);
 };

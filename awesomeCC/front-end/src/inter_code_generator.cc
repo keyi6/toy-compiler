@@ -142,7 +142,7 @@ void InterCodeGenerator::_block(SyntaxTreeNode * cur) {
  */
 void InterCodeGenerator::_if(SyntaxTreeNode * cur) {
     SyntaxTreeNode * cs = cur -> first_son, * pre = nullptr;
-    int m1_inst, m2_inst, inst;
+    int m1_inst, m2_inst;
 
     while (cs) {
         if (cs -> value == "Control-Condition") {

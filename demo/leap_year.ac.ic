@@ -1,0 +1,21 @@
+MOV,2000,,v1[0]
+MOV,3000,,v1[1]
+MOV,0,,v0
+JL,v0,2,5
+J,,,21
+PRINT,v1[v0],,
+MOD,v1[v0],4,t0
+JE,t0,0,9
+J,,,17
+MOD,v1[v0],100,t1
+JNE,t1,0,15
+J,,,12
+MOD,v1[v0],400,t2
+JE,t2,0,15
+J,,,17
+PRINT,"is leap year",,
+J,,,18
+PRINT,"is not leap year",,
+ADD,v0,1,t3
+MOV,t3,,v0
+J,,,3

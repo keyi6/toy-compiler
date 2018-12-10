@@ -17,11 +17,12 @@ using std::ostream;
 
 class Error {
 private:
-    int line_number;
+    int line_number; // 行号
+    int pos; // 行中位置
     string errorMsg;
 
 public:
-    Error(string _errorMsg, int _line_number = -1);
+    Error(string _errorMsg, int _line_number = -1, int _pos = -1);
 
     friend ostream & operator << (ostream & out, Error & e);
 };

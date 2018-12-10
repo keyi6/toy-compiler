@@ -1,7 +1,8 @@
-//
-// Created by cj on 2018-12-09.
-//
-
+/**
+ * @file all_api.h
+ * @brief api provider
+ * @author Keyi Li
+ */
 #ifndef AWESOMECC_ALL_API_H
 #define AWESOMECC_ALL_API_H
 
@@ -14,6 +15,7 @@
 #include <iostream>
 using std::cout;
 using std::endl;
+
 
 /**
  * @brief 解释执行中间代码
@@ -41,4 +43,5 @@ inline void compile_and_execute(string path) {
     Interpreter intp;
     intp.execute(inter_code_file);
 }
+
 #endif //AWESOMECC_ALL_API_H

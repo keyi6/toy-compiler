@@ -22,38 +22,29 @@ SyntaxAnalyzer::SyntaxAnalyzer() = default;
  * @author Keyi Li
  * @param sentences string vector, 等待分析的句子们
  * @param verbose bool, 是否输出语法树
- * @return
- *      -<em>true</em> 无错误
- *      -<em>false</em> 有错误
  */
-bool SyntaxAnalyzer::analyze(vector<string> sentences, bool verbose) {
+void SyntaxAnalyzer::analyze(vector<string> sentences, bool verbose) {
     LexicalAnalyzer la;
     // 如果能通过词法分析
-    if (la.analyze(sentences, false)) {
-        // for oo check
-        index = 4;
+    la.analyze(sentences, false);
+    // for oo check
+    index = 4;
 
-        tokens = la.getAllTokens();
-        len = tokens.size() - 1;
-        line_number_map = la.getLineNumberMap();
+    tokens = la.getAllTokens();
+    len = tokens.size() - 1;
+    line_number_map = la.getLineNumberMap();
 
-        try {
-            _analyze();
-        }
-        catch (Error & e) {
-            cout << "Syntax analyze errors" << endl;
-            cout << e;
-            exit(0);
-            return false;
-        }
-
-        if (verbose)
-            tree -> display();
-
-        return true;
+    try {
+        _analyze();
+    }
+    catch (Error & e) {
+        cout << "Syntax analyze errors" << endl;
+        cout << e;
+        exit(0);
     }
 
-    return false;
+    if (verbose)
+        tree -> display();
 }
 
 
@@ -107,18 +98,18 @@ SENTENCE_PATTERN_ENUM SyntaxAnalyzer::_judgeSentencePattern() {
         // print 语句
         case int(TOKEN_TYPE_ENUM::PRINT):
             return SENTENCE_PATTERN_ENUM::PRINT;
-        // include 语句
+            // include 语句
         case int(TOKEN_TYPE_ENUM::SHARP):
             if (index + 1 < len && tokens[index + 1].type == TOKEN_TYPE_ENUM::INCLUDE)
                 return SENTENCE_PATTERN_ENUM::INCLUDE;
-        // 控制语句
+            // 控制语句
         case int(TOKEN_TYPE_ENUM::IF):
         case int(TOKEN_TYPE_ENUM::ELSE):
         case int(TOKEN_TYPE_ENUM::DO):
         case int(TOKEN_TYPE_ENUM::WHILE):
         case int(TOKEN_TYPE_ENUM::FOR):
             return SENTENCE_PATTERN_ENUM::CONTROL;
-        // 申明语句
+            // 申明语句
         case int(TOKEN_TYPE_ENUM::INT):
         case int(TOKEN_TYPE_ENUM::FLOAT):
         case int(TOKEN_TYPE_ENUM::DOUBLE):
@@ -133,7 +124,7 @@ SENTENCE_PATTERN_ENUM SyntaxAnalyzer::_judgeSentencePattern() {
                     nn_type == TOKEN_TYPE_ENUM::COMMA)        // int a, b;
                     return SENTENCE_PATTERN_ENUM::STATEMENT;
             }
-        // 函数调用 或者 赋值语句
+            // 函数调用 或者 赋值语句
         case int(TOKEN_TYPE_ENUM::IDENTIFIER):
             if (index + 1 < len) {
                 TOKEN_TYPE_ENUM n_type = tokens[index + 1].type;
@@ -142,10 +133,10 @@ SENTENCE_PATTERN_ENUM SyntaxAnalyzer::_judgeSentencePattern() {
                 if (n_type == TOKEN_TYPE_ENUM::LL_BRACKET)    // sum(10);
                     return SENTENCE_PATTERN_ENUM::FUNCTION_CALL;
             }
-        // return 语句
+            // return 语句
         case int(TOKEN_TYPE_ENUM::RETURN):
             return SENTENCE_PATTERN_ENUM::RETURN;
-        // 右大括号 表示函数 或者 block的结束
+            // 右大括号 表示函数 或者 block的结束
         case int(TOKEN_TYPE_ENUM::RB_BRACKET):
             return SENTENCE_PATTERN_ENUM::RB_BRACKET;
         default:
@@ -235,13 +226,13 @@ void SyntaxAnalyzer::_statement(SyntaxTreeNode * father_node) {
                         // 如果是，或者；就直接读取
                         if (n_type == TOKEN_TYPE_ENUM::COMMA || n_type == TOKEN_TYPE_ENUM::SEMICOLON) {
                             state_tree -> addNode(new SyntaxTreeNode(cur_value, "array-" + variable_type, size),
-                                                       state_tree -> root);
+                                                  state_tree -> root);
                             if (tokens[index ++].type == TOKEN_TYPE_ENUM::COMMA)
                                 break;
                             else
                                 return;
                         }
-                        // 如果是 = 那么就读取那些初始化信息
+                            // 如果是 = 那么就读取那些初始化信息
                         else if (n_type == TOKEN_TYPE_ENUM::ASSIGN) {
                             index ++;
 
@@ -319,7 +310,7 @@ void SyntaxAnalyzer::_expression(SyntaxTreeNode * father_node, TOKEN_TYPE_ENUM s
             reverse_polish_exp.emplace_back(new_tree);
             index ++;
         }
-        // 变量
+            // 变量
         else if (cur_type == TOKEN_TYPE_ENUM::IDENTIFIER) {
             // 数组下标
             if (index + 3 < len && tokens[index + 1].type == TOKEN_TYPE_ENUM::LM_BRACKET) {
@@ -338,7 +329,7 @@ void SyntaxAnalyzer::_expression(SyntaxTreeNode * father_node, TOKEN_TYPE_ENUM s
 
                 reverse_polish_exp.emplace_back(new_tree);
             }
-            // 一般的变量
+                // 一般的变量
             else {
                 SyntaxTree * new_tree = new SyntaxTree(new SyntaxTreeNode("Expression-Variable"));
                 new_tree -> addNode(new SyntaxTreeNode(tokens[index].value), new_tree -> root);
@@ -347,7 +338,7 @@ void SyntaxAnalyzer::_expression(SyntaxTreeNode * father_node, TOKEN_TYPE_ENUM s
                 index ++;
             }
         }
-        // 运算符
+            // 运算符
         else if (Token::isExpressionOperator(cur_type)) {
             SyntaxTree * new_tree = new SyntaxTree(new SyntaxTreeNode("Expression-Operator"));
             new_tree -> addNode(new SyntaxTreeNode(tokens[index].value), new_tree -> root);
@@ -356,7 +347,7 @@ void SyntaxAnalyzer::_expression(SyntaxTreeNode * father_node, TOKEN_TYPE_ENUM s
             if (cur_type == TOKEN_TYPE_ENUM::LL_BRACKET) {
                 op_stack.push(new_tree);
             }
-            // 如果是 ）
+                // 如果是 ）
             else if (cur_type == TOKEN_TYPE_ENUM::RL_BRACKET) {
                 SyntaxTree * temp_t;
                 bool flag = false;
@@ -375,7 +366,7 @@ void SyntaxAnalyzer::_expression(SyntaxTreeNode * father_node, TOKEN_TYPE_ENUM s
                 if (! flag)
                     throw Error("in expression, expected `(` before `)`", line_number_map[index]);
             }
-            // 如果是其他的 + - * / > < 那些
+                // 如果是其他的 + - * / > < 那些
             else {
                 SyntaxTree * temp_t;
                 int cur_pio = int(tokens[index].type), t_pio;
@@ -443,7 +434,7 @@ void SyntaxAnalyzer::_expression(SyntaxTreeNode * father_node, TOKEN_TYPE_ENUM s
 
                 op_stack.push(new_tree);
             }
-            // 如果是双目运算符
+                // 如果是双目运算符
             else {
                 b = op_stack.top();
                 op_stack.pop();
@@ -481,7 +472,7 @@ void SyntaxAnalyzer::_expression(SyntaxTreeNode * father_node, TOKEN_TYPE_ENUM s
                 op_stack.push(new_tree);
             }
         }
-        // 不是运算符
+            // 不是运算符
         else
             op_stack.push(temp_t);
     }
@@ -545,7 +536,7 @@ void SyntaxAnalyzer::_functionStatement(SyntaxTreeNode * father_node) {
     if (tokens[index].type == TOKEN_TYPE_ENUM::RL_BRACKET) {
         index ++;
     }
-    // 如果下一个不是），读取参数列表
+        // 如果下一个不是），读取参数列表
     else {
         // 建一个参数树
         SyntaxTreeNode * param_list = new SyntaxTreeNode("ParameterList");
@@ -585,8 +576,8 @@ void SyntaxAnalyzer::_functionStatement(SyntaxTreeNode * father_node) {
     if (cur_type == TOKEN_TYPE_ENUM::LB_BRACKET) {
         _block(func_state_tree -> root);
     }
-    // 如果下一个是; ，就当作单纯的函数声明
-    // 如果两个都不是 就有问题
+        // 如果下一个是; ，就当作单纯的函数声明
+        // 如果两个都不是 就有问题
     else if (cur_type != TOKEN_TYPE_ENUM::SEMICOLON)
         throw Error("in function statement, expected `;` or `}`", line_number_map[index]);
 }
