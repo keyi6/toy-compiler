@@ -7,7 +7,7 @@
  */
 
 class Main {
-    void main() {
+    public void main() {
         int i, j;
 
         int a[5] = {651, 54, 409, 13, 4};
@@ -26,7 +26,7 @@ class Main {
 
 
         for (i = 0; i < 5; i = i + 1) {
-            print(a[i] * 2);
+            print(a[i]);
         }
     }
 }

@@ -1,8 +1,10 @@
 language: c++
-install: cmake . && make
+
+install:
+  - cmake .
+  - make
+
 compiler:
+  - gcc
   - clang
-jobs:
-  include:
-  - stage: install
-    script: cmake . && make
+

@@ -12,7 +12,7 @@
 
 
 int main() {
-    string path = "/Users/cjhahaha/Workspace/CompilePrinciple/awesomeCC/demo/leap_year.ac";
+    string path = "/Users/cjhahaha/Workspace/CompilePrinciple/awesomeCC/demo/bubble_sort.ac";
     vector<string> source_file = readSourceFile(path);
 
     SyntaxAnalyzer sa;

@@ -22,10 +22,10 @@ MOD,v5,400,t4
 JE,t4,0,23
 J,,,27
 PRINT,v5,,
-PRINT,"is leap year",,
+PRINT,"is leap year.",,
 PRINT,,,
 J,,,30
 PRINT,v5,,
-PRINT,"is not leap year",,
+PRINT,"is not leap year.",,
 PRINT,,,
 J,,,t1

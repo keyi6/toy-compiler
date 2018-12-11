@@ -110,16 +110,17 @@ SENTENCE_PATTERN_ENUM SyntaxAnalyzer::_judgeSentencePattern() {
         case int(TOKEN_TYPE_ENUM::WHILE):
         case int(TOKEN_TYPE_ENUM::FOR):
             return SENTENCE_PATTERN_ENUM::CONTROL;
+            // 函数声明
+        case int(TOKEN_TYPE_ENUM::PRIVATE):
+        case int(TOKEN_TYPE_ENUM::PUBLIC):
+            return SENTENCE_PATTERN_ENUM::FUNCTION_STATEMENT;
             // 申明语句
         case int(TOKEN_TYPE_ENUM::INT):
         case int(TOKEN_TYPE_ENUM::FLOAT):
         case int(TOKEN_TYPE_ENUM::DOUBLE):
-        case int(TOKEN_TYPE_ENUM::VOID):
         case int(TOKEN_TYPE_ENUM::CHAR):
             if (index + 2 < len && tokens[index + 1].type == TOKEN_TYPE_ENUM::IDENTIFIER) {
                 TOKEN_TYPE_ENUM nn_type = tokens[index + 2].type;
-                if (nn_type == TOKEN_TYPE_ENUM::LL_BRACKET)   // int sum();
-                    return SENTENCE_PATTERN_ENUM::FUNCTION_STATEMENT;
                 if (nn_type == TOKEN_TYPE_ENUM::SEMICOLON ||  // int a;
                     nn_type == TOKEN_TYPE_ENUM::LM_BRACKET || // int a[10];
                     nn_type == TOKEN_TYPE_ENUM::COMMA)        // int a, b;
@@ -531,6 +532,7 @@ void SyntaxAnalyzer::_include(SyntaxTreeNode * father_node) {
  * @author Keyi Li
  */
 void SyntaxAnalyzer::_functionStatement(SyntaxTreeNode * father_node) {
+    index ++;
     SyntaxTree * func_state_tree = new SyntaxTree(new SyntaxTreeNode("FunctionStatement"));
     tree -> addNode(func_state_tree -> root, father_node);
 
