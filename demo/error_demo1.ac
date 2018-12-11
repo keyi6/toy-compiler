@@ -16,12 +16,11 @@ class Main {
 		int year[2] = {2000, 3000};
 
 		for (i = 0; i < 2; i = i + 1) {
-				print year[i];
 			if (year[i] % 4 == 0 && year[i] % 100 != 0 || year[i] % 400 == 0) {
-				print "is leap year";
+				print(year[i], "is leap year");
 			}
 			else {
-				print "is not leap year";
+				print(year[i], "is not leap year");
 			}
 		}
     }
