@@ -279,8 +279,15 @@ void InterCodeGenerator::_if(SyntaxTreeNode * cur) {
  * @author Keyi Li
  */
 void InterCodeGenerator::_print(SyntaxTreeNode * cur) {
-    string print_place = _expression(cur -> first_son);
-    _emit(INTER_CODE_OP_ENUM::PRINT, print_place, "", "");
+    SyntaxTreeNode * ps = cur -> first_son;
+    string print_place;
+    while (ps) {
+        print_place = _expression(ps);
+        _emit(INTER_CODE_OP_ENUM::PRINT, print_place, "", "");
+
+        ps = ps -> right;
+    }
+    _emit(INTER_CODE_OP_ENUM::PRINT, "", "", "");
 }
 
 

@@ -154,28 +154,45 @@ void SyntaxAnalyzer::_print(SyntaxTreeNode * father_node) {
     SyntaxTree * print_tree = new SyntaxTree(new SyntaxTreeNode("Print"));
     tree -> addNode(print_tree -> root, father_node);
 
+    // 读取 print
     index ++;
-    if (tokens[index].type == TOKEN_TYPE_ENUM::DOUBLE_QUOTE) {
-        // 读取 "
-        index ++;
+    if (tokens[index].type != TOKEN_TYPE_ENUM::LL_BRACKET)
+        throw Error("in print function, arguments should be wrapped in `()`");
+    // 读取 (
+    index ++;
 
-        print_tree -> addNode(new SyntaxTreeNode("Expression-String"), print_tree -> root);
-        print_tree -> addNode(new SyntaxTreeNode("\"" + tokens[index].value + "\"" ), print_tree -> cur_node);
+    int temp_end;
+    while (index < len && tokens[index].type != TOKEN_TYPE_ENUM::RL_BRACKET) {
+        temp_end = index;
+        while (temp_end < len &&
+               tokens[temp_end].type != TOKEN_TYPE_ENUM::RL_BRACKET &&
+               tokens[temp_end].type != TOKEN_TYPE_ENUM::COMMA)
+            temp_end ++;
 
-        // 读取 "
-        index ++;
-        if (tokens[index].type != TOKEN_TYPE_ENUM::DOUBLE_QUOTE)
-            throw Error("excepted `\"` appears in pairs", line_number_map[index]);
+        if (tokens[index].type == TOKEN_TYPE_ENUM::DOUBLE_QUOTE) {
+            // 读取 "
+            index ++;
 
-        index ++;
-        if (tokens[index].type != TOKEN_TYPE_ENUM::SEMICOLON)
-            throw Error("excepted `;` after `print`", line_number_map[index]);
+            print_tree -> addNode(new SyntaxTreeNode("Expression-String"), print_tree -> root);
+            print_tree -> addNode(new SyntaxTreeNode("\"" + tokens[index].value + "\"" ), print_tree -> cur_node);
 
-        index ++;
+            // 读取 "
+            index ++;
+            if (tokens[index].type != TOKEN_TYPE_ENUM::DOUBLE_QUOTE)
+                throw Error("excepted `\"` appears in pairs", line_number_map[index]);
+
+            index ++;
+        }
+        else {
+            _expression(print_tree -> root, tokens[temp_end].type);
+        }
+
+        if (tokens[temp_end].type == TOKEN_TYPE_ENUM::RL_BRACKET) {
+            index ++;
+            break;
+        }
     }
-    else {
-        _expression(print_tree -> root);
-    }
+
 }
 
 

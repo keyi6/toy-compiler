@@ -4,5 +4,5 @@ compiler:
   - clang
 jobs:
   include:
-  - stage: test
-    script: cmake --target awesomeCC_test -j 2
+  - stage: install
+    script: cmake . && make

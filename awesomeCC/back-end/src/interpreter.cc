@@ -74,10 +74,12 @@ void Interpreter::_execute(bool verbose) {
 
 void Interpreter::_print() {
     string value_str = code[index].arg1;
-    if (value_str[0] == '\"' || value_str[0] == '\'')
-        cout << value_str.substr(1, value_str.size() - 2) << endl;
+    if (value_str == "")
+        cout << endl;
+    else if (value_str[0] == '\"' || value_str[0] == '\'')
+        cout << value_str.substr(1, value_str.size() - 2) << " ";
     else
-        cout << _getValue(value_str) << endl;
+        cout << _getValue(value_str) << " ";
 }
 
 
