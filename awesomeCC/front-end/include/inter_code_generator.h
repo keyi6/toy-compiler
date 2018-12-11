@@ -1,10 +1,6 @@
 /**
- *
  * @file inter_code_generator.h
  * @brief 中间代码生成器类
- *
- * @author Keyi Li
- *
  */
 #ifndef AWESOMECC_INTER_CODE_GENERATOR_H
 #define AWESOMECC_INTER_CODE_GENERATOR_H
@@ -68,6 +64,9 @@ public:
 };
 
 
+/**
+ * @brief 函数信息类
+ */
 class FuncInfo: public Info {
 public:
     string name;
@@ -84,16 +83,16 @@ public:
  */
 class InterCodeGenerator {
 private:
-    SyntaxTree * tree; // 语法树
-    int temp_var_index; // 临时变量栈顶
-    int var_index; // 用户的变量栈顶
-    int context_index; // 局部变量区分
+    SyntaxTree * tree;                        // 语法树
+    int temp_var_index;                       // 临时变量栈顶
+    int var_index;                            // 用户的变量栈顶
+    int context_index;                        // 局部变量区分
 
 
-    map<string, VarInfo> table; // 变量表
-    map<string, FuncInfo> func_table; // 函数表
+    map<string, VarInfo> table;               // 变量表
+    map<string, FuncInfo> func_table;         // 函数表
     map<string, vector<int> > func_backpatch; // 函数表
-    vector<Quadruple> inter_code; // 生成的四元式
+    vector<Quadruple> inter_code;             // 生成的四元式
 
     void _analyze(SyntaxTreeNode * cur);
 

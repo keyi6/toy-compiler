@@ -1,7 +1,6 @@
 /**
  * @file all_api.h
  * @brief api provider
- * @author Keyi Li
  */
 #ifndef AWESOMECC_ALL_API_H
 #define AWESOMECC_ALL_API_H
@@ -20,7 +19,6 @@ using std::endl;
 /**
  * @brief 解释执行中间代码
  * @param path 中间代码文件路径
- * @author Keyi Li
  */
 inline void compile_and_execute(string path) {
     vector<string> source_file = readSourceFile(path);

@@ -1,10 +1,6 @@
 /**
- *
  * @file lexical_analyzer.cc
  * @brief 词法分析器，具体实现
- *
- * @author Keyi Li
- *
  */
 
 

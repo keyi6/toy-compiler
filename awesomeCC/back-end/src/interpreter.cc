@@ -1,10 +1,6 @@
 /**
- *
  * @file virtual_machine.cc
  * @brief 解释执行程序
- *
- * @author Keyi Li
- *
  */
 
 #include "../include/interpreter.h"
@@ -13,6 +9,9 @@
 Interpreter::Interpreter() = default;
 
 
+/**
+ * @brief 解释执行
+ */
 void Interpreter::execute(vector<Quadruple> _code, bool verbose) {
     code = move(_code);
     index = 0;
@@ -31,6 +30,9 @@ void Interpreter::execute(vector<Quadruple> _code, bool verbose) {
 }
 
 
+/**
+ * @brief 解释执行
+ */
 void Interpreter::_execute(bool verbose) {
     int op = int(code[index].op);
     if (verbose) {
@@ -81,6 +83,10 @@ void Interpreter::_execute(bool verbose) {
 }
 
 
+
+/**
+ * @brief 执行print
+ */
 void Interpreter::_print() {
     string value_str = code[index].arg1;
     if (value_str == "")
@@ -92,6 +98,9 @@ void Interpreter::_print() {
 }
 
 
+/**
+ * @brief 执行运行
+ */
 void Interpreter::_calc(int op) {
     int a = _getValue(code[index].arg1);
     int b = _getValue(code[index].arg2);
@@ -125,6 +134,9 @@ void Interpreter::_calc(int op) {
 }
 
 
+/**
+ * @brief 执行赋值
+ */
 void Interpreter::_assign() {
     string res = code[index].res;
 
@@ -141,6 +153,9 @@ void Interpreter::_assign() {
 }
 
 
+/**
+ * @brief 解释跳转
+ */
 void Interpreter::_jump() {
     INTER_CODE_OP_ENUM op = code[index].op;
     if (op == INTER_CODE_OP_ENUM::J) {
@@ -161,6 +176,9 @@ void Interpreter::_jump() {
 }
 
 
+/**
+ * @brief 获得地址
+ */
 int Interpreter::_getAddress(string value_str) {
     if (value_str[0] == 'v') {
         int len = value_str.size();
@@ -193,6 +211,9 @@ int Interpreter::_getAddress(string value_str) {
 }
 
 
+/**
+ * @brief 或得值
+ */
 double Interpreter::_getValue(string value_str) {
     if (value_str[0] == 'p') {
         return index + string2int(value_str.substr(3));
@@ -223,6 +244,10 @@ double Interpreter::_getValue(string value_str) {
 }
 
 
+
+/**
+ * @brief 出战
+ */
 void Interpreter::_pop() {
     string res = code[index].res;
     if (activity.empty()) {cout << "Stackempty!!!\n"; exit(0);}
@@ -237,6 +262,9 @@ void Interpreter::_pop() {
 }
 
 
+/**
+ * @brief 进栈
+ */
 void Interpreter::_push() {
     double v = _getValue(code[index].res);
     activity.push(v);

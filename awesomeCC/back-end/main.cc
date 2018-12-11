@@ -1,10 +1,6 @@
 /**
- *
  * @file main.cc
  * @brief 运行入口文件
- *
- * @author Keyi Li
- *
  */
 
 #include "backend_api.h"

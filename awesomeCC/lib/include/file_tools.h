@@ -1,10 +1,6 @@
 /**
- *
  * @file file_tools.h
  * @brief 处理文件的函数们
- *
- * @author Keyi Li
- *
  */
 
 #ifndef AWESOMECC_FILE_TOOLS_H

@@ -1,11 +1,6 @@
 /**
- *
  * @file syntax_analyzer.cc
  * @brief 语法分析器类具体实现
- *
- * @author Keyi Li
- * @author Hanwen Liu
- *
  */
 
 #include "../include/syntax_analyzer.h"
@@ -21,7 +16,6 @@ SyntaxAnalyzer::SyntaxAnalyzer() = default;
 
 /**
  * @brief 进行语法分析
- * @author Keyi Li
  * @param sentences string vector, 等待分析的句子们
  * @param verbose bool, 是否输出语法树
  */
@@ -52,7 +46,6 @@ void SyntaxAnalyzer::analyze(vector<string> sentences, bool verbose) {
 
 /**
  * @brief 进行语法分析
- * @author Keyi Li
  */
 void SyntaxAnalyzer::_analyze() {
     if (tokens[0].type != TOKEN_TYPE_ENUM::CLASS)
@@ -89,7 +82,6 @@ void SyntaxAnalyzer::_analyze() {
 
 /**
  * @brief 判断句子的种类
- * @author Keyi Li
  * @return SENTENCE_PATTERN_ENUM, 句子种类的枚举类
  */
 SENTENCE_PATTERN_ENUM SyntaxAnalyzer::_judgeSentencePattern() {
@@ -150,7 +142,6 @@ SENTENCE_PATTERN_ENUM SyntaxAnalyzer::_judgeSentencePattern() {
 
 /**
  * @brief 处理print语句
- * @author Keyi Li
  */
 void SyntaxAnalyzer::_print(SyntaxTreeNode * father_node) {
     SyntaxTree * print_tree = new SyntaxTree(new SyntaxTreeNode("Print", POS(tokens[index])));
@@ -202,7 +193,6 @@ void SyntaxAnalyzer::_print(SyntaxTreeNode * father_node) {
 
 /**
  * @brief 处理申明语句
- * @author Keyi Li
  */
 void SyntaxAnalyzer::_statement(SyntaxTreeNode * father_node) {
     SyntaxTree * state_tree = new SyntaxTree(new SyntaxTreeNode("Statement", POS(tokens[index])));
@@ -307,15 +297,15 @@ void SyntaxAnalyzer::_statement(SyntaxTreeNode * father_node) {
                                 throw Error("in array initialization, expected `{}`", POS(tokens[index]));
                         }
                         else
-                            throw Error("Unrecognized symbol in statement", POS(tokens[index]));
+                            throw Error("in statement, unrecognized symbol `" + tokens[index].value + "`", POS(tokens[index]));
                     }
                     else
-                        throw Error("Expected `]` after a statement of an array", POS(tokens[index]));
+                        throw Error("in statement, expected `]` after a statement of an array", POS(tokens[index]));
                 }
-                throw Error("Unrecognized symbol in statement", POS(tokens[index]));
+                throw Error("in statement, Unrecognized symbol in statement", POS(tokens[index]));
             }
             default:
-                throw Error("Unrecognized symbol in statement", POS(tokens[index]));
+                throw Error("in statement, unrecognized symbol `" +  tokens[index].value + "`", POS(tokens[index]));
         }
     }
 }
@@ -323,7 +313,6 @@ void SyntaxAnalyzer::_statement(SyntaxTreeNode * father_node) {
 
 /**
  * @brief 处理表达式
- * @author Keyi Li
  */
 void SyntaxAnalyzer::_expression(SyntaxTreeNode * father_node, TOKEN_TYPE_ENUM stop_sign) {
     stack<SyntaxTree *> op_stack;
@@ -522,7 +511,6 @@ void SyntaxAnalyzer::_expression(SyntaxTreeNode * father_node, TOKEN_TYPE_ENUM s
 
 /**
  * @brief 处理include语句
- * @author Keyi Li
  */
 void SyntaxAnalyzer::_include(SyntaxTreeNode * father_node) {
     SyntaxTree * include_tree = new SyntaxTree(new SyntaxTreeNode("Include", POS(tokens[index])));
@@ -548,7 +536,6 @@ void SyntaxAnalyzer::_include(SyntaxTreeNode * father_node) {
 
 /**
  * @brief 处理函数声明
- * @author Keyi Li
  */
 void SyntaxAnalyzer::_functionStatement(SyntaxTreeNode * father_node) {
     index ++;
@@ -625,7 +612,6 @@ void SyntaxAnalyzer::_functionStatement(SyntaxTreeNode * father_node) {
 
 /**
  * @brief 处理return
- * @author Keyi Li
  */
 void SyntaxAnalyzer::_return(SyntaxTreeNode * father_node) {
     SyntaxTree * return_tree = new SyntaxTree();
@@ -656,7 +642,6 @@ void SyntaxAnalyzer::_return(SyntaxTreeNode * father_node) {
 
 /**
  * @brief 处理大括号
- * @author Keyi Li
  */
 void SyntaxAnalyzer::_block(SyntaxTreeNode * father_node) {
     SyntaxTree * block_tree = new SyntaxTree(new SyntaxTreeNode("Block", POS(tokens[index])));
@@ -706,7 +691,6 @@ void SyntaxAnalyzer::_block(SyntaxTreeNode * father_node) {
 
 /**
  * @brief 处理函数调用
- * @author Keyi Li
  */
 void SyntaxAnalyzer::_functionCall(SyntaxTreeNode * father_node) {
     // TODO 在expressoin里加
@@ -750,7 +734,6 @@ void SyntaxAnalyzer::_functionCall(SyntaxTreeNode * father_node) {
 
 /**
  * @brief 处理赋值语句
- * @author Keyi Li
  */
 void SyntaxAnalyzer::_assignment(SyntaxTreeNode * father_node, TOKEN_TYPE_ENUM stop_token) {
     SyntaxTree * assign_tree = new SyntaxTree(new SyntaxTreeNode("Assignment", POS(tokens[index])));
@@ -791,7 +774,6 @@ void SyntaxAnalyzer::_assignment(SyntaxTreeNode * father_node, TOKEN_TYPE_ENUM s
 
 /**
  * @brief 处理控制语句
- * @author Keyi Li
  */
 void SyntaxAnalyzer::_control(SyntaxTreeNode * father_node) {
     int cur_type = int(tokens[index].type);
@@ -813,7 +795,6 @@ void SyntaxAnalyzer::_control(SyntaxTreeNode * father_node) {
 
 /**
  * @brief 处理for
- * @author Keyi Li
  */
 void SyntaxAnalyzer::_for(SyntaxTreeNode * father_node) {
     SyntaxTree * psudo_while_tree = new SyntaxTree(new SyntaxTreeNode("Control-While", POS(tokens[index])));
@@ -852,7 +833,6 @@ void SyntaxAnalyzer::_for(SyntaxTreeNode * father_node) {
 
 /**
  * @brief 处理while
- * @author Keyi Li
  */
 void SyntaxAnalyzer::_while(SyntaxTreeNode * father_node) {
     SyntaxTree * while_tree = new SyntaxTree(new SyntaxTreeNode("Control-While", POS(tokens[index])));
@@ -881,7 +861,6 @@ void SyntaxAnalyzer::_while(SyntaxTreeNode * father_node) {
 
 /**
  * @brief 处理if
- * @author Keyi Li
  */
 void SyntaxAnalyzer::_if(SyntaxTreeNode * father_node) {
     SyntaxTree * if_tree = new SyntaxTree(new SyntaxTreeNode("Control-If", POS(tokens[index])));
@@ -961,7 +940,6 @@ void SyntaxAnalyzer::_else_if(SyntaxTreeNode * father_node) {
 
 /**
  * @brief 处理else
- * @author Keyi Li
  */
 void SyntaxAnalyzer::_else(SyntaxTreeNode * father_node) {
     if (tokens[index].type == TOKEN_TYPE_ENUM::ELSE) {
@@ -980,7 +958,6 @@ void SyntaxAnalyzer::_else(SyntaxTreeNode * father_node) {
 
 /**
  * @brief 返回生成的语法🌲
- * @author Keyi Li
  */
 SyntaxTree * SyntaxAnalyzer::getSyntaxTree() {
     return tree;

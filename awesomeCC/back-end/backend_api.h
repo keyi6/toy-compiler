@@ -1,10 +1,6 @@
 /**
- *
  * @file backend_api.h
  * @brief 后端api
- *
- * @author Keyi Li
- *
  */
 
 #ifndef AWESOMECC_BACKEND_API_H
@@ -16,7 +12,6 @@
 /**
  * @brief 解释执行中间代码
  * @param path 中间代码文件路径
- * @author Keyi Li
  */
 inline void interpreter(string path) {
     vector<Quadruple> inter_code_file = readInterCodeFile(path);

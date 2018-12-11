@@ -1,10 +1,6 @@
 /**
- *
  * @file inter_code_generator.h
  * @brief 中间代码生成器类具体实现
- *
- * @author Keyi Li
- *
  */
 
 #include "../include/inter_code_generator.h"
@@ -30,7 +26,6 @@ VarInfo::VarInfo() = default;
  * @brief VarInfo构造函数
  * @param _name 变量名字
  * @param _type 种类
- * @author Keyi Li
  */
 VarInfo::VarInfo(VARIABLE_INFO_ENUM _type, int _place) {
     name = "v" + int2string(_place);
@@ -52,7 +47,6 @@ FuncInfo::FuncInfo(string _name, VARIABLE_INFO_ENUM _ret_type, int _start_place,
 
 /**
  * @brief 中间代码生成器构造函数
- * @author Keyi Li
  */
 InterCodeGenerator::InterCodeGenerator() = default;
 
@@ -60,7 +54,6 @@ InterCodeGenerator::InterCodeGenerator() = default;
 /**
  * @brief 中间代码生成
  * @param _tree SyntaxTree *
- * @author Keyi Li
  */
 void InterCodeGenerator::analyze(SyntaxTree * _tree, bool verbose) {
     inter_code.clear();
@@ -179,7 +172,6 @@ void InterCodeGenerator::_functionStatement(SyntaxTreeNode * cur) {
 
 /**
  * @brief 翻译block
- * @author Keyi Li
  */
 void InterCodeGenerator::_block(SyntaxTreeNode * cur, bool restore) {
     int _pre_var_index = var_index;
@@ -231,7 +223,6 @@ void InterCodeGenerator::_block(SyntaxTreeNode * cur, bool restore) {
 
 /**
  * @brief 翻译Print
- * @author Keyi Li
  */
 void InterCodeGenerator::_if(SyntaxTreeNode * cur) {
     SyntaxTreeNode * cs = cur -> first_son, * pre = nullptr;
@@ -281,7 +272,6 @@ void InterCodeGenerator::_if(SyntaxTreeNode * cur) {
 
 /**
  * @brief 翻译Print
- * @author Keyi Li
  */
 void InterCodeGenerator::_print(SyntaxTreeNode * cur) {
     SyntaxTreeNode * ps = cur -> first_son;
@@ -298,7 +288,6 @@ void InterCodeGenerator::_print(SyntaxTreeNode * cur) {
 
 /**
  * @brief 翻译赋值语句
- * @author Keyi Li
  */
 void InterCodeGenerator::_assignment(SyntaxTreeNode * cur) {
     SyntaxTreeNode * cs = cur -> first_son;
@@ -317,7 +306,6 @@ void InterCodeGenerator::_assignment(SyntaxTreeNode * cur) {
 
 /**
  * @brief 翻译表达式
- * @author Keyi Li
  * @param cur 一个Expression-*节点执政
  * @return place, string
  */
@@ -417,7 +405,6 @@ string InterCodeGenerator::_expression(SyntaxTreeNode * cur) {
 
 /**
  * @brief 翻译while语句
- * @author Keyi Li
  */
 void InterCodeGenerator::_while(SyntaxTreeNode * cur) {
     int m_inst1 = inter_code.size();
@@ -438,7 +425,6 @@ void InterCodeGenerator::_while(SyntaxTreeNode * cur) {
 
 /**
  * @brief 翻译变量声明语句
- * @author Keyi Li
  */
 void InterCodeGenerator::_statement(SyntaxTreeNode * cur) {
     SyntaxTreeNode * cs = cur -> first_son;
@@ -499,7 +485,6 @@ void InterCodeGenerator::_statement(SyntaxTreeNode * cur) {
 
 /**
  * @brief 处理函数调用
- * @author Keyi Li
  */
 void InterCodeGenerator::_functionCall(SyntaxTreeNode * cur) {
     // backup
@@ -546,7 +531,6 @@ void InterCodeGenerator::_functionCall(SyntaxTreeNode * cur) {
  * @brief 寻找标识符
  * @param name 标识符
  * @return code var
- * @author Keyi Li
  */
 string InterCodeGenerator::_lookUpVar(string name, SyntaxTreeNode * cur) {
     if (table.find(name) == table.end())
@@ -560,7 +544,6 @@ string InterCodeGenerator::_lookUpVar(string name, SyntaxTreeNode * cur) {
  * @brief 寻找标识符
  * @param name 标识符
  * @return code var
- * @author Keyi Li
  */
 string InterCodeGenerator::_lookUpVar(SyntaxTreeNode * arr_pointer) {
     string base = arr_pointer -> first_son -> value;
@@ -576,7 +559,6 @@ string InterCodeGenerator::_lookUpVar(SyntaxTreeNode * arr_pointer) {
  * @param arg1 参数1
  * @param arg2 参数2
  * @param res 结果
- * @author Keyi Li
  */
 void InterCodeGenerator::_emit(INTER_CODE_OP_ENUM op, string arg1, string arg2, string res) {
     inter_code.emplace_back(Quadruple(op, move(arg1), move(arg2), move(res)));
@@ -586,7 +568,6 @@ void InterCodeGenerator::_emit(INTER_CODE_OP_ENUM op, string arg1, string arg2, 
 /**
  * @brief 保存到文件
  * @param 路径
- * @author Keyi Li
  */
 void InterCodeGenerator::saveToFile(string path) {
     ofstream out_file;

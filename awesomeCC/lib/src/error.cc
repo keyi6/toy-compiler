@@ -2,9 +2,6 @@
  *
  * @file error.cc
  * @brief 错误类具体实现
- *
- * @author Keyi Li
- *
  */
 
 #include "../include/error.h"

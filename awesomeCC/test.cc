@@ -1,10 +1,6 @@
 /**
- *
- * @file main.cc
- * @brief 运行入口文件
- *
- * @author Keyi Li
- *
+ * @file test.cc
+ * @brief 测试入口文件
  */
 
 #include "front-end/frontend_api.h"

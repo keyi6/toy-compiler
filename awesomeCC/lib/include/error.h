@@ -1,10 +1,6 @@
 /**
- *
  * @file error.h
  * @brief 错误类，用于报错
- *
- * @author Keyi Li
- *
  */
 
 #ifndef AWESOMECC_ERROR_HPP
@@ -18,7 +14,7 @@ using std::ostream;
 class Error {
 private:
     int line_number; // 行号
-    int pos; // 行中位置
+    int pos;         // 行中位置
     string errorMsg;
 
 public:

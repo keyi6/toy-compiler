@@ -1,9 +1,6 @@
 /**
  * @file token.h
  * @brief Token类，用于识别Token
- *
- * @author Keyi Li
- *
  */
 #ifndef AWESOMECC_TOKEN_HPP
 #define AWESOMECC_TOKEN_HPP
@@ -90,22 +87,22 @@ enum class TOKEN_TYPE_ENUM {
  */
 class Token {
 public:
-    string value; // 值
-    int line_number; // 行号
-    int pos;  // 行中位置
+    string value;                                           // 值
+    int line_number;                                        // 行号
+    int pos;                                                // 行中位置
     TOKEN_TYPE_ENUM type;
 
     Token(string _value = "", TOKEN_TYPE_ENUM = TOKEN_TYPE_ENUM::NONE, int _pos = -1, int _line_number  = -1);
 
-    static vector<string> TOKEN_TYPE;             // Token 种类
-    static map<string, TOKEN_TYPE_ENUM> DETAIL_TOKEN_TYPE; // 将关键字、运算符、分隔符进行具体化
-    static vector<string> KEYWORDS;               // 关键字
-    static vector<string> OPERATORS;              // 运算符
-    static vector<char> SEPARATORS;               // 分隔符
+    static vector<string> TOKEN_TYPE;                       // Token 种类
+    static map<string, TOKEN_TYPE_ENUM> DETAIL_TOKEN_TYPE;  // 将关键字、运算符、分隔符进行具体化
+    static vector<string> KEYWORDS;                         // 关键字
+    static vector<string> OPERATORS;                        // 运算符
+    static vector<char> SEPARATORS;                         // 分隔符
 
-    static bool isExpressionOperator(TOKEN_TYPE_ENUM t); // 是否是表达式中的运算符
-    static bool isBoolOperator(TOKEN_TYPE_ENUM t); // 是否是bool运算符
-    static bool isUniOperator(TOKEN_TYPE_ENUM t); // 是不是一元输入法
+    static bool isExpressionOperator(TOKEN_TYPE_ENUM t);    // 是否是表达式中的运算符
+    static bool isBoolOperator(TOKEN_TYPE_ENUM t);          // 是否是bool运算符
+    static bool isUniOperator(TOKEN_TYPE_ENUM t);           // 是不是一元输入法
 
     friend ostream & operator << (ostream &out, Token & t);
 };

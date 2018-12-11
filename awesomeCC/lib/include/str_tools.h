@@ -1,10 +1,6 @@
 /**
- *
  * @file str_tools.h
  * @brief 处理字符串的函数们
- *
- * @author Keyi Li
- *
  */
 
 #ifndef AWESOMECC_STRTOOLS_H

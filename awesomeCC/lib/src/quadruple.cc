@@ -1,10 +1,6 @@
 /**
- *
  * @file quadruple.cc
  * @brief 四元式类具体实现
- *
- * @author Keyi Li
- *
  */
 
 #include "../include/quadruple.h"
@@ -58,7 +54,6 @@ map<string, INTER_CODE_OP_ENUM> Quadruple::COUNTERPART_INTER_CODE_MAP = {
 
 /**
  * @brief 四元式构造函数
- * @author Keyi Li
  */
 Quadruple::Quadruple(INTER_CODE_OP_ENUM _op, string _arg1, string _arg2, string _res) {
     op = _op;
@@ -70,7 +65,6 @@ Quadruple::Quadruple(INTER_CODE_OP_ENUM _op, string _arg1, string _arg2, string 
 
 /**
  * @brief 四元式输出流
- * @author Keyi Li
  */
 ostream & operator << (ostream & out, Quadruple & q) {
     out << "(";

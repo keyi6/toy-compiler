@@ -1,10 +1,6 @@
 /**
- *
  * @file syntax_analyzer.h
  * @brief 语法分析器类，用于生成语法树
- *
- * @author Keyi Li
- *
  */
 #ifndef AWESOMECC_SYNTAX_ANALYZER_HPP
 #define AWESOMECC_SYNTAX_ANALYZER_HPP
@@ -41,7 +37,7 @@ private:
     vector<Token> tokens;
     SyntaxTree * tree;
 
-    SENTENCE_PATTERN_ENUM _judgeSentencePattern();
+    SENTENCE_PATTERN_ENUM _judgeSentencePattern(); // 判断句子种类
 
     void _analyze();
 

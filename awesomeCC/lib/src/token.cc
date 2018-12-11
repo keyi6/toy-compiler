@@ -1,9 +1,6 @@
 /**
  * @file token.cc
  * @brief Token类具体实现
- *
- * @author Keyi Li
- *
  */
 
 #include "../include/token.h"
@@ -93,7 +90,6 @@ vector<char> Token::SEPARATORS = {'(', ')', '{', '}', '[', ']', ',', '\'', ';' ,
 
 /**
  * @brief Token狗仔函数
- * @author Keyi Li
  */
 Token::Token(string _value, TOKEN_TYPE_ENUM _type, int _pos, int _line_number) {
     value = _value;
@@ -111,7 +107,6 @@ Token::Token(string _value, TOKEN_TYPE_ENUM _type, int _pos, int _line_number) {
 
 /**
  * @brief 判断是不是表达式中的运算符
- * @author Keyi Li
  * @param t TOKEN_TYPE_ENUM
  * @return
  *      -<em>true</em> 是
@@ -125,7 +120,6 @@ bool Token::isExpressionOperator(TOKEN_TYPE_ENUM t) {
 
 /**
  * @brief 判断是不是单目运算符
- * @author Keyi Li
  * @param t TOKEN_TYPE_ENUM
  * @return
  *      -<em>true</em> 是
@@ -140,7 +134,6 @@ bool Token::isUniOperator(TOKEN_TYPE_ENUM t) {
 
 /**
  * @brief 判断是不是逻辑运算符
- * @author Keyi Li
  * @param t TOKEN_TYPE_ENUM
  * @return
  *      -<em>true</em> 是

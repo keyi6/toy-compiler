@@ -6,7 +6,6 @@
 
 /**
  * @brief 语法树节点构造函数
- * @author Keyi Li
  */
 SyntaxTreeNode::SyntaxTreeNode(string _value, string _type, string _extra_info) {
     left = right = father = first_son = nullptr;
