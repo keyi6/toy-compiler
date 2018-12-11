@@ -512,21 +512,22 @@ void InterCodeGenerator::_functionCall(SyntaxTreeNode * cur) {
         throw Error("function `" + func_name + "` is not defined before use", POS(cur));
 
     // TODO 返回地址
-    int temp_place = inter_code.size(), cnt = 0;
+    int temp_place = inter_code.size();
     _emit(INTER_CODE_OP_ENUM::PUSH, "", "", "");
 
     SyntaxTreeNode * param = cur -> first_son -> right;
     SyntaxTreeNode * ps = param -> first_son;
+    while (ps -> right) ps = ps -> right;
+
     string param_place;
     while (ps) {
         param_place = _expression(ps -> first_son);
         _emit(INTER_CODE_OP_ENUM::PUSH, "", "", param_place);
 
-        cnt ++;
-        ps = ps -> right;
+        ps = ps -> left;
     }
 
-    inter_code[temp_place].res = "pc+" + int2string(cnt + 1);
+    inter_code[temp_place].res = "pc+" + int2string(inter_code.size() - temp_place + 1);
 
     if (func_backpatch.find(func_name) == func_backpatch.end()) {
         vector<int> t;

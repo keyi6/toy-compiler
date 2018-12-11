@@ -33,8 +33,15 @@ void Interpreter::execute(vector<Quadruple> _code, bool verbose) {
 
 void Interpreter::_execute(bool verbose) {
     int op = int(code[index].op);
-    if (verbose)
-        cout << "processing code #" << index << endl;
+    if (verbose) {
+        cout << "processing code #" << index << "t1= "  << t_stack[1] << "  stack: ";
+        stack<double> ns = activity;
+        while (not ns.empty()) {
+            cout << ns.top() << ", ";
+            ns.pop();
+        }
+        cout << endl;
+    }
 
     switch (op) {
         case int(INTER_CODE_OP_ENUM::MOV):
@@ -86,9 +93,9 @@ void Interpreter::_print() {
 
 
 void Interpreter::_calc(int op) {
-    double a = _getValue(code[index].arg1);
-    double b = _getValue(code[index].arg2);
-    double value;
+    int a = _getValue(code[index].arg1);
+    int b = _getValue(code[index].arg2);
+    int value;
 
     switch (op) {
         case int(INTER_CODE_OP_ENUM::ADD):
@@ -218,9 +225,9 @@ double Interpreter::_getValue(string value_str) {
 
 void Interpreter::_pop() {
     string res = code[index].res;
+    if (activity.empty()) {cout << "Stackempty!!!\n"; exit(0);}
     double v = activity.top();
     activity.pop();
-    cout << "debug [pop] " <<  v << endl;
 
     int temp_index = _getAddress(res);
     if (res[0] == 'v')

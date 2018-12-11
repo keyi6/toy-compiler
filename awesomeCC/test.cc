@@ -12,7 +12,7 @@
 
 
 int main() {
-    string path = "/Users/cjhahaha/Workspace/CompilePrinciple/awesomeCC/demo/fact.ac";
+    string path = "/Users/cjhahaha/Workspace/CompilePrinciple/awesomeCC/demo/qsort.ac";
     vector<string> source_file = readSourceFile(path);
 
     SyntaxAnalyzer sa;
@@ -27,5 +27,5 @@ int main() {
 
     Interpreter itep;
     vector<Quadruple> code = readInterCodeFile(path + ".ic");
-    itep.execute(code);
+    itep.execute(code);//, true);
 }
