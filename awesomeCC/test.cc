@@ -12,7 +12,7 @@
 
 
 int main() {
-    string path = "/Users/cjhahaha/Workspace/CompilePrinciple/awesomeCC/demo/bubble_sort.ac";
+    string path = "/Users/cjhahaha/Workspace/CompilePrinciple/awesomeCC/demo/leap_year.ac";
     vector<string> source_file = readSourceFile(path);
 
     SyntaxAnalyzer sa;
@@ -21,8 +21,8 @@ int main() {
     sa.getSyntaxTree() -> display(true);
 
     InterCodeGenerator icg;
-    icg.analyze(sa.getSyntaxTree(), false);
+    icg.analyze(sa.getSyntaxTree(), true);
     icg.saveToFile(path + ".ic");
 
-    interpreter(path + ".ic");
+    //interpreter(path + ".ic");
 }

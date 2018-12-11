@@ -10,22 +10,42 @@
 #include "../include/inter_code_generator.h"
 
 
+
+map<string, VARIABLE_INFO_ENUM> Info::VAR_INFO_MAP = {
+        {"double", VARIABLE_INFO_ENUM::DOUBLE},
+        {"float", VARIABLE_INFO_ENUM::DOUBLE},
+        {"int", VARIABLE_INFO_ENUM::INT},
+        {"void", VARIABLE_INFO_ENUM::VOID},
+};
+
+
 /**
- * @brief Info构造函数
+ * @brief VarInfo构造函数
  */
-Info::Info() = default;
+VarInfo::VarInfo() = default;
 
 
 /**
- * @brief Info构造函数
+ * @brief VarInfo构造函数
  * @param _name 变量名字
  * @param _type 种类
  * @author Keyi Li
  */
-Info::Info(VARIABLE_INFO_ENUM _type, int _place) {
+VarInfo::VarInfo(VARIABLE_INFO_ENUM _type, int _place) {
     name = "v" + int2string(_place);
     place = _place;
     type = _type;
+}
+
+
+FuncInfo::FuncInfo() = default;
+
+
+FuncInfo::FuncInfo(string _name, VARIABLE_INFO_ENUM _ret_type, int _start_place, int _end_place) {
+    name = move(_name);
+    ret_type = _ret_type;
+    start_place = _start_place;
+    end_place = _end_place;
 }
 
 
@@ -44,8 +64,9 @@ InterCodeGenerator::InterCodeGenerator() = default;
 void InterCodeGenerator::analyze(SyntaxTree * _tree, bool verbose) {
     inter_code.clear();
     var_index = 0;
-    temp_var_index = pre_temp_var_index = 0;
+    temp_var_index = 0;
     context_index = 0;
+    func_backpatch.clear();
 
     tree = _tree;
 
@@ -53,14 +74,15 @@ void InterCodeGenerator::analyze(SyntaxTree * _tree, bool verbose) {
         _analyze(tree -> root -> first_son);
     }
     catch (Error & e) {
-        cout << "Semantic analyze errors" << endl;
+        cout << "Semantic analyze errors :" << endl;
         cout << e;
         exit(0);
     }
 
     if (verbose) {
-        cout << "Generated " << inter_code.size() << " inter codes" << endl;
-        for (int i = 0; i < inter_code.size(); i ++) {
+        int l = inter_code.size();
+        cout << "Generated " << l << " inter codes" << endl;
+        for (int i = 0; i < l; i ++) {
             cout << "#" << setw(3) << setfill(' ') << std::left << i;
             cout << inter_code[i];
         }
@@ -68,36 +90,84 @@ void InterCodeGenerator::analyze(SyntaxTree * _tree, bool verbose) {
 }
 
 
-/**
- * @brief 中间代码生成
- * @param _tree SyntaxTree *
- * @author Keyi Li
- */
 void InterCodeGenerator::_analyze(SyntaxTreeNode * cur) {
-    if (cur -> value == "FunctionStatement") {
-        // TODO 函数声明
-        SyntaxTreeNode * type_tree, * name_tree, * param_tree, * block_tree;
-        SyntaxTreeNode * cs = cur -> first_son;
-        while (cs) {
-            if (cs -> value == "FunctionName")
-                name_tree = cs -> first_son;
-            else if (cs -> value == "Type")
-                type_tree = cs -> first_son;
-            else if (cs -> value == "Block") {
-                block_tree = cs;
+    SyntaxTreeNode * name_tree, * main_block;
+    vector<SyntaxTreeNode *> funcs;
+    string name, type;
+
+    while (cur) {
+        if (cur -> value == "FunctionStatement") {
+            name_tree = cur -> first_son -> right;
+            name = name_tree -> first_son -> value;
+
+            if (name == "main")
+                main_block = name_tree -> right -> right;
+            else {
+                type = cur -> first_son -> value;
+
+
+                func_table[name] = FuncInfo(name, Info::VAR_INFO_MAP[type], 0, 0);
+                funcs.emplace_back(cur);
             }
-            else if (cs -> value == "ParameterList")
-                param_tree = cs;
 
-            cs = cs -> right;
+            cur = cur -> right;
         }
-
-        // main 函数直接执行
-        if (name_tree -> value == "main") {
-            _block(block_tree);
-        }
+        else
+            throw Error("what is this `" + cur -> value + "`???");
     }
-    // TODO 其他
+
+    // main 函数直接执行
+    _block(main_block, false);
+
+    int main_end = inter_code.size();
+    _emit(INTER_CODE_OP_ENUM::J, "", "", "");
+
+    // 翻译别的函数
+    for (auto func: funcs)
+        _functionStatement(func);
+
+    // main 结束就直接结束
+    inter_code[main_end].res = int2string(inter_code.size());
+
+    for (auto it: func_backpatch)
+        if (! it.second.empty()) {
+            cout << "debug " << func_table[it.first].start_place << " " << endl;
+            string dest = int2string(func_table[it.first].start_place);
+            for (auto i: it.second)
+                inter_code[i].res = dest;
+        }
+}
+
+
+void InterCodeGenerator::_functionStatement(SyntaxTreeNode * cur) {
+    SyntaxTreeNode * name_tree, * param_tree, * block_tree, * type_tree;
+    type_tree = cur -> first_son;
+    name_tree = type_tree -> right;
+    param_tree = name_tree -> right;
+    block_tree = param_tree -> right;
+
+    string func_name = name_tree -> first_son -> value;
+
+    int func_start = int(inter_code.size());
+
+    // start
+    SyntaxTreeNode * ps = param_tree -> first_son;
+    while (ps) {
+        // 或者 函数放前面 其他放后面？
+        _statement(ps);
+        _emit(INTER_CODE_OP_ENUM::POP, "", "", table[ps -> first_son -> value].name);
+        ps = ps -> right;
+    }
+
+    _block(block_tree);
+    _emit(INTER_CODE_OP_ENUM::POP, "", "", "pc");
+    // end
+
+    int func_end = inter_code.size() - 1;
+
+    func_table[func_name] = FuncInfo(name_tree -> first_son -> value,
+                                              Info::VAR_INFO_MAP[type_tree -> first_son -> value],
+                                              func_start, func_end);
 }
 
 
@@ -105,8 +175,10 @@ void InterCodeGenerator::_analyze(SyntaxTreeNode * cur) {
  * @brief 翻译block
  * @author Keyi Li
  */
-void InterCodeGenerator::_block(SyntaxTreeNode * cur) {
+void InterCodeGenerator::_block(SyntaxTreeNode * cur, bool restore) {
     int _pre_var_index = var_index;
+    map<string, VarInfo> pre_table = table;
+
     context_index ++;
 
     SyntaxTreeNode * cs = cur -> first_son;
@@ -126,17 +198,26 @@ void InterCodeGenerator::_block(SyntaxTreeNode * cur) {
             _block(cs);
             cur -> next_list = cs -> next_list;
         }
+        else if (cs -> value == "FunctionCall")
+            _functionCall(cs);
         // TODO 其他
+        else
+            cout << "Debug " << cs -> value << endl;
 
+        // 回填
         _backpatch(cs -> next_list, inter_code.size());
 
         cs = cs -> right;
 
+        // 回填
         if (cs)
-        cur -> next_list = cs -> next_list;
+            cur -> next_list = cs -> next_list;
     }
 
-    var_index = _pre_var_index ;
+    if (restore) {
+        var_index = _pre_var_index;
+        table = pre_table;
+    }
 }
 
 
@@ -211,9 +292,9 @@ void InterCodeGenerator::_assignment(SyntaxTreeNode * cur) {
 
     string store_place;
     if (cs -> value == "Expression-ArrayItem")
-        store_place = _lookUp(cs);
+        store_place = _lookUpVar(cs);
     else
-        store_place = _lookUp(cur -> first_son -> value);
+        store_place = _lookUpVar(cur -> first_son -> value);
 
     _emit(INTER_CODE_OP_ENUM::MOV, r_value_place, "", store_place);
 }
@@ -307,11 +388,11 @@ string InterCodeGenerator::_expression(SyntaxTreeNode * cur) {
     }
         // 变量
     else if (cur -> value == "Expression-Variable") {
-        return _lookUp(cur -> first_son -> value);
+        return _lookUpVar(cur -> first_son -> value);
     }
         // 数组项
     else if (cur -> value == "Expression-ArrayItem") {
-        return _lookUp(cur);
+        return _lookUpVar(cur);
     }
 
     cout << "debug >> " << cur -> value << endl;
@@ -346,19 +427,18 @@ void InterCodeGenerator::_while(SyntaxTreeNode * cur) {
  */
 void InterCodeGenerator::_statement(SyntaxTreeNode * cur) {
     SyntaxTreeNode * cs = cur -> first_son;
-
     while (cs) {
         string type = cs -> type;
         if (type == "double" || type == "float") {
-            Info info(VARIABLE_INFO_ENUM::DOUBLE, var_index ++);
+            VarInfo info(VARIABLE_INFO_ENUM::DOUBLE, var_index ++);
             table[cs -> value] = info;
         }
         else if (type == "int") {
-            Info info(VARIABLE_INFO_ENUM::INT, var_index ++);
+            VarInfo info(VARIABLE_INFO_ENUM::INT, var_index ++);
             table[cs -> value] = info;
         }
         else if (type.size() > 6 && type.substr(0, 6) == "array-") {
-            Info info(VARIABLE_INFO_ENUM::ARRAY, var_index ++);
+            VarInfo info(VARIABLE_INFO_ENUM::ARRAY, var_index ++);
             table[cs -> value] = info;
 
             string extra_info = cs -> extra_info;
@@ -403,12 +483,53 @@ void InterCodeGenerator::_statement(SyntaxTreeNode * cur) {
 
 
 /**
+ * @brief 处理函数调用
+ * @author Keyi Li
+ */
+void InterCodeGenerator::_functionCall(SyntaxTreeNode * cur) {
+    // backup
+    int _pre_var_index = var_index;
+    map<string, VarInfo> pre_table = table;
+
+
+    string func_name = cur -> first_son -> first_son -> value;
+    if (func_table.find(func_name) == func_table.end())
+        throw Error("function `" + func_name + "` is not defined before use");
+
+    _emit(INTER_CODE_OP_ENUM::PUSH, "", "", "pc");
+    // TODO 返回地址
+
+    SyntaxTreeNode * param = cur -> first_son -> right;
+    SyntaxTreeNode * ps = param -> first_son;
+    string param_place;
+    while (ps) {
+        param_place = _expression(ps -> first_son);
+        _emit(INTER_CODE_OP_ENUM::PUSH, "", "", param_place);
+
+        ps = ps -> right;
+    }
+
+
+    if (func_backpatch.find(func_name) == func_backpatch.end()) {
+        vector<int> t;
+        func_backpatch[func_name] = t;
+    }
+    func_backpatch[func_name].emplace_back(inter_code.size());
+    _emit(INTER_CODE_OP_ENUM::J, "", "", "");
+
+    // restore
+    var_index = _pre_var_index;
+    table = pre_table;
+}
+
+
+/**
  * @brief 寻找标识符
  * @param name 标识符
  * @return code var
  * @author Keyi Li
  */
-string InterCodeGenerator::_lookUp(string name) {
+string InterCodeGenerator::_lookUpVar(string name) {
     if (table.find(name) == table.end())
         throw Error("variable `" + name + "` is not defined before use");
 
@@ -422,11 +543,11 @@ string InterCodeGenerator::_lookUp(string name) {
  * @return code var
  * @author Keyi Li
  */
-string InterCodeGenerator::_lookUp(SyntaxTreeNode * arr_pointer) {
+string InterCodeGenerator::_lookUpVar(SyntaxTreeNode * arr_pointer) {
     string base = arr_pointer -> first_son -> value;
     string index_place = _expression(arr_pointer -> first_son -> right -> first_son);
 
-    return _lookUp(base) + "[" + index_place + "]";
+    return _lookUpVar(base) + "[" + index_place + "]";
 }
 
 

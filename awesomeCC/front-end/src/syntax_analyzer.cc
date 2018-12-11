@@ -533,27 +533,26 @@ void SyntaxAnalyzer::_functionStatement(SyntaxTreeNode * father_node) {
     // 读取(
     index ++;
 
+    // 建一个参数树
+    SyntaxTreeNode * param_list = new SyntaxTreeNode("ParameterList");
+    func_state_tree -> addNode(param_list, func_state_tree -> root);
+
     // 如果下一个是）
     if (tokens[index].type == TOKEN_TYPE_ENUM::RL_BRACKET) {
         index ++;
     }
         // 如果下一个不是），读取参数列表
     else {
-        // 建一个参数树
-        SyntaxTreeNode * param_list = new SyntaxTreeNode("ParameterList");
-        func_state_tree -> addNode(param_list, func_state_tree -> root);
-
         while (index < len && tokens[index].type != TOKEN_TYPE_ENUM::RL_BRACKET) {
             cur_value = tokens[index].value;
 
             if (cur_value == "int" || cur_value == "double" || cur_value == "float") {
                 SyntaxTreeNode * param = new SyntaxTreeNode("Parameter");
                 func_state_tree -> addNode(param, param_list);
-                func_state_tree -> addNode(new SyntaxTreeNode(cur_value), param);
 
                 index ++;
                 if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::IDENTIFIER) {
-                    func_state_tree -> addNode(new SyntaxTreeNode(tokens[index].value), param);
+                    func_state_tree -> addNode(new SyntaxTreeNode(tokens[index].value, cur_value), param);
                     index ++;
 
                     if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::COMMA)
@@ -647,7 +646,14 @@ void SyntaxAnalyzer::_block(SyntaxTreeNode * father_node) {
                 _print(block_tree -> root);
                 break;
             default:
-                throw Error("in block, unidentified symbols `" + tokens[index].value + "`  found", line_number_map[index]);
+                // 如果是空语句
+                if (tokens[index].type == TOKEN_TYPE_ENUM::SEMICOLON) {
+                    index ++;
+                    continue;
+                }
+
+                throw Error("in block, unidentified symbols `" + tokens[index].value + "`  found",
+                            line_number_map[index]);
         }
     }
 
@@ -660,9 +666,45 @@ void SyntaxAnalyzer::_block(SyntaxTreeNode * father_node) {
 
 /**
  * @brief 处理函数调用
+ * @author Keyi Li
  */
 void SyntaxAnalyzer::_functionCall(SyntaxTreeNode * father_node) {
-    // TODO 处理函数调用
+    // TODO 在expressoin里加
+
+    SyntaxTree * func_call_tree = new SyntaxTree(new SyntaxTreeNode("FunctionCall"));
+    tree -> addNode(func_call_tree -> root, father_node);
+
+    func_call_tree -> addNode(new SyntaxTreeNode("FunctionName"), func_call_tree -> root);
+    func_call_tree -> addNode(new SyntaxTreeNode(tokens[index].value), func_call_tree -> cur_node);
+
+    SyntaxTree * param_tree = new SyntaxTree(new SyntaxTreeNode("FunctionParameters"));
+    func_call_tree -> addNode(param_tree -> root, func_call_tree -> root);
+
+    // 读取 函数名
+    index ++;
+    if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::LL_BRACKET) {
+        // 读取 （
+        index ++;
+
+        int next_end;
+        while (index < len && tokens[index].type != TOKEN_TYPE_ENUM::RL_BRACKET) {
+            next_end = index;
+            while (next_end < len &&
+                  (tokens[next_end].type != TOKEN_TYPE_ENUM::RL_BRACKET &&
+                   tokens[next_end].type != TOKEN_TYPE_ENUM::COMMA))
+                        next_end ++;
+
+            param_tree -> addNode(new SyntaxTreeNode("Param"), param_tree -> root);
+            _expression(param_tree -> cur_node, tokens[next_end].type);
+
+            index = next_end + 1;
+            if (tokens[next_end].type == TOKEN_TYPE_ENUM::RL_BRACKET)
+                break;
+        }
+    }
+    else
+        throw Error("in function call, expected `(` after function name",
+                    tokens[index].line_number, tokens[index].pos);
 }
 
 

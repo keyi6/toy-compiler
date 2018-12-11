@@ -12,8 +12,12 @@
 #include "../../lib/include/str_tools.h"
 #include "../../lib/include/quadruple.h"
 
+#include <stack>
+#include <string>
 #include <vector>
 
+using std::stack;
+using std::string;
 using std::vector;
 
 
@@ -23,6 +27,7 @@ private:
     vector<Quadruple> code;
     vector<double> t_stack;
     vector<double> v_stack;
+    stack<string> activity;
 
     double _getValue(string value_str);
     int _getAddress(string value_str);

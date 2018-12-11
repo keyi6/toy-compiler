@@ -13,8 +13,9 @@
 vector<string> Quadruple::INTER_CODE_OP = {
         "ADD", "SUB", "DIV", "MUL", "MOD",
         "J", "JE", "JNE", "JL", "JG",
-        "MOV", "PRINT"
+        "MOV", "PRINT", "POP", "PUSH"
 };
+
 
 
 map<string, INTER_CODE_OP_ENUM> Quadruple::INTER_CODE_MAP = {
@@ -40,8 +41,11 @@ map<string, INTER_CODE_OP_ENUM> Quadruple::INTER_CODE_MAP = {
         {"JNE", INTER_CODE_OP_ENUM::JNE},
         {"JG", INTER_CODE_OP_ENUM::JG},
         {"JL", INTER_CODE_OP_ENUM::JL},
+
         {"MOV", INTER_CODE_OP_ENUM::MOV},
         {"PRINT", INTER_CODE_OP_ENUM::PRINT},
+        {"POP", INTER_CODE_OP_ENUM::POP},
+        {"PUSH", INTER_CODE_OP_ENUM::PUSH},
 };
 
 

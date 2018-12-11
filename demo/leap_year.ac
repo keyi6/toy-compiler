@@ -7,19 +7,20 @@
  */
 
 class Main {
-    public void main() {
-		int i;
+    void judge(int y) {
+        if (y % 4 == 0 && y % 100 != 0 || y % 400 == 0) {
+            print "is leap year";
+        }
+        else {
+            print "is not leap year";
+        }
+    }
+
+    void main() {
+		int i, j;
 		int year[2] = {2000, 3000};
 
-		for (i = 0; i < 2; i = i + 1) {
-				print year[i];
-			if (year[i] % 4 == 0 && year[i] % 100 != 0 || year[i] % 400 == 0) {
-				print "is leap year";
-			}
-			else {
-				print "is not leap year";
-			}
-		}
+		judge(year[0]);
     }
 }
 

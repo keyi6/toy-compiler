@@ -43,7 +43,9 @@ enum class INTER_CODE_OP_ENUM {
     JG,   // arg1 > arg2 跳转
     /* other */
     MOV,  // 赋值
-    PRINT // 输出
+    PRINT, // 输出
+    POP,
+    PUSH
 };
 
 
