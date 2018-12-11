@@ -8,6 +8,7 @@
  */
 
 #include "../include/inter_code_generator.h"
+#define POS(cur) cur->line_number, cur->pos
 
 
 
@@ -113,7 +114,7 @@ void InterCodeGenerator::_analyze(SyntaxTreeNode * cur) {
             cur = cur -> right;
         }
         else
-            throw Error("what is this `" + cur -> value + "`???");
+            throw Error("what is this `" + cur -> value + "`???", POS(cur));
     }
 
     // main 函数直接执行
@@ -304,7 +305,7 @@ void InterCodeGenerator::_assignment(SyntaxTreeNode * cur) {
     if (cs -> value == "Expression-ArrayItem")
         store_place = _lookUpVar(cs);
     else
-        store_place = _lookUpVar(cur -> first_son -> value);
+        store_place = _lookUpVar(cur -> first_son -> value, cur);
 
     _emit(INTER_CODE_OP_ENUM::MOV, r_value_place, "", store_place);
 }
@@ -380,7 +381,7 @@ string InterCodeGenerator::_expression(SyntaxTreeNode * cur) {
     else if (cur -> value == "Expression-UniOp") {
         // TODO
     }
-    else if (cur -> value == "Expression-Bool-UniOp"){
+    else if (cur -> value == "Expression-Bool-UniOp") {
         // TODO
     }
         // 常量
@@ -398,7 +399,7 @@ string InterCodeGenerator::_expression(SyntaxTreeNode * cur) {
     }
         // 变量
     else if (cur -> value == "Expression-Variable") {
-        return _lookUpVar(cur -> first_son -> value);
+        return _lookUpVar(cur -> first_son -> value, cur);
     }
         // 数组项
     else if (cur -> value == "Expression-ArrayItem") {
@@ -406,7 +407,7 @@ string InterCodeGenerator::_expression(SyntaxTreeNode * cur) {
     }
 
     cout << "debug >> " << cur -> value << endl;
-    throw Error("How can you step into this place???");
+    throw Error("How can you step into this place???", POS(cur));
 }
 
 
@@ -484,7 +485,7 @@ void InterCodeGenerator::_statement(SyntaxTreeNode * cur) {
             }
         }
         else {
-            throw Error("type `" + type + "` are not supported yet");
+            throw Error("type `" + type + "` are not supported yet", POS(cur));
         }
 
         cs = cs -> right;
@@ -504,7 +505,7 @@ void InterCodeGenerator::_functionCall(SyntaxTreeNode * cur) {
 
     string func_name = cur -> first_son -> first_son -> value;
     if (func_table.find(func_name) == func_table.end())
-        throw Error("function `" + func_name + "` is not defined before use");
+        throw Error("function `" + func_name + "` is not defined before use", POS(cur));
 
     // TODO 返回地址
 
@@ -540,9 +541,9 @@ void InterCodeGenerator::_functionCall(SyntaxTreeNode * cur) {
  * @return code var
  * @author Keyi Li
  */
-string InterCodeGenerator::_lookUpVar(string name) {
+string InterCodeGenerator::_lookUpVar(string name, SyntaxTreeNode * cur) {
     if (table.find(name) == table.end())
-        throw Error("variable `" + name + "` is not defined before use");
+        throw Error("variable `" + name + "` is not defined before use", POS(cur));
 
     return table[name].name;
 }
@@ -558,7 +559,7 @@ string InterCodeGenerator::_lookUpVar(SyntaxTreeNode * arr_pointer) {
     string base = arr_pointer -> first_son -> value;
     string index_place = _expression(arr_pointer -> first_son -> right -> first_son);
 
-    return _lookUpVar(base) + "[" + index_place + "]";
+    return _lookUpVar(base, arr_pointer) + "[" + index_place + "]";
 }
 
 
@@ -588,19 +589,6 @@ void InterCodeGenerator::saveToFile(string path) {
 
     out_file.close();
 }
-
-
-/**
- * @brief 数组第i项的地址
- * @author Keyi Li
- */
-string InterCodeGenerator::_locateArrayItem(string arr_name, string arr_i) {
-    if (table.find(arr_name) == table.end())
-        throw Error("array variable `" + arr_name + "` is not defined before use");
-
-    return "v" + int2string(table[arr_name].place) + "[" + arr_i + "]";
-}
-
 
 
 void InterCodeGenerator::_backpatch(vector<int> v, int dest_index) {

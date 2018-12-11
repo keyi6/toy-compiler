@@ -62,9 +62,9 @@ map<string, INTER_CODE_OP_ENUM> Quadruple::COUNTERPART_INTER_CODE_MAP = {
  */
 Quadruple::Quadruple(INTER_CODE_OP_ENUM _op, string _arg1, string _arg2, string _res) {
     op = _op;
-    arg1 = _arg1;
-    arg2 = _arg2;
-    res = _res;
+    arg1 = move(_arg1);
+    arg2 = move(_arg2);
+    res = move(_res);
 }
 
 

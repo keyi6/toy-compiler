@@ -1,10 +1,6 @@
 /**
- *
  * @file syntax_tree.cc
  * @brief 语法树的函数们
- *
- * @author Keyi Li
- *
  */
 #include "../include/syntax_tree.h"
 
@@ -25,9 +21,34 @@ SyntaxTreeNode::SyntaxTreeNode(string _value, string _type, string _extra_info) 
 }
 
 
+SyntaxTreeNode::SyntaxTreeNode(string _value, int _line_number, int _pos) {
+    left = right = father = first_son = nullptr;
+
+    value = move(_value);
+    line_number = _line_number;
+    pos = _pos;
+
+    true_list.clear();
+    false_list.clear();
+    next_list.clear();
+}
+
+SyntaxTreeNode::SyntaxTreeNode(string _value, string _type, string _extra_info, int _line_number, int _pos) {
+    left = right = father = first_son = nullptr;
+
+    value = move(_value);
+    type = move(_type);
+    extra_info = move(_extra_info);
+    line_number = _line_number;
+    pos = _pos;
+
+    true_list.clear();
+    false_list.clear();
+    next_list.clear();
+}
+
 /**
  * @brief 语法树构造函数
- * @author Keyi Li
  */
 SyntaxTree::SyntaxTree(SyntaxTreeNode * _root) {
     root = cur_node = _root;
@@ -36,7 +57,6 @@ SyntaxTree::SyntaxTree(SyntaxTreeNode * _root) {
 
 /**
  * @brief 悬挂一个节点
- * @author Keyi Li
  */
 void SyntaxTree::addNode(SyntaxTreeNode * child_node, SyntaxTreeNode * father_node) {
     child_node -> father = father_node;
@@ -57,25 +77,12 @@ void SyntaxTree::addNode(SyntaxTreeNode * child_node, SyntaxTreeNode * father_no
 
 
 /**
- * @brief 交换左右两个相邻节点
- * @author Keyi Li
- */
-void SyntaxTree::switchNode(SyntaxTreeNode * center) {
-    SyntaxTreeNode * l = center -> left, * r = center -> right;
-    if (center -> father && center -> father -> first_son == l)
-        center -> father -> first_son = r;
-
-    swap(center -> left, center -> right);
-    swap(center -> left -> left, center -> right -> left);
-    swap(center -> left -> right, center -> right -> right);
-}
-
-
-/**
  * @brief dfs语法树
- * @author Keyi Li
  */
  void SyntaxTree::dfs(SyntaxTreeNode * cur, int depth, int status, bool verbose) {
+     // windows似乎不支持这些字符集
+     // linux、unix 是支持的
+     /*
      for (int i = 0; i < depth; i ++) {
          if (status & (1 << (depth - i - 1)))
              cout << "    ";
@@ -83,7 +90,19 @@ void SyntaxTree::switchNode(SyntaxTreeNode * center) {
              cout << "│   ";
      }
      cout << (cur -> right ? "├── " : "└── " ) << cur -> value;
+    */
 
+     // 这里的trick是状态压缩，提高速度
+     // status 二进制 第i位为1 表示这一层已经结束
+     for (int i = 0; i < depth; i ++) {
+         if (status & (1 << (depth - i - 1)))
+             cout << "    ";
+         else
+             cout << "|   ";
+     }
+     cout << (cur -> right ? "|-- " : "\\-- " ) << cur -> value;
+
+     // 除了 value 之外的信息
      if (verbose) {
          if (cur -> type != "" && cur -> extra_info != "")
              cout << " (type: " << cur -> type << ", extra_info: " << cur -> extra_info << ")";
@@ -113,6 +132,7 @@ void SyntaxTree::switchNode(SyntaxTreeNode * center) {
      }
 
      cout << endl;
+     // 如果这是这一层的节点 更新status
      int new_status = (status << 1) + int(cur -> right == nullptr);
 
      if (cur -> first_son) {
@@ -130,7 +150,6 @@ void SyntaxTree::switchNode(SyntaxTreeNode * center) {
 
 /**
  * @brief 打印语法树
- * @author Keyi Li
  */
  void SyntaxTree::display(bool verbose) {
      cout << root -> value << endl;

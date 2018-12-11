@@ -39,7 +39,6 @@ class SyntaxAnalyzer {
 private:
     int index, len;
     vector<Token> tokens;
-    vector<int> line_number_map;
     SyntaxTree * tree;
 
     SENTENCE_PATTERN_ENUM _judgeSentencePattern();

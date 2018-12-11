@@ -32,10 +32,12 @@ Error::Error(string _errorMsg, int _line_number, int _pos) {
  */
 ostream & operator << (ostream & out, Error & e) {
     if (~ e.line_number)
-        out << "On line " << e.line_number;
+        out << "On line " << e.line_number << " ";
     if (~ e.pos)
-        out << "pos " << e.pos;
-    out << ": ";
+        out << "pos " << e.pos << " ";
+    if (~ e.line_number || ~ e.pos)
+        out << ": ";
+
     out << e.errorMsg << endl;
     return out;
 }

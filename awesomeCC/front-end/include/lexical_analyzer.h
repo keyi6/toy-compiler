@@ -29,7 +29,6 @@ class LexicalAnalyzer {
 private:
     vector<Token> tokens; // 当前句子的token列表
     vector<Token> all_tokens; // 所有token
-    vector<int> line_number_map; // token index 和 行号的映射
     string sentence; // 目前分析的橘子
     int len; // 目前在分析的橘子的长度
     bool in_comment; // 现在是否在注释中的标识
@@ -50,7 +49,6 @@ private:
 public:
     LexicalAnalyzer();
     vector<Token> getAllTokens(); // 获得所有all_token
-    vector<int> getLineNumberMap();
     void analyze(vector<string> _sentences,bool verbose = true); // 词法分析
 };
 

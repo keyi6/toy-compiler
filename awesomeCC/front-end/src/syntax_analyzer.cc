@@ -9,6 +9,8 @@
  */
 
 #include "../include/syntax_analyzer.h"
+#define POS(x) x.line_number, x.pos
+
 
 
 /**
@@ -33,7 +35,6 @@ void SyntaxAnalyzer::analyze(vector<string> sentences, bool verbose) {
 
     tokens = la.getAllTokens();
     len = tokens.size() - 1;
-    line_number_map = la.getLineNumberMap();
 
     try {
         _analyze();
@@ -57,7 +58,7 @@ void SyntaxAnalyzer::_analyze() {
     if (tokens[0].type != TOKEN_TYPE_ENUM::CLASS)
         throw Error("Everything should be wrapped in a class.", tokens[0].line_number, tokens[0].pos);
 
-    tree = new SyntaxTree(new SyntaxTreeNode("Class-" + tokens[1].value));
+    tree = new SyntaxTree(new SyntaxTreeNode("Class-" + tokens[1].value, POS(tokens[index])));
 
 
     while (index < len) {
@@ -80,7 +81,7 @@ void SyntaxAnalyzer::_analyze() {
                 _print(tree -> cur_node);
                 break;
             default:
-                throw Error("in main, unidentified symbol", line_number_map[index]);
+                throw Error("in main, unidentified symbol", POS(tokens[index]));
         }
     }
 }
@@ -152,7 +153,7 @@ SENTENCE_PATTERN_ENUM SyntaxAnalyzer::_judgeSentencePattern() {
  * @author Keyi Li
  */
 void SyntaxAnalyzer::_print(SyntaxTreeNode * father_node) {
-    SyntaxTree * print_tree = new SyntaxTree(new SyntaxTreeNode("Print"));
+    SyntaxTree * print_tree = new SyntaxTree(new SyntaxTreeNode("Print", POS(tokens[index])));
     tree -> addNode(print_tree -> root, father_node);
 
     // 读取 print
@@ -174,13 +175,15 @@ void SyntaxAnalyzer::_print(SyntaxTreeNode * father_node) {
             // 读取 "
             index ++;
 
-            print_tree -> addNode(new SyntaxTreeNode("Expression-String"), print_tree -> root);
-            print_tree -> addNode(new SyntaxTreeNode("\"" + tokens[index].value + "\"" ), print_tree -> cur_node);
+            print_tree -> addNode(new SyntaxTreeNode("Expression-String", POS(tokens[index])), print_tree -> root);
+            print_tree -> addNode(new SyntaxTreeNode("\"" + tokens[index].value + "\"",
+                                                     POS(tokens[index])),
+                                  print_tree -> cur_node);
 
             // 读取 "
             index ++;
             if (tokens[index].type != TOKEN_TYPE_ENUM::DOUBLE_QUOTE)
-                throw Error("excepted `\"` appears in pairs", line_number_map[index]);
+                throw Error("excepted `\"` appears in pairs", POS(tokens[index]));
 
             index ++;
         }
@@ -202,7 +205,7 @@ void SyntaxAnalyzer::_print(SyntaxTreeNode * father_node) {
  * @author Keyi Li
  */
 void SyntaxAnalyzer::_statement(SyntaxTreeNode * father_node) {
-    SyntaxTree * state_tree = new SyntaxTree(new SyntaxTreeNode("Statement"));
+    SyntaxTree * state_tree = new SyntaxTree(new SyntaxTreeNode("Statement", POS(tokens[index])));
     tree -> addNode(state_tree -> root, father_node);
 
     // 读取变量类型
@@ -221,7 +224,11 @@ void SyntaxAnalyzer::_statement(SyntaxTreeNode * father_node) {
                 TOKEN_TYPE_ENUM n_type = tokens[index].type;
                 // 如果是，或者；就直接读取
                 if (n_type == TOKEN_TYPE_ENUM::COMMA || n_type == TOKEN_TYPE_ENUM::SEMICOLON) {
-                    state_tree -> addNode(new SyntaxTreeNode(cur_value, variable_type), state_tree -> root);
+                    state_tree -> addNode(new SyntaxTreeNode(cur_value,
+                                                             variable_type,
+                                                             "",
+                                                             POS(tokens[index])),
+                                          state_tree -> root);
                     index ++;
                     if (n_type == TOKEN_TYPE_ENUM::COMMA)
                         break;
@@ -244,7 +251,10 @@ void SyntaxAnalyzer::_statement(SyntaxTreeNode * father_node) {
                         n_type = tokens[index].type;
                         // 如果是，或者；就直接读取
                         if (n_type == TOKEN_TYPE_ENUM::COMMA || n_type == TOKEN_TYPE_ENUM::SEMICOLON) {
-                            state_tree -> addNode(new SyntaxTreeNode(cur_value, "array-" + variable_type, size),
+                            state_tree -> addNode(new SyntaxTreeNode(cur_value,
+                                                                     "array-" + variable_type,
+                                                                      size,
+                                                                      POS(tokens[index])),
                                                   state_tree -> root);
                             if (tokens[index ++].type == TOKEN_TYPE_ENUM::COMMA)
                                 break;
@@ -276,14 +286,16 @@ void SyntaxAnalyzer::_statement(SyntaxTreeNode * father_node) {
                                     else
                                         throw Error(
                                                 "in array initialization, expected `,` or `}` after a digital constant",
-                                                line_number_map[index]);
+                                                POS(tokens[index]));
                                 } while (index < len && tokens[index].type != TOKEN_TYPE_ENUM::RB_BRACKET);
 
                                 index ++;
                                 n_type = tokens[index].type;
                                 if (n_type == TOKEN_TYPE_ENUM::COMMA || n_type == TOKEN_TYPE_ENUM::SEMICOLON) {
-                                    state_tree -> addNode(
-                                            new SyntaxTreeNode(cur_value, "array-" + variable_type, size + init_v),
+                                    state_tree -> addNode(new SyntaxTreeNode(cur_value,
+                                                                              "array-" + variable_type,
+                                                                              size + init_v,
+                                                                              POS(tokens[index])),
                                             state_tree -> root);
                                     if (tokens[index ++].type == TOKEN_TYPE_ENUM::COMMA)
                                         break;
@@ -292,18 +304,18 @@ void SyntaxAnalyzer::_statement(SyntaxTreeNode * father_node) {
                                 }
                             }
                             else
-                                throw Error("in array initialization, expected `{}`", line_number_map[index]);
+                                throw Error("in array initialization, expected `{}`", POS(tokens[index]));
                         }
                         else
-                            throw Error("Unrecognized symbol in statement", line_number_map[index]);
+                            throw Error("Unrecognized symbol in statement", POS(tokens[index]));
                     }
                     else
-                        throw Error("Expected `]` after a statement of an array", line_number_map[index]);
+                        throw Error("Expected `]` after a statement of an array", POS(tokens[index]));
                 }
-                throw Error("Unrecognized symbol in statement", line_number_map[index]);
+                throw Error("Unrecognized symbol in statement", POS(tokens[index]));
             }
             default:
-                throw Error("Unrecognized symbol in statement", line_number_map[index]);
+                throw Error("Unrecognized symbol in statement", POS(tokens[index]));
         }
     }
 }
@@ -323,8 +335,10 @@ void SyntaxAnalyzer::_expression(SyntaxTreeNode * father_node, TOKEN_TYPE_ENUM s
 
         // 常量
         if (cur_type == TOKEN_TYPE_ENUM::DIGIT_CONSTANT) {
-            SyntaxTree * new_tree = new SyntaxTree(new SyntaxTreeNode("Expression-Constant"));
-            new_tree -> addNode(new SyntaxTreeNode(tokens[index].value), new_tree -> root);
+            SyntaxTree * new_tree = new SyntaxTree(new SyntaxTreeNode("Expression-Constant", POS(tokens[index])));
+            new_tree -> addNode(new SyntaxTreeNode(tokens[index].value,
+                                                   POS(tokens[index])),
+                                new_tree -> root);
 
             reverse_polish_exp.emplace_back(new_tree);
             index ++;
@@ -333,16 +347,18 @@ void SyntaxAnalyzer::_expression(SyntaxTreeNode * father_node, TOKEN_TYPE_ENUM s
         else if (cur_type == TOKEN_TYPE_ENUM::IDENTIFIER) {
             // 数组下标
             if (index + 3 < len && tokens[index + 1].type == TOKEN_TYPE_ENUM::LM_BRACKET) {
-                SyntaxTree * new_tree = new SyntaxTree(new SyntaxTreeNode("Expression-ArrayItem"));
+                SyntaxTree * new_tree = new SyntaxTree(new SyntaxTreeNode("Expression-ArrayItem", POS(tokens[index])));
 
                 // 数组名字
-                new_tree -> addNode(new SyntaxTreeNode(tokens[index].value), new_tree -> cur_node);
+                new_tree -> addNode(new SyntaxTreeNode(tokens[index].value,
+                                                       POS(tokens[index])),
+                                    new_tree -> cur_node);
 
                 // 读取 名字 和 [
                 index += 2;
 
                 // 数组下标
-                SyntaxTreeNode * index_node = new SyntaxTreeNode("Array-Index");
+                SyntaxTreeNode * index_node = new SyntaxTreeNode("Array-Index", POS(tokens[index]));
                 new_tree -> addNode(index_node, new_tree -> root);
                 _expression(index_node, TOKEN_TYPE_ENUM::RM_BRACKET);
 
@@ -350,8 +366,10 @@ void SyntaxAnalyzer::_expression(SyntaxTreeNode * father_node, TOKEN_TYPE_ENUM s
             }
                 // 一般的变量
             else {
-                SyntaxTree * new_tree = new SyntaxTree(new SyntaxTreeNode("Expression-Variable"));
-                new_tree -> addNode(new SyntaxTreeNode(tokens[index].value), new_tree -> root);
+                SyntaxTree * new_tree = new SyntaxTree(new SyntaxTreeNode("Expression-Variable", POS(tokens[index])));
+                new_tree -> addNode(new SyntaxTreeNode(tokens[index].value,
+                                                       POS(tokens[index])),
+                                    new_tree -> root);
 
                 reverse_polish_exp.emplace_back(new_tree);
                 index ++;
@@ -359,8 +377,9 @@ void SyntaxAnalyzer::_expression(SyntaxTreeNode * father_node, TOKEN_TYPE_ENUM s
         }
             // 运算符
         else if (Token::isExpressionOperator(cur_type)) {
-            SyntaxTree * new_tree = new SyntaxTree(new SyntaxTreeNode("Expression-Operator"));
-            new_tree -> addNode(new SyntaxTreeNode(tokens[index].value), new_tree -> root);
+            SyntaxTree * new_tree = new SyntaxTree(new SyntaxTreeNode("Expression-Operator", POS(tokens[index])));
+            new_tree -> addNode(new SyntaxTreeNode(tokens[index].value,
+                                                   POS(tokens[index])), new_tree -> root);
 
             // 如果是 (
             if (cur_type == TOKEN_TYPE_ENUM::LL_BRACKET) {
@@ -383,7 +402,7 @@ void SyntaxAnalyzer::_expression(SyntaxTreeNode * father_node, TOKEN_TYPE_ENUM s
                 }
 
                 if (! flag)
-                    throw Error("in expression, expected `(` before `)`", line_number_map[index]);
+                    throw Error("in expression, expected `(` before `)`", POS(tokens[index]));
             }
                 // 如果是其他的 + - * / > < 那些
             else {
@@ -407,11 +426,11 @@ void SyntaxAnalyzer::_expression(SyntaxTreeNode * father_node, TOKEN_TYPE_ENUM s
             index ++;
         }
         else
-            throw Error("in expression, unrecognized symbols `" + tokens[index].value + "`" , line_number_map[index]);
+            throw Error("in expression, unrecognized symbols `" + tokens[index].value + "`" , POS(tokens[index]));
     }
 
     if (!(len < index || tokens[index].type == stop_sign))
-        throw Error("in expression, expected token `" + token2string(stop_sign) + "` at the end", line_number_map[index]);
+        throw Error("in expression, expected token `" + token2string(stop_sign) + "` at the end", POS(tokens[index]));
 
     // 读取stop sign
     index ++;
@@ -420,7 +439,7 @@ void SyntaxAnalyzer::_expression(SyntaxTreeNode * father_node, TOKEN_TYPE_ENUM s
     while (! op_stack.empty()) {
         temp_t = op_stack.top();
         if (temp_t -> root -> first_son -> value == "(")
-            throw Error("in expression, expected `)` after `(`", line_number_map[index]);
+            throw Error("in expression, expected `)` after `(`", POS(tokens[index]));
         reverse_polish_exp.emplace_back(temp_t);
         op_stack.pop();
     }
@@ -440,10 +459,10 @@ void SyntaxAnalyzer::_expression(SyntaxTreeNode * father_node, TOKEN_TYPE_ENUM s
 
                 SyntaxTree * new_tree;
                 if (Token::isBoolOperator(Token::DETAIL_TOKEN_TYPE[temp_t -> root -> first_son -> value])) {
-                    new_tree = new SyntaxTree(new SyntaxTreeNode( "Expression-Bool-UniOp"));
+                    new_tree = new SyntaxTree(new SyntaxTreeNode( "Expression-Bool-UniOp", POS(tokens[index])));
                 }
                 else {
-                    new_tree = new SyntaxTree(new SyntaxTreeNode( "Expression-UniOp"));
+                    new_tree = new SyntaxTree(new SyntaxTreeNode( "Expression-UniOp", POS(tokens[index])));
                 }
 
                 // 添加操作符
@@ -463,10 +482,10 @@ void SyntaxAnalyzer::_expression(SyntaxTreeNode * father_node, TOKEN_TYPE_ENUM s
 
                 SyntaxTree * new_tree;
                 if (Token::isBoolOperator(Token::DETAIL_TOKEN_TYPE[temp_t -> root -> first_son -> value])) {
-                    new_tree = new SyntaxTree(new SyntaxTreeNode( "Expression-Bool-DoubleOp"));
+                    new_tree = new SyntaxTree(new SyntaxTreeNode( "Expression-Bool-DoubleOp", POS(tokens[index])));
                 }
                 else {
-                    new_tree = new SyntaxTree(new SyntaxTreeNode( "Expression-DoubleOp"));
+                    new_tree = new SyntaxTree(new SyntaxTreeNode( "Expression-DoubleOp", POS(tokens[index])));
                 }
 
                 if (Token::isBoolOperator(Token::DETAIL_TOKEN_TYPE[temp_t -> root -> first_son -> value])) {
@@ -506,7 +525,7 @@ void SyntaxAnalyzer::_expression(SyntaxTreeNode * father_node, TOKEN_TYPE_ENUM s
  * @author Keyi Li
  */
 void SyntaxAnalyzer::_include(SyntaxTreeNode * father_node) {
-    SyntaxTree * include_tree = new SyntaxTree(new SyntaxTreeNode("Include"));
+    SyntaxTree * include_tree = new SyntaxTree(new SyntaxTreeNode("Include", POS(tokens[index])));
 
     tree -> addNode(include_tree -> root, father_node);
 
@@ -519,7 +538,7 @@ void SyntaxAnalyzer::_include(SyntaxTreeNode * father_node) {
         if (quote_cnt == 2 || tokens[index].value == ">")
             flag = false;
 
-        SyntaxTreeNode * new_node = new SyntaxTreeNode(tokens[index].value);
+        SyntaxTreeNode * new_node = new SyntaxTreeNode(tokens[index].value, POS(tokens[index]));
         include_tree -> addNode(new_node, include_tree -> root);
 
         index ++;
@@ -533,27 +552,27 @@ void SyntaxAnalyzer::_include(SyntaxTreeNode * father_node) {
  */
 void SyntaxAnalyzer::_functionStatement(SyntaxTreeNode * father_node) {
     index ++;
-    SyntaxTree * func_state_tree = new SyntaxTree(new SyntaxTreeNode("FunctionStatement"));
+    SyntaxTree * func_state_tree = new SyntaxTree(new SyntaxTreeNode("FunctionStatement", POS(tokens[index])));
     tree -> addNode(func_state_tree -> root, father_node);
 
     string cur_value;
     TOKEN_TYPE_ENUM cur_type;
 
     // 读取返回类型
-    func_state_tree -> addNode(new SyntaxTreeNode("Type"), func_state_tree -> root);
-    func_state_tree -> addNode(new SyntaxTreeNode(tokens[index].value), func_state_tree -> cur_node);
+    func_state_tree -> addNode(new SyntaxTreeNode("Type", POS(tokens[index])), func_state_tree -> root);
+    func_state_tree -> addNode(new SyntaxTreeNode(tokens[index].value, POS(tokens[index])), func_state_tree -> cur_node);
     index ++;
 
     // 读取函数名
-    func_state_tree -> addNode(new SyntaxTreeNode("FunctionName"), func_state_tree -> root);
-    func_state_tree -> addNode(new SyntaxTreeNode(tokens[index].value), func_state_tree -> cur_node);
+    func_state_tree -> addNode(new SyntaxTreeNode("FunctionName", POS(tokens[index])), func_state_tree -> root);
+    func_state_tree -> addNode(new SyntaxTreeNode(tokens[index].value, POS(tokens[index])), func_state_tree -> cur_node);
     index ++;
 
     // 读取(
     index ++;
 
     // 建一个参数树
-    SyntaxTreeNode * param_list = new SyntaxTreeNode("ParameterList");
+    SyntaxTreeNode * param_list = new SyntaxTreeNode("ParameterList", POS(tokens[index]));
     func_state_tree -> addNode(param_list, func_state_tree -> root);
 
     // 如果下一个是）
@@ -566,12 +585,14 @@ void SyntaxAnalyzer::_functionStatement(SyntaxTreeNode * father_node) {
             cur_value = tokens[index].value;
 
             if (cur_value == "int" || cur_value == "double" || cur_value == "float") {
-                SyntaxTreeNode * param = new SyntaxTreeNode("Parameter");
+                SyntaxTreeNode * param = new SyntaxTreeNode("Parameter", POS(tokens[index]));
                 func_state_tree -> addNode(param, param_list);
 
                 index ++;
                 if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::IDENTIFIER) {
-                    func_state_tree -> addNode(new SyntaxTreeNode(tokens[index].value, cur_value), param);
+                    func_state_tree -> addNode(new SyntaxTreeNode(tokens[index].value,
+                                                                  cur_value, "",
+                                                                  POS(tokens[index])), param);
                     index ++;
 
                     if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::COMMA)
@@ -581,11 +602,11 @@ void SyntaxAnalyzer::_functionStatement(SyntaxTreeNode * father_node) {
                         break;
                     }
                     else
-                        throw Error("in function statement's parameter list, should be `,` or `)` after", line_number_map[index]);
+                        throw Error("in function statement's parameter list, should be `,` or `)` after", POS(tokens[index]));
                 }
             }
             else
-                throw Error("in function statement's parameter list, unidentified parameter type found", line_number_map[index]);
+                throw Error("in function statement's parameter list, unidentified parameter type found", POS(tokens[index]));
         }
     }
 
@@ -598,7 +619,7 @@ void SyntaxAnalyzer::_functionStatement(SyntaxTreeNode * father_node) {
         // 如果下一个是; ，就当作单纯的函数声明
         // 如果两个都不是 就有问题
     else if (cur_type != TOKEN_TYPE_ENUM::SEMICOLON)
-        throw Error("in function statement, expected `;` or `}`", line_number_map[index]);
+        throw Error("in function statement, expected `;` or `}`", POS(tokens[index]));
 }
 
 
@@ -612,24 +633,24 @@ void SyntaxAnalyzer::_return(SyntaxTreeNode * father_node) {
     index ++;
     if (index < len) {
         if (tokens[index].type == TOKEN_TYPE_ENUM::SEMICOLON) {
-            return_tree -> root = return_tree -> cur_node = new SyntaxTreeNode("VoidReturn");
-            return_tree -> addNode(new SyntaxTreeNode(tokens[index - 1].value), return_tree -> cur_node);
+            return_tree -> root = return_tree -> cur_node = new SyntaxTreeNode("VoidReturn", POS(tokens[index]));
+            return_tree -> addNode(new SyntaxTreeNode(tokens[index - 1].value, POS(tokens[index])), return_tree -> cur_node);
 
             tree -> addNode(return_tree -> root, father_node);
             index ++;
         }
         else {
-            return_tree -> root = return_tree -> cur_node = new SyntaxTreeNode("Return");
+            return_tree -> root = return_tree -> cur_node = new SyntaxTreeNode("Return", POS(tokens[index]));
             tree -> addNode(return_tree -> root, father_node);
 
-            return_tree -> addNode(new SyntaxTreeNode(tokens[index - 1].value), return_tree -> cur_node);
+            return_tree -> addNode(new SyntaxTreeNode(tokens[index - 1].value, POS(tokens[index])), return_tree -> cur_node);
             _expression(return_tree -> root);
             return;
         }
 
     }
     else
-        throw Error("in return, expected an expression or semicolon after `return`", line_number_map[index]);
+        throw Error("in return, expected an expression or semicolon after `return`", POS(tokens[index]));
 }
 
 
@@ -638,7 +659,7 @@ void SyntaxAnalyzer::_return(SyntaxTreeNode * father_node) {
  * @author Keyi Li
  */
 void SyntaxAnalyzer::_block(SyntaxTreeNode * father_node) {
-    SyntaxTree * block_tree = new SyntaxTree(new SyntaxTreeNode("Block"));
+    SyntaxTree * block_tree = new SyntaxTree(new SyntaxTreeNode("Block", POS(tokens[index])));
     tree -> addNode(block_tree -> root, father_node);
 
     index ++;
@@ -672,14 +693,14 @@ void SyntaxAnalyzer::_block(SyntaxTreeNode * father_node) {
                 }
 
                 throw Error("in block, unidentified symbols `" + tokens[index].value + "`  found",
-                            line_number_map[index]);
+                            POS(tokens[index]));
         }
     }
 
     if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::RB_BRACKET)
         index ++;
     else
-        throw Error("in block, expected }`", line_number_map[index]);
+        throw Error("in block, expected }`", POS(tokens[index]));
 }
 
 
@@ -690,13 +711,13 @@ void SyntaxAnalyzer::_block(SyntaxTreeNode * father_node) {
 void SyntaxAnalyzer::_functionCall(SyntaxTreeNode * father_node) {
     // TODO 在expressoin里加
 
-    SyntaxTree * func_call_tree = new SyntaxTree(new SyntaxTreeNode("FunctionCall"));
+    SyntaxTree * func_call_tree = new SyntaxTree(new SyntaxTreeNode("FunctionCall", POS(tokens[index])));
     tree -> addNode(func_call_tree -> root, father_node);
 
-    func_call_tree -> addNode(new SyntaxTreeNode("FunctionName"), func_call_tree -> root);
-    func_call_tree -> addNode(new SyntaxTreeNode(tokens[index].value), func_call_tree -> cur_node);
+    func_call_tree -> addNode(new SyntaxTreeNode("FunctionName", POS(tokens[index])), func_call_tree -> root);
+    func_call_tree -> addNode(new SyntaxTreeNode(tokens[index].value, POS(tokens[index])), func_call_tree -> cur_node);
 
-    SyntaxTree * param_tree = new SyntaxTree(new SyntaxTreeNode("FunctionParameters"));
+    SyntaxTree * param_tree = new SyntaxTree(new SyntaxTreeNode("FunctionParameters", POS(tokens[index])));
     func_call_tree -> addNode(param_tree -> root, func_call_tree -> root);
 
     // 读取 函数名
@@ -713,7 +734,7 @@ void SyntaxAnalyzer::_functionCall(SyntaxTreeNode * father_node) {
                    tokens[next_end].type != TOKEN_TYPE_ENUM::COMMA))
                         next_end ++;
 
-            param_tree -> addNode(new SyntaxTreeNode("Param"), param_tree -> root);
+            param_tree -> addNode(new SyntaxTreeNode("Param", POS(tokens[index])), param_tree -> root);
             _expression(param_tree -> cur_node, tokens[next_end].type);
 
             index = next_end + 1;
@@ -723,7 +744,7 @@ void SyntaxAnalyzer::_functionCall(SyntaxTreeNode * father_node) {
     }
     else
         throw Error("in function call, expected `(` after function name",
-                    tokens[index].line_number, tokens[index].pos);
+                    POS(tokens[index]));
 }
 
 
@@ -732,11 +753,11 @@ void SyntaxAnalyzer::_functionCall(SyntaxTreeNode * father_node) {
  * @author Keyi Li
  */
 void SyntaxAnalyzer::_assignment(SyntaxTreeNode * father_node, TOKEN_TYPE_ENUM stop_token) {
-    SyntaxTree * assign_tree = new SyntaxTree(new SyntaxTreeNode("Assignment"));
+    SyntaxTree * assign_tree = new SyntaxTree(new SyntaxTreeNode("Assignment", POS(tokens[index])));
     tree -> addNode(assign_tree -> root, father_node);
 
     if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::IDENTIFIER) {
-        assign_tree -> addNode(new SyntaxTreeNode(tokens[index].value), assign_tree -> root);
+        assign_tree -> addNode(new SyntaxTreeNode(tokens[index].value, POS(tokens[index])), assign_tree -> root);
         index ++;
 
         // a[0] = 10;
@@ -744,8 +765,10 @@ void SyntaxAnalyzer::_assignment(SyntaxTreeNode * father_node, TOKEN_TYPE_ENUM s
             assign_tree -> cur_node -> value = "Expression-ArrayItem";
 
             index ++;
-            assign_tree -> addNode(new SyntaxTreeNode(tokens[index - 2].value), assign_tree -> root -> first_son);
-            assign_tree -> addNode(new SyntaxTreeNode("Array-Index"), assign_tree -> root -> first_son);
+            assign_tree -> addNode(new SyntaxTreeNode(tokens[index - 2].value,
+                                                      POS(tokens[index - 2])),
+                                   assign_tree -> root -> first_son);
+            assign_tree -> addNode(new SyntaxTreeNode("Array-Index", POS(tokens[index])), assign_tree -> root -> first_son);
             _expression(assign_tree -> cur_node, TOKEN_TYPE_ENUM::RM_BRACKET);
         }
 
@@ -756,13 +779,13 @@ void SyntaxAnalyzer::_assignment(SyntaxTreeNode * father_node, TOKEN_TYPE_ENUM s
             _expression(assign_tree -> root, stop_token);
         }
         else {
-            throw Error("in assignment, expected `=` after an identifier", line_number_map[index]);
+            throw Error("in assignment, expected `=` after an identifier", POS(tokens[index]));
         }
     }
     else if (index < len && tokens[index].type == stop_token)
         index ++;
     else
-        throw Error("in assignment, expected a `" + token2string(stop_token) + "` after", line_number_map[index]);
+        throw Error("in assignment, expected a `" + token2string(stop_token) + "` after", POS(tokens[index]));
 }
 
 
@@ -783,7 +806,7 @@ void SyntaxAnalyzer::_control(SyntaxTreeNode * father_node) {
             _if(father_node);
             break;
         default:
-            throw Error("unsupported control statement", line_number_map[index]);
+            throw Error("unsupported control statement", POS(tokens[index]));
     }
 }
 
@@ -793,7 +816,7 @@ void SyntaxAnalyzer::_control(SyntaxTreeNode * father_node) {
  * @author Keyi Li
  */
 void SyntaxAnalyzer::_for(SyntaxTreeNode * father_node) {
-    SyntaxTree * psudo_while_tree = new SyntaxTree(new SyntaxTreeNode("Control-While"));
+    SyntaxTree * psudo_while_tree = new SyntaxTree(new SyntaxTreeNode("Control-While", POS(tokens[index])));
     // 读取 for
     index ++;
 
@@ -806,11 +829,11 @@ void SyntaxAnalyzer::_for(SyntaxTreeNode * father_node) {
         _assignment(father_node);
 
         // 读取第二个条件语句
-        psudo_while_tree -> addNode(new SyntaxTreeNode("Condition"), psudo_while_tree -> root);
+        psudo_while_tree -> addNode(new SyntaxTreeNode("Condition", POS(tokens[index])), psudo_while_tree -> root);
         _expression(psudo_while_tree -> cur_node);
 
         // 读取第三个赋值语句
-        SyntaxTreeNode * temp = new SyntaxTreeNode("");
+        SyntaxTreeNode * temp = new SyntaxTreeNode("", POS(tokens[index]));
         _assignment(temp, TOKEN_TYPE_ENUM::RL_BRACKET);
 
         // 读取 {
@@ -820,10 +843,10 @@ void SyntaxAnalyzer::_for(SyntaxTreeNode * father_node) {
             tree -> addNode(psudo_while_tree -> root, father_node);
         }
         else
-            throw Error("in for, Expected `{` after `for (assignment; condition; assignment)`", line_number_map[index]);
+            throw Error("in for, Expected `{` after `for (assignment; condition; assignment)`", POS(tokens[index]));
     }
     else
-        throw Error("Expected `(` after `for`", line_number_map[index]);
+        throw Error("Expected `(` after `for`", POS(tokens[index]));
 }
 
 
@@ -832,7 +855,7 @@ void SyntaxAnalyzer::_for(SyntaxTreeNode * father_node) {
  * @author Keyi Li
  */
 void SyntaxAnalyzer::_while(SyntaxTreeNode * father_node) {
-    SyntaxTree * while_tree = new SyntaxTree(new SyntaxTreeNode("Control-While"));
+    SyntaxTree * while_tree = new SyntaxTree(new SyntaxTreeNode("Control-While", POS(tokens[index])));
     tree -> addNode(while_tree -> root, father_node);
 
     // 读取while
@@ -842,17 +865,17 @@ void SyntaxAnalyzer::_while(SyntaxTreeNode * father_node) {
         index ++;
 
         // 读取 表达式 直到遇到）
-        while_tree -> addNode(new SyntaxTreeNode("Condition"), while_tree -> root);
+        while_tree -> addNode(new SyntaxTreeNode("Condition", POS(tokens[index])), while_tree -> root);
         _expression(while_tree -> cur_node, TOKEN_TYPE_ENUM::RL_BRACKET);
 
         // 读取 {
         if (index < len && tokens[index].type == TOKEN_TYPE_ENUM::LB_BRACKET)
             _block(while_tree -> root);
         else
-            throw Error("Expected `{` after `while (condition)`", line_number_map[index]);
+            throw Error("Expected `{` after `while (condition)`", POS(tokens[index]));
     }
     else
-        throw Error("Expected `(` after `while`", line_number_map[index]);
+        throw Error("Expected `(` after `while`", POS(tokens[index]));
 }
 
 
@@ -861,7 +884,7 @@ void SyntaxAnalyzer::_while(SyntaxTreeNode * father_node) {
  * @author Keyi Li
  */
 void SyntaxAnalyzer::_if(SyntaxTreeNode * father_node) {
-    SyntaxTree * if_tree = new SyntaxTree(new SyntaxTreeNode("Control-If"));
+    SyntaxTree * if_tree = new SyntaxTree(new SyntaxTreeNode("Control-If", POS(tokens[index])));
     tree -> addNode(if_tree -> root, father_node);
 
     // 读取 if
@@ -872,7 +895,7 @@ void SyntaxAnalyzer::_if(SyntaxTreeNode * father_node) {
         // 读取 (
         index ++;
 
-        if_tree -> addNode(new SyntaxTreeNode("Control-Condition"), if_tree -> root);
+        if_tree -> addNode(new SyntaxTreeNode("Control-Condition", POS(tokens[index])), if_tree -> root);
         _expression(if_tree -> cur_node, TOKEN_TYPE_ENUM::RL_BRACKET);
 
         // 如果是 {
@@ -890,11 +913,11 @@ void SyntaxAnalyzer::_if(SyntaxTreeNode * father_node) {
             }
         }
         else {
-            throw Error("in if, expected `{` after `if (condition)`", line_number_map[index]);
+            throw Error("in if, expected `{` after `if (condition)`", POS(tokens[index]));
         }
     }
     else {
-        throw Error("in if, expected `(` after `if`", line_number_map[index]);
+        throw Error("in if, expected `(` after `if`", POS(tokens[index]));
     }
 }
 
@@ -927,11 +950,11 @@ void SyntaxAnalyzer::_else_if(SyntaxTreeNode * father_node) {
             }
         }
         else {
-            throw Error("in else-if, expected `{` after `if (condition)`", line_number_map[index]);
+            throw Error("in else-if, expected `{` after `if (condition)`", POS(tokens[index]));
         }
     }
     else {
-        throw Error("in else-if, expected `(` after `if`", line_number_map[index]);
+        throw Error("in else-if, expected `(` after `if`", POS(tokens[index]));
     }
 }
 
@@ -947,11 +970,11 @@ void SyntaxAnalyzer::_else(SyntaxTreeNode * father_node) {
             _block(father_node);
         }
         else {
-            throw Error("in if, expected `{` after `else` or `if`", line_number_map[index]);
+            throw Error("in if, expected `{` after `else` or `if`", POS(tokens[index]));
         }
     }
     else
-        throw Error("in if, how can you do this???", line_number_map[index]);
+        throw Error("in if, how can you do this???", POS(tokens[index]));
 }
 
 

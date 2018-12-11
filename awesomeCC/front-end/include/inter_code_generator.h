@@ -57,7 +57,6 @@ public:
 
 /**
  * @brief 变量信息类
- * @author Keyi Li
  */
 class VarInfo: public Info {
 public:
@@ -82,7 +81,6 @@ public:
 
 /**
  * @brief 中间代码生成器类
- * @author Keyi Li
  */
 class InterCodeGenerator {
 private:
@@ -99,12 +97,11 @@ private:
 
     void _analyze(SyntaxTreeNode * cur);
 
-    string _lookUpVar(string name);
+    string _lookUpVar(string name, SyntaxTreeNode * cur);
     string _lookUpVar(SyntaxTreeNode * arr_pointer);
 
     void _emit(INTER_CODE_OP_ENUM op, string arg1, string arg2, string res);
 
-    string _locateArrayItem(string arr_name, string arr_i);
     string _expression(SyntaxTreeNode * cur);
     void _block(SyntaxTreeNode * cur, bool restore = true);
     void _print(SyntaxTreeNode * cur);

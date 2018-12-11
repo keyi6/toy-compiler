@@ -1,10 +1,6 @@
 /**
- *
  * @file syntax_tree.h
  * @brief 语法树类
- *
- * @author Keyi Li
- *
  */
 #ifndef AWESOMECC_SYNTAX_TREE_H
 #define AWESOMECC_SYNTAX_TREE_H
@@ -23,14 +19,16 @@ using std::string;
 class SyntaxTreeNode {
 public:
     string value, type, extra_info;
+    int line_number, pos;
 
     // 孩子-兄弟表示法
-    // left 是左兄弟, right 是右边兄弟
-    // father 是父节点, first_son 是第一个子节点
-    SyntaxTreeNode * left, * right, * father, * first_son;
+    SyntaxTreeNode * left, * right; // left 是左兄弟, right 是右边兄弟
+    SyntaxTreeNode * father, * first_son; // father 是父节点, first_son 是第一个子节点
     vector<int> true_list, false_list, next_list;
 
-    SyntaxTreeNode(string _value = "", string _type = "", string _extra_info = "");
+    SyntaxTreeNode(string _value, string _type = "", string _extra_info = "");
+    SyntaxTreeNode(string _value, int _line_number, int _pos);
+    SyntaxTreeNode(string _value, string _type, string _extra_info, int _line_number, int _pos);
 };
 
 
@@ -43,7 +41,6 @@ public:
     SyntaxTree(SyntaxTreeNode * _root = nullptr);
 
     void addNode(SyntaxTreeNode * child_node, SyntaxTreeNode * father_node = nullptr);
-    void switchNode(SyntaxTreeNode * center);
     void display(bool verbose = false);
 };
 
