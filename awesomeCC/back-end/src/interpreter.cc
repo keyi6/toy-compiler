@@ -8,7 +8,7 @@
  */
 
 #include "../include/interpreter.h"
-
+#define INCREMENT 100
 
 Interpreter::Interpreter() = default;
 
@@ -19,9 +19,11 @@ void Interpreter::execute(vector<Quadruple> _code, bool verbose) {
     while (not activity.empty())
         activity.pop();
 
-    // TODO 我们需要动态区域
-    t_stack.resize(100);
-    v_stack.resize(100);
+    // 初始大小 之后动态变换
+    t_size = 100;
+    t_stack.resize(t_size);
+    v_size = 1000;
+    v_stack.resize(v_size);
 
     int code_len = code.size();
     while (index < code_len)
@@ -155,24 +157,38 @@ void Interpreter::_jump() {
 int Interpreter::_getAddress(string value_str) {
     if (value_str[0] == 'v') {
         int len = value_str.size();
-        for (int i = 0; i < len; i ++)
+        for (int i = 0; i < len; i ++) {
             if (value_str[i] == '[') {
                 // 相对寻址
                 int offset = _getValue(value_str.substr(i + 1, len - i - 2));
                 int base = _getValue(value_str.substr(1, i - 1));
                 return offset + base;
             }
-        return string2int(value_str.substr(1));
+        }
+
+        int ret = string2int(value_str.substr(1));
+        if (ret >= v_size) {
+            v_size += INCREMENT;
+            v_stack.resize(v_size);
+        }
+
+        return ret;
     }
     else {
-        return string2int(value_str.substr(1));
+        int ret = string2int(value_str.substr(1));
+        if (ret >= t_size) {
+            t_size += INCREMENT;
+            t_stack.resize(t_size);
+        }
+
+        return ret;
     }
 }
 
 
 double Interpreter::_getValue(string value_str) {
-    if (value_str == "pc") {
-        return index + 2;
+    if (value_str[0] == 'p') {
+        return index + string2int(value_str.substr(3));
     }
     // 寻址
     if (value_str[0] == 'v') {
@@ -204,6 +220,7 @@ void Interpreter::_pop() {
     string res = code[index].res;
     double v = activity.top();
     activity.pop();
+    cout << "debug [pop] " <<  v << endl;
 
     int temp_index = _getAddress(res);
     if (res[0] == 'v')

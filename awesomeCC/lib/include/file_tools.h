@@ -83,7 +83,7 @@ vector<Quadruple> readInterCodeFile(string path) {
             len = 0;
             while (start + len < line_len && ! (line[start + len] == ',' && line[start + len - 1] != '\\'))
                 len ++;
-            string arg1 = regex_replace(line.substr(start, len), regex("\\\\"), "");
+            string arg1 = regex_replace(line.substr(start, len), regex("\\\\"), string(""));
 
             start += len + 1;
             len = 0;

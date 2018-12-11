@@ -24,6 +24,8 @@ using std::vector;
 class Interpreter {
 private:
     int index; // 我的pc指针
+    int v_size;
+    int t_size;
     vector<Quadruple> code;
     vector<double> t_stack;
     vector<double> v_stack;

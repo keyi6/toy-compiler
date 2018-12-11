@@ -103,6 +103,7 @@ private:
     void _emit(INTER_CODE_OP_ENUM op, string arg1, string arg2, string res);
 
     string _expression(SyntaxTreeNode * cur);
+    void _voidReturn(SyntaxTreeNode * cur);
     void _block(SyntaxTreeNode * cur, bool restore = true);
     void _print(SyntaxTreeNode * cur);
     void _statement(SyntaxTreeNode * cur);

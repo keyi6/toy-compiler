@@ -110,11 +110,14 @@ void InterCodeGenerator::_analyze(SyntaxTreeNode * cur) {
                 func_table[name] = FuncInfo(name, Info::VAR_INFO_MAP[type], 0, 0);
                 funcs.emplace_back(cur);
             }
-
-            cur = cur -> right;
+        }
+        else if (cur -> value == "Statement") {
+            _statement(cur);
         }
         else
-            throw Error("what is this `" + cur -> value + "`???", POS(cur));
+            throw Error("`" + cur -> value + "` is not allowed in a root of a class", POS(cur));
+
+        cur = cur -> right;
     }
 
     // main 函数直接执行
@@ -151,18 +154,17 @@ void InterCodeGenerator::_functionStatement(SyntaxTreeNode * cur) {
     int func_start = int(inter_code.size());
 
     // start
-    string temp_place = "t" + int2string(temp_var_index ++);
-    _emit(INTER_CODE_OP_ENUM::POP, "", "", temp_place);
-
     SyntaxTreeNode * ps = param_tree -> first_son;
     while (ps) {
-        // 或者 函数放前面 其他放后面？
         _statement(ps);
         _emit(INTER_CODE_OP_ENUM::POP, "", "", table[ps -> first_son -> value].name);
         ps = ps -> right;
     }
-
     _block(block_tree);
+
+    string temp_place = "t" + int2string(temp_var_index ++);
+    // 自动return
+    _emit(INTER_CODE_OP_ENUM::POP, "", "", temp_place);
     _emit(INTER_CODE_OP_ENUM::J, "", "", temp_place);
 
     // end
@@ -204,6 +206,8 @@ void InterCodeGenerator::_block(SyntaxTreeNode * cur, bool restore) {
         }
         else if (cs -> value == "FunctionCall")
             _functionCall(cs);
+        else if (cs -> value == "VoidReturn")
+            _voidReturn(cs);
         // TODO 其他
         else
             cout << "Debug <<<" << cs -> value << endl;
@@ -392,8 +396,8 @@ string InterCodeGenerator::_expression(SyntaxTreeNode * cur) {
     else if (cur -> value == "Expression-String") {
         string temp = cur -> first_son -> value;
         // 转义
-        temp = regex_replace(temp, regex(","), "\\,");
-        temp = regex_replace(temp, regex("\\\\"), "\\\\");
+        temp = regex_replace(temp, regex(","), string("\\,"));
+        temp = regex_replace(temp, regex("\\\\"), string("\\\\"));
 
         return temp;
     }
@@ -508,6 +512,8 @@ void InterCodeGenerator::_functionCall(SyntaxTreeNode * cur) {
         throw Error("function `" + func_name + "` is not defined before use", POS(cur));
 
     // TODO 返回地址
+    int temp_place = inter_code.size(), cnt = 0;
+    _emit(INTER_CODE_OP_ENUM::PUSH, "", "", "");
 
     SyntaxTreeNode * param = cur -> first_son -> right;
     SyntaxTreeNode * ps = param -> first_son;
@@ -516,11 +522,11 @@ void InterCodeGenerator::_functionCall(SyntaxTreeNode * cur) {
         param_place = _expression(ps -> first_son);
         _emit(INTER_CODE_OP_ENUM::PUSH, "", "", param_place);
 
+        cnt ++;
         ps = ps -> right;
     }
 
-    _emit(INTER_CODE_OP_ENUM::PUSH, "", "", "pc");
-
+    inter_code[temp_place].res = "pc+" + int2string(cnt + 1);
 
     if (func_backpatch.find(func_name) == func_backpatch.end()) {
         vector<int> t;
@@ -596,3 +602,14 @@ void InterCodeGenerator::_backpatch(vector<int> v, int dest_index) {
         inter_code[i].res = int2string(dest_index);
 }
 
+
+void InterCodeGenerator::_voidReturn(SyntaxTreeNode * cur) {
+    SyntaxTreeNode * cf = cur;
+    while (cf && cf -> value != "FunctionStatement")
+        cf = cf -> father;
+
+    string temp_place = "t" + int2string(temp_var_index ++);
+    // 自动return
+    _emit(INTER_CODE_OP_ENUM::POP, "", "", temp_place);
+    _emit(INTER_CODE_OP_ENUM::J, "", "", temp_place);
+}

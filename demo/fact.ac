@@ -1,0 +1,26 @@
+/*
+ * this is a simple demo using awesomeCC
+ * a new language designed and created
+ * by Keyi Li & Hanwen Liu
+ *
+ * LICENSE: GPL V3.0
+ */
+
+class Main {
+    private void fact(int x) {
+        if (x > 5) {
+            print(x);
+            fact(x - 1);
+        }
+        else {
+            return;
+        }
+    }
+
+    int y;
+
+    public void main() {
+        y = 10;
+        fact(10);
+    }
+}

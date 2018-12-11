@@ -6,6 +6,13 @@ awesome C Compiler
 ![](https://img.shields.io/badge/license-GPL-blue.svg)
 
 
+## installation
+```bash
+cmake .
+make
+```
+
+
 ## TODO
 这个代码太丑了 我要重构一下
 
@@ -16,11 +23,5 @@ awesome C Compiler
 3. 其他
    - [x] unit test
    - [ ] build test
-   - [ ] 堆栈的存储区🤔
-     - [ ] 内存监控🤔
-     - [x] 一块静态区（常量？简单变量？） + 一块动态区（变量）（有递归的都要动态🤔？）
-       - [x] 每个block分配一个新的存储区
    - [ ] rewrite travis.yml
-   - [ ] write INSTALLATION
    - [ ] 规范化Error
-   - [x] Error精准到char pos

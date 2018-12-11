@@ -12,17 +12,20 @@
 
 
 int main() {
-    string path = "/Users/cjhahaha/Workspace/CompilePrinciple/awesomeCC/demo/error_demo2.ac";
+    string path = "/Users/cjhahaha/Workspace/CompilePrinciple/awesomeCC/demo/fact.ac";
     vector<string> source_file = readSourceFile(path);
 
     SyntaxAnalyzer sa;
     sa.analyze(source_file, false);
 
-//    sa.getSyntaxTree() -> display(true);
 
+    sa.getSyntaxTree() -> display(true);
     InterCodeGenerator icg;
     icg.analyze(sa.getSyntaxTree(), true);
     icg.saveToFile(path + ".ic");
 
-    interpreter(path + ".ic");
+
+    Interpreter itep;
+    vector<Quadruple> code = readInterCodeFile(path + ".ic");
+    itep.execute(code);
 }

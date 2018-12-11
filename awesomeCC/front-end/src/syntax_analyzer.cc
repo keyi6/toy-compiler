@@ -69,7 +69,7 @@ void SyntaxAnalyzer::_analyze() {
                 _include(tree -> root);
                 break;
             case int(SENTENCE_PATTERN_ENUM::STATEMENT):
-                _statement(tree -> cur_node);
+                _statement(tree -> root);
                 break;
             case int(SENTENCE_PATTERN_ENUM::FUNCTION_STATEMENT):
                 _functionStatement(tree -> root);
