@@ -131,7 +131,6 @@ void InterCodeGenerator::_analyze(SyntaxTreeNode * cur) {
 
     for (auto it: func_backpatch)
         if (! it.second.empty()) {
-            cout << "debug " << func_table[it.first].start_place << " " << endl;
             string dest = int2string(func_table[it.first].start_place);
             for (auto i: it.second)
                 inter_code[i].res = dest;
@@ -151,6 +150,9 @@ void InterCodeGenerator::_functionStatement(SyntaxTreeNode * cur) {
     int func_start = int(inter_code.size());
 
     // start
+    string temp_place = "t" + int2string(temp_var_index ++);
+    _emit(INTER_CODE_OP_ENUM::POP, "", "", temp_place);
+
     SyntaxTreeNode * ps = param_tree -> first_son;
     while (ps) {
         // 或者 函数放前面 其他放后面？
@@ -160,7 +162,8 @@ void InterCodeGenerator::_functionStatement(SyntaxTreeNode * cur) {
     }
 
     _block(block_tree);
-    _emit(INTER_CODE_OP_ENUM::POP, "", "", "pc");
+    _emit(INTER_CODE_OP_ENUM::J, "", "", temp_place);
+
     // end
 
     int func_end = inter_code.size() - 1;
@@ -202,7 +205,7 @@ void InterCodeGenerator::_block(SyntaxTreeNode * cur, bool restore) {
             _functionCall(cs);
         // TODO 其他
         else
-            cout << "Debug " << cs -> value << endl;
+            cout << "Debug <<<" << cs -> value << endl;
 
         // 回填
         _backpatch(cs -> next_list, inter_code.size());
@@ -496,7 +499,6 @@ void InterCodeGenerator::_functionCall(SyntaxTreeNode * cur) {
     if (func_table.find(func_name) == func_table.end())
         throw Error("function `" + func_name + "` is not defined before use");
 
-    _emit(INTER_CODE_OP_ENUM::PUSH, "", "", "pc");
     // TODO 返回地址
 
     SyntaxTreeNode * param = cur -> first_son -> right;
@@ -508,6 +510,8 @@ void InterCodeGenerator::_functionCall(SyntaxTreeNode * cur) {
 
         ps = ps -> right;
     }
+
+    _emit(INTER_CODE_OP_ENUM::PUSH, "", "", "pc");
 
 
     if (func_backpatch.find(func_name) == func_backpatch.end()) {

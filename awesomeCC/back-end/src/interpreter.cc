@@ -13,9 +13,11 @@
 Interpreter::Interpreter() = default;
 
 
-void Interpreter::execute(vector<Quadruple> _code) {
+void Interpreter::execute(vector<Quadruple> _code, bool verbose) {
     code = move(_code);
     index = 0;
+    while (not activity.empty())
+        activity.pop();
 
     // TODO 我们需要动态区域
     t_stack.resize(100);
@@ -23,12 +25,14 @@ void Interpreter::execute(vector<Quadruple> _code) {
 
     int code_len = code.size();
     while (index < code_len)
-        _execute();
+        _execute(verbose);
 }
 
 
-void Interpreter::_execute() {
+void Interpreter::_execute(bool verbose) {
     int op = int(code[index].op);
+    if (verbose)
+        cout << "processing code #" << index << endl;
 
     switch (op) {
         case int(INTER_CODE_OP_ENUM::MOV):
@@ -53,6 +57,14 @@ void Interpreter::_execute() {
         case int(INTER_CODE_OP_ENUM::JL):
         case int(INTER_CODE_OP_ENUM::JG):
             _jump();
+            break;
+        case int(INTER_CODE_OP_ENUM::POP):
+            _pop();
+            index ++;
+            break;
+        case int(INTER_CODE_OP_ENUM::PUSH):
+            _push();
+            index ++;
             break;
         default:
             break;
@@ -157,6 +169,9 @@ int Interpreter::_getAddress(string value_str) {
 
 
 double Interpreter::_getValue(string value_str) {
+    if (value_str == "pc") {
+        return index + 2;
+    }
     // 寻址
     if (value_str[0] == 'v') {
         int len = value_str.size();
@@ -183,3 +198,20 @@ double Interpreter::_getValue(string value_str) {
 }
 
 
+void Interpreter::_pop() {
+    string res = code[index].res;
+    double v = activity.top();
+    activity.pop();
+
+    int temp_index = _getAddress(res);
+    if (res[0] == 'v')
+        v_stack[temp_index] = v;
+    else
+        t_stack[temp_index] = v;
+}
+
+
+void Interpreter::_push() {
+    double v = _getValue(code[index].res);
+    activity.push(v);
+}

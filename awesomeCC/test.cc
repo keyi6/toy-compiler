@@ -18,11 +18,11 @@ int main() {
     SyntaxAnalyzer sa;
     sa.analyze(source_file, false);
 
-    sa.getSyntaxTree() -> display(true);
+//    sa.getSyntaxTree() -> display(true);
 
     InterCodeGenerator icg;
     icg.analyze(sa.getSyntaxTree(), true);
     icg.saveToFile(path + ".ic");
 
-    //interpreter(path + ".ic");
+    interpreter(path + ".ic");
 }

@@ -27,20 +27,22 @@ private:
     vector<Quadruple> code;
     vector<double> t_stack;
     vector<double> v_stack;
-    stack<string> activity;
+    stack<double> activity;
 
     double _getValue(string value_str);
     int _getAddress(string value_str);
 
     void _calc(int op);
-    void _execute();
+    void _execute(bool verbose = false);
     void _print();
     void _assign();
     void _jump();
+    void _pop();
+    void _push();
 
 public:
     Interpreter();
-    void execute(vector<Quadruple> _code);
+    void execute(vector<Quadruple> _code, bool verbose = false);
 };
 
 
