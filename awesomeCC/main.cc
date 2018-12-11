@@ -46,7 +46,6 @@ map<string, string> HELP_TEXT = {
 
 /**
  * @brief 输出 help text
- * @author Keyi Li
  */
 void getHelp() {
     cout << "OVERVIEW: awesome CC compiler, developed by Keyi Li & Hanwen Liu" << endl << endl;
@@ -77,7 +76,6 @@ void getHelp() {
 
 /**
  * @brief 输出 version text
- * @author Keyi Li
  */
 void getVersion() {
     cout << "awesome CC compiler 1.0" << endl;
@@ -88,7 +86,6 @@ void getVersion() {
 
 /**
  * @brief 接受命令行参数
- * @author Keyi Li
  */
 int main(int argc, char * argv[]) {
     if (argc <= 1) {
