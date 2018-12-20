@@ -10,7 +10,7 @@ MOV,t2,,v1[v0]
 ADD,v0,1,t3
 MOV,t3,,v0
 J,,,3
-MOV,2,,v0
+MOV,0,,v0
 JL,v0,9,15
 J,,,20
 PRINT,v1[v0],,
