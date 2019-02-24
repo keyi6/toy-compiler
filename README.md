@@ -5,8 +5,14 @@ awesome C Compiler
 ![](https://img.shields.io/badge/language-c++-green.svg)
 ![](https://img.shields.io/badge/license-GPL-blue.svg)
 
+## preview
+
+![preview](./doc/preview.png)
+
+详细请见`/doc`.
 
 ## installation
+
 ```bash
 cmake .
 make
