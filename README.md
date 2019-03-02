@@ -2,7 +2,7 @@
 awesome C Compiler
 
 ![](https://img.shields.io/badge/language-c++-green.svg)
-![](https://img.shields.io/badge/license-GPL-blue.svg)
+![](https://img.shields.io/badge/license-MIT-blue.svg)
 
 ## preview
 

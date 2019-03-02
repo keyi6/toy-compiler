@@ -42,7 +42,6 @@ private:
     void _analyze();
 
     void _print(SyntaxTreeNode * father_node);
-    void _include(SyntaxTreeNode * father_node);
     void _functionStatement(SyntaxTreeNode * father_node);
     void _statement(SyntaxTreeNode * father_node);
     void _functionCall(SyntaxTreeNode * father_node);

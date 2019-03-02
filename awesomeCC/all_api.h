@@ -21,14 +21,17 @@ using std::endl;
  * @param path 中间代码文件路径
  */
 inline void compile_and_execute(string path) {
+	// 读取源文件
     vector<string> source_file = readSourceFile(path);
 
     time_t start_time = time(nullptr);
     cout << "start compiling " << path << "..." << endl << endl;
 
+	// 词法分析 并 语法分析
     SyntaxAnalyzer sa;
     sa.analyze(source_file, false);
 
+	// 语义分析并生成中间代码
     InterCodeGenerator icg;
     icg.analyze(sa.getSyntaxTree(), false);
     icg.saveToFile(path + ".ic");
@@ -36,6 +39,7 @@ inline void compile_and_execute(string path) {
     time_t end_time = time(nullptr);
     cout << "compile finish in " << (end_time - start_time) << " sec(s)." << endl << endl;
 
+	// 解释执行
     cout << "------ start executing ------" << endl;
     vector<Quadruple> inter_code_file = readInterCodeFile(path + ".ic");
     Interpreter intp;

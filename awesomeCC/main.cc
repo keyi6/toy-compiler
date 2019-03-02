@@ -1,6 +1,6 @@
 /**
  * @file main.cc
- * @brief 运行入口文件
+ * @brief ./acc 运行入口文件，处理命令行参数
  */
 
 #include "front-end/frontend_api.h"
@@ -121,7 +121,6 @@ int main(int argc, char * argv[]) {
                     return 0;
                 }
             }
-
         }
 
     }

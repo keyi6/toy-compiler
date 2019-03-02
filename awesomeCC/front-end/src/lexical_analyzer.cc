@@ -153,68 +153,17 @@ void LexicalAnalyzer::_analyze() {
             cur_pos += 2;
             continue;
         }
-        // 处理 #include
-        else if (cur_char == '#') {
-            tokens.emplace_back(Token("#", TOKEN_TYPE_ENUM::SEPARATOR,
-                                      cur_pos ++, cur_line_number));
-            _skipBlank();
-
-            if (cur_pos + 7 < len && sentence.substr(cur_pos, 7) == "include") {
-                // 读取include
-                cur_pos += 7;
-                tokens.emplace_back(Token("include", TOKEN_TYPE_ENUM::KEYWORD,
-                                          cur_pos, cur_line_number));
-                _skipBlank();
-
-                // 如果是 " 或者 <
-                if (sentence[cur_pos] == '\"' || sentence[cur_pos] == '<') {
-                    // 读取这个字符，用于检查配对
-                    cur_char = sentence[cur_pos ++];
-
-                    tokens.emplace_back(Token(char2string(cur_char), TOKEN_TYPE_ENUM::SEPARATOR,
-                                              cur_pos, cur_line_number));
-
-                    char match_char = cur_char == '\"' ? '\"' : '>';
-                    int lib_name_start = cur_pos, lib_name_len = 0;
-                    while (cur_pos < len) {
-                        if (sentence[cur_pos] == match_char) {
-                            tokens.emplace_back(Token(sentence.substr(lib_name_start, lib_name_len),
-                                                      TOKEN_TYPE_ENUM::IDENTIFIER,
-                                                      lib_name_start, cur_line_number));
-
-                            tokens.emplace_back(Token(char2string(match_char),
-                                                      TOKEN_TYPE_ENUM::SEPARATOR,
-                                                      cur_pos, cur_line_number));
-
-                            _skipBlank();
-                            if (cur_pos < len)
-                                throw Error("in include, unidentified token after " + char2string(match_char),
-                                            cur_line_number, cur_pos);
-                            return;
-                        }
-                        else
-                            lib_name_len ++, cur_pos ++;
-                    }
-                    // 找不到match_char 的时候执行
-                    throw Error("in include, lack of " + char2string(match_char),
-                                cur_line_number, cur_pos);
-                }
-                else
-                    throw Error("in include, unidentified symbol after `include`",
-                                cur_line_number, cur_pos);
-            }
-            else
-                throw Error("in include, unidentified symbol after #",
-                            cur_line_number, cur_pos);
-        }
         // 关键字 和 标识符
         else if (isalpha(cur_char) || cur_char == '_') {
-            // 读取这个词
+            // 找结尾
             int temp_len = 0;
             while (cur_pos + temp_len <= len &&
-                  (isalpha(sentence[cur_pos + temp_len]) || sentence[cur_pos + temp_len] == '_'))
+                  (isalpha(sentence[cur_pos + temp_len]) || // 字母
+                   sentence[cur_pos + temp_len] == '_' ||   // _
+                   isdigit(sentence[cur_pos + temp_len])))  // 数字
                 temp_len ++;
 
+            // 截取 并 加入token列表
             string temp_str = sentence.substr(cur_pos, temp_len);
             tokens.emplace_back(Token(temp_str,
                                       _isKeyword(temp_str) ? TOKEN_TYPE_ENUM::KEYWORD : TOKEN_TYPE_ENUM::IDENTIFIER,
@@ -225,11 +174,11 @@ void LexicalAnalyzer::_analyze() {
         }
         // 数字常量
         else if (isdigit(cur_char) || cur_char == '.') {
+            // 找结尾
             int temp_len = 0;
             bool hasDot = false;
             while (cur_pos + temp_len <= len &&
-                  (isdigit(sentence[cur_pos + temp_len]) ||
-                   sentence[cur_pos + temp_len] == '.')) {
+                  (isdigit(sentence[cur_pos + temp_len]) || sentence[cur_pos + temp_len] == '.')) {
 
                 if (sentence[cur_pos + temp_len] == '.') {
                     if (not hasDot)
@@ -242,6 +191,7 @@ void LexicalAnalyzer::_analyze() {
                 temp_len ++;
             }
 
+            // 截取 并 加入token列表
             tokens.emplace_back(Token(sentence.substr(cur_pos, temp_len),
                                       TOKEN_TYPE_ENUM::DIGIT_CONSTANT,
                                       cur_pos, cur_line_number));
@@ -251,6 +201,7 @@ void LexicalAnalyzer::_analyze() {
         }
         // 分隔符 和 字符串常量
         else if (_isSeparator(cur_char)) {
+            // 先加入token列表
             string temp_str = sentence.substr(cur_pos, 1);
             tokens.emplace_back(Token(temp_str, TOKEN_TYPE_ENUM::SEPARATOR,
                                       cur_pos, cur_line_number));
@@ -286,8 +237,8 @@ void LexicalAnalyzer::_analyze() {
             // ++ -- << >> && || ==
             if ((cur_char == '+' || cur_char == '-' || cur_char == '<' || cur_char == '>' ||
                  cur_char == '&' || cur_char == '|' || cur_char == '=') &&
-                cur_pos + 1 < len &&
-                sentence[cur_pos + 1] == cur_char) {
+                cur_pos + 1 < len && sentence[cur_pos + 1] == cur_char) {
+
                 tokens.emplace_back(Token(sentence.substr(cur_pos, 2), TOKEN_TYPE_ENUM::OPERATOR,
                                           cur_pos, cur_line_number));
                 cur_pos += 2;
