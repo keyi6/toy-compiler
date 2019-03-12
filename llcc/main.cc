@@ -1,6 +1,6 @@
 /**
  * @file main.cc
- * @brief .llacc 运行入口文件，处理命令行参数
+ * @brief llcc 运行入口文件，处理命令行参数
  */
 
 #include "front-end/frontend_api.h"
@@ -78,9 +78,8 @@ void getHelp() {
  * @brief 输出 version text
  */
 void getVersion() {
-    cout << "awesome CC compiler 1.0" << endl;
-    cout << "developed by Keyi Li & Hanwen Liu" << endl;
-
+    cout << "LLCC v1.1" << endl;
+    cout << "developed by cjhahaha (https://github.com/cjhahaha/toy-compiler) " << endl;
 }
 
 
@@ -122,6 +121,5 @@ int main(int argc, char * argv[]) {
                 }
             }
         }
-
     }
 }
