@@ -35,7 +35,7 @@ make
 ## 预览
 
 - GUI由@iLHW 开发。
-![preview](/Users/cjhahaha/Workspace/toy-compiler/doc/preview.png)
+![preview](./doc/preview.png)
 
 文档详见 `/doc`.
 
