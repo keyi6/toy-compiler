@@ -3,8 +3,3 @@ language: c++
 install:
   - cmake .
   - make
-
-compiler:
-  - gcc
-  - clang
-
