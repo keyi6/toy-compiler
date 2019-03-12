@@ -24,10 +24,9 @@ void SyntaxAnalyzer::analyze(vector<string> sentences, bool verbose) {
     // 如果能通过词法分析
     la.analyze(sentences, true);
 
-    // oo 需要被包含再类中，所以开头必须是class xxx {，结尾必须是}
-    index = 3;
+    index = 0;
     tokens = la.getAllTokens();
-    len = tokens.size() - 1;
+    len = tokens.size();
 
     try {
         _analyze();
@@ -47,10 +46,6 @@ void SyntaxAnalyzer::analyze(vector<string> sentences, bool verbose) {
  * @brief 进行语法分析
  */
 void SyntaxAnalyzer::_analyze() {
-    // 为了支持oo
-    if (tokens[0].type != TOKEN_TYPE_ENUM::CLASS || tokens[1].type != TOKEN_TYPE_ENUM::IDENTIFIER)
-        throw Error("Everything should be wrapped in a class.", tokens[0].line_number, tokens[0].pos);
-
     tree = new SyntaxTree(new SyntaxTreeNode("Class-" + tokens[1].value, POS(tokens[index])));
 
     // 对语句们分开处理
@@ -100,21 +95,20 @@ SENTENCE_PATTERN_ENUM SyntaxAnalyzer::_judgeSentencePattern() {
         case int(TOKEN_TYPE_ENUM::WHILE):
         case int(TOKEN_TYPE_ENUM::FOR):
             return SENTENCE_PATTERN_ENUM::CONTROL;
-            // 函数声明
-        case int(TOKEN_TYPE_ENUM::PRIVATE):
-        case int(TOKEN_TYPE_ENUM::PUBLIC):
-            return SENTENCE_PATTERN_ENUM::FUNCTION_STATEMENT;
-            // 申明语句
+            // 函数声明 或者 变量申明
         case int(TOKEN_TYPE_ENUM::INT):
         case int(TOKEN_TYPE_ENUM::FLOAT):
         case int(TOKEN_TYPE_ENUM::DOUBLE):
         case int(TOKEN_TYPE_ENUM::CHAR):
+        case int(TOKEN_TYPE_ENUM::VOID):
             if (index + 2 < len && tokens[index + 1].type == TOKEN_TYPE_ENUM::IDENTIFIER) {
                 TOKEN_TYPE_ENUM nn_type = tokens[index + 2].type;
                 if (nn_type == TOKEN_TYPE_ENUM::SEMICOLON ||  // int a;
                     nn_type == TOKEN_TYPE_ENUM::LM_BRACKET || // int a[10];
                     nn_type == TOKEN_TYPE_ENUM::COMMA)        // int a, b;
                     return SENTENCE_PATTERN_ENUM::STATEMENT;
+                else if (nn_type == TOKEN_TYPE_ENUM::LL_BRACKET)
+                    return SENTENCE_PATTERN_ENUM::FUNCTION_STATEMENT;
             }
             // 函数调用 或者 赋值语句
         case int(TOKEN_TYPE_ENUM::IDENTIFIER):
@@ -511,7 +505,6 @@ void SyntaxAnalyzer::_expression(SyntaxTreeNode * father_node, TOKEN_TYPE_ENUM s
  * @brief 处理函数声明
  */
 void SyntaxAnalyzer::_functionStatement(SyntaxTreeNode * father_node) {
-    index ++;
     SyntaxTree * func_state_tree = new SyntaxTree(new SyntaxTreeNode("FunctionStatement", POS(tokens[index])));
     tree -> addNode(func_state_tree -> root, father_node);
 

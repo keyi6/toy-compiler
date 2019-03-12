@@ -15,6 +15,8 @@ aux_source_directory(lib/include LIB_INC)
 add_library(
         llcc_lib
         all_api.h
+        front-end/frontend_api.h
+        back-end/backend_api.h
         ${LIB_SRC} ${LIB_INC}
         ${F_SRC} ${F_INC}
         ${B_SRC} ${B_INC}

@@ -1,5 +1,0 @@
-class Hello {
-	public void main() {
-		print("hello, world");
-	}
-}
