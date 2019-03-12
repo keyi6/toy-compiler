@@ -1,23 +1,21 @@
-# awesomeCC
-awesome C Compiler
-
+# llcc
 ![](https://img.shields.io/badge/language-c++-green.svg)
 ![](https://img.shields.io/badge/license-MIT-blue.svg)
 
-## preview
+[English Document](#Document) 
 
-![preview](./doc/preview.png)
-
-详细请见`/doc`.
-
-## installation
-
-```bash
-cmake .
-make
-```
+[中文文档](#文档) 
 
 
-## TODO
-这个代码太丑了 我要重构一下
 
+## Document
+
+llcc is a light c compiler I made for Compile Principle Course Design.
+
+
+
+
+
+## 文档
+
+llcc 是我在编译原理课程设计中做的 C子集编译器。
