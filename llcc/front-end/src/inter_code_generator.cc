@@ -90,6 +90,7 @@ void InterCodeGenerator::_analyze(SyntaxTreeNode * cur) {
     string name, type;
 
     while (cur) {
+        temp_var_index = 0;
         if (cur -> value == "FunctionStatement") {
             name_tree = cur -> first_son -> right;
             name = name_tree -> first_son -> value;

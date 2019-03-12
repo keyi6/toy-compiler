@@ -2,8 +2,8 @@
  * @file all_api.h
  * @brief api provider
  */
-#ifndef AWESOMECC_ALL_API_H
-#define AWESOMECC_ALL_API_H
+#ifndef LLCC_ALL_API_H
+#define LLCC_ALL_API_H
 
 #include "front-end/include/syntax_analyzer.h"
 #include "front-end/include/inter_code_generator.h"
@@ -46,4 +46,4 @@ inline void compile_and_execute(string path) {
     intp.execute(inter_code_file);
 }
 
-#endif //AWESOMECC_ALL_API_H
+#endif //LLCC_ALL_API_H

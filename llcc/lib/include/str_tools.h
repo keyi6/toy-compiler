@@ -3,8 +3,8 @@
  * @brief 处理字符串的函数们
  */
 
-#ifndef AWESOMECC_STRTOOLS_H
-#define AWESOMECC_STRTOOLS_H
+#ifndef LLCC_STRTOOLS_H
+#define LLCC_STRTOOLS_H
 
 #include "token.h"
 
@@ -134,4 +134,4 @@ inline string token2string(TOKEN_TYPE_ENUM type) {
 }
 
 
-#endif //AWESOMECC_STRTOOLS_H
+#endif //LLCC_STRTOOLS_H

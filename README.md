@@ -1,4 +1,4 @@
-# llcc
+# toy compiler llcc
 ![](https://img.shields.io/badge/language-c++-green.svg)
 ![](https://img.shields.io/badge/license-MIT-blue.svg)
 

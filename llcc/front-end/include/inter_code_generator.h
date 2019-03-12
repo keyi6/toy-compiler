@@ -2,8 +2,8 @@
  * @file inter_code_generator.h
  * @brief 中间代码生成器类
  */
-#ifndef AWESOMECC_INTER_CODE_GENERATOR_H
-#define AWESOMECC_INTER_CODE_GENERATOR_H
+#ifndef LLCC_INTER_CODE_GENERATOR_H
+#define LLCC_INTER_CODE_GENERATOR_H
 
 #define V(x) (x).begin(),(x).end()
 
@@ -122,4 +122,4 @@ public:
 };
 
 
-#endif //AWESOMECC_INNER_CODE_GENERATOR_H
+#endif //LLCC_INNER_CODE_GENERATOR_H

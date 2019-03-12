@@ -3,8 +3,8 @@
  * @brief 处理文件的函数们
  */
 
-#ifndef AWESOMECC_FILE_TOOLS_H
-#define AWESOMECC_FILE_TOOLS_H
+#ifndef LLCC_FILE_TOOLS_H
+#define LLCC_FILE_TOOLS_H
 
 #include "quadruple.h"
 #include "str_tools.h"
@@ -105,4 +105,4 @@ vector<Quadruple> readInterCodeFile(string path) {
     return ret;
 }
 
-#endif //AWESOMECC_FILE_TOOLS_H
+#endif //LLCC_FILE_TOOLS_H

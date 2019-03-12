@@ -22,7 +22,7 @@ SyntaxAnalyzer::SyntaxAnalyzer() = default;
 void SyntaxAnalyzer::analyze(vector<string> sentences, bool verbose) {
     LexicalAnalyzer la;
     // 如果能通过词法分析
-    la.analyze(sentences, true);
+    la.analyze(sentences, false);
 
     index = 0;
     tokens = la.getAllTokens();

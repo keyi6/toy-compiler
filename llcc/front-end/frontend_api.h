@@ -2,8 +2,8 @@
  * @file frontend_api.cc
  * @brief 前段api
  */
-#ifndef AWESOMECC_FRONTEND_API_H
-#define AWESOMECC_FRONTEND_API_H
+#ifndef LLCC_FRONTEND_API_H
+#define LLCC_FRONTEND_API_H
 
 
 #include "../lib/include/file_tools.h"
@@ -40,16 +40,17 @@ inline void parser(string path) {
  * @brief 语义分析 & 中间代码生成，输出好看的中间代码，并生成.ic（inter code）文件
  * @param path 代码文件路径
  */
-inline void code_generator(string path) {
+inline void code_generator(string path, bool save = true) {
     vector<string> source_file = readSourceFile(path);
 
     SyntaxAnalyzer sa;
     sa.analyze(source_file, false);
 
     InterCodeGenerator icg;
-    icg.analyze(sa.getSyntaxTree(), true);
-    icg.saveToFile(path + ".ic");
+    icg.analyze(sa.getSyntaxTree(), false);
+    if (save)
+        icg.saveToFile(path + ".ic");
 }
 
 
-#endif //AWESOMECC_FRONTEND_API_H
+#endif //LLCC_FRONTEND_API_H

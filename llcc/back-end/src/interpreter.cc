@@ -19,9 +19,9 @@ void Interpreter::execute(vector<Quadruple> _code, bool verbose) {
         activity.pop();
 
     // 初始大小 之后动态变换
-    t_size = 100;
+    t_size = 20;
     t_stack.resize(t_size);
-    v_size = 1000;
+    v_size = 100;
     v_stack.resize(v_size);
 
     int code_len = code.size();
@@ -250,7 +250,7 @@ double Interpreter::_getValue(string value_str) {
  */
 void Interpreter::_pop() {
     string res = code[index].res;
-    if (activity.empty()) {cout << "Stackempty!!!\n"; exit(0);}
+    if (activity.empty()) {cout << "Stacks is empty!!!\n"; exit(0);}
     double v = activity.top();
     activity.pop();
 

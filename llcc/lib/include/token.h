@@ -2,8 +2,8 @@
  * @file token.h
  * @brief Token类，用于识别Token
  */
-#ifndef AWESOMECC_TOKEN_HPP
-#define AWESOMECC_TOKEN_HPP
+#ifndef LLCC_TOKEN_HPP
+#define LLCC_TOKEN_HPP
 
 #include <map>
 #include <vector>
@@ -108,4 +108,4 @@ public:
 };
 
 
-#endif //AWESOMECC_TOKEN_HPP
+#endif //LLCC_TOKEN_HPP

@@ -1,4 +1,0 @@
-/Users/cjhahaha/Workspace/toy-compiler/llcc/cmake-build-debug/CMakeFiles/llcc.dir
-/Users/cjhahaha/Workspace/toy-compiler/llcc/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/Users/cjhahaha/Workspace/toy-compiler/llcc/cmake-build-debug/CMakeFiles/edit_cache.dir
-/Users/cjhahaha/Workspace/toy-compiler/llcc/cmake-build-debug/CMakeFiles/llcc_lib.dir

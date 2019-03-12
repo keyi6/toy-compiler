@@ -3,8 +3,8 @@
  * @brief 词法分析器类
  */
 
-#ifndef AWESOMECC_LEXICAL_ANALYZER_HPP
-#define AWESOMECC_LEXICAL_ANALYZER_HPP
+#ifndef LLCC_LEXICAL_ANALYZER_HPP
+#define LLCC_LEXICAL_ANALYZER_HPP
 
 #include "../../lib/include/token.h"
 #include "../../lib/include/error.h"
@@ -49,4 +49,4 @@ public:
 };
 
 
-#endif //AWESOMECC_LEXICAL_ANALYZER_HPP
+#endif //LLCC_LEXICAL_ANALYZER_HPP

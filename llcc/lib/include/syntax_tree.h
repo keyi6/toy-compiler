@@ -2,8 +2,8 @@
  * @file syntax_tree.h
  * @brief 语法树类
  */
-#ifndef AWESOMECC_SYNTAX_TREE_H
-#define AWESOMECC_SYNTAX_TREE_H
+#ifndef LLCC_SYNTAX_TREE_H
+#define LLCC_SYNTAX_TREE_H
 
 #include <vector>
 #include <string>
@@ -44,4 +44,4 @@ public:
     void display(bool verbose = false);
 };
 
-#endif //AWESOMECC_SYNTAX_TREE_H
+#endif //LLCC_SYNTAX_TREE_H

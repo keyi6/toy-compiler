@@ -2,8 +2,8 @@
  * @file virtual_machine.cc
  * @brief 解释执行程序
  */
-#ifndef AWESOMECC_VIRTUAL_MACHINE_H
-#define AWESOMECC_VIRTUAL_MACHINE_H
+#ifndef LLCC_VIRTUAL_MACHINE_H
+#define LLCC_VIRTUAL_MACHINE_H
 
 #include "../../lib/include/str_tools.h"
 #include "../../lib/include/quadruple.h"
@@ -44,4 +44,4 @@ public:
 };
 
 
-#endif //AWESOMECC_VIRTUAL_MACHINE_H
+#endif //LLCC_VIRTUAL_MACHINE_H

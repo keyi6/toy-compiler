@@ -3,8 +3,8 @@
  * @brief 四元式类
  */
 
-#ifndef AWESOMECC_QUADRUPLE_H
-#define AWESOMECC_QUADRUPLE_H
+#ifndef LLCC_QUADRUPLE_H
+#define LLCC_QUADRUPLE_H
 
 #include <map>
 #include <string>
@@ -64,4 +64,4 @@ public:
 };
 
 
-#endif //AWESOMECC_QUADRUPLE_H
+#endif //LLCC_QUADRUPLE_H

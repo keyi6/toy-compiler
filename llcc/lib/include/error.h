@@ -3,8 +3,8 @@
  * @brief 错误类，用于报错
  */
 
-#ifndef AWESOMECC_ERROR_HPP
-#define AWESOMECC_ERROR_HPP
+#ifndef LLCC_ERROR_HPP
+#define LLCC_ERROR_HPP
 
 #include <string>
 using std::string;
@@ -24,4 +24,4 @@ public:
 };
 
 
-#endif //AWESOMECC_ERROR_HPP
+#endif //LLCC_ERROR_HPP

@@ -3,8 +3,8 @@
  * @brief 后端api
  */
 
-#ifndef AWESOMECC_BACKEND_API_H
-#define AWESOMECC_BACKEND_API_H
+#ifndef LLCC_BACKEND_API_H
+#define LLCC_BACKEND_API_H
 
 #include "include/interpreter.h"
 #include "../lib/include/file_tools.h"
@@ -22,4 +22,4 @@ inline void interpreter(string path) {
 
 
 
-#endif //AWESOMECC_BACKEND_API_H
+#endif //LLCC_BACKEND_API_H

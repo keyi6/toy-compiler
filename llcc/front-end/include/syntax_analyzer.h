@@ -2,8 +2,8 @@
  * @file syntax_analyzer.h
  * @brief 语法分析器类，用于生成语法树
  */
-#ifndef AWESOMECC_SYNTAX_ANALYZER_HPP
-#define AWESOMECC_SYNTAX_ANALYZER_HPP
+#ifndef LLCC_SYNTAX_ANALYZER_HPP
+#define LLCC_SYNTAX_ANALYZER_HPP
 
 #include "../../lib/include/str_tools.h"
 #include "../../lib/include/error.h"
@@ -63,4 +63,4 @@ public:
 };
 
 
-#endif //AWESOMECC_SYNTAX_ANALYZER_HPP
+#endif //LLCC_SYNTAX_ANALYZER_HPP
